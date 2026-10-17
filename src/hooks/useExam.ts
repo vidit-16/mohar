@@ -1,0 +1,151 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { Address, Hex } from "viem"
+import {
+  blockTimeMs,
+  deadlineOf,
+  type Exam,
+  groupExams,
+  judge,
+  examRecords,
+  liveClient,
+  openExamFrom,
+  openReveals,
+  type PaperQuestion,
+  type Row,
+  sameAddr,
+  type Verdict,
+} from "../lib/mohar"
+import { errText, EXPLORER } from "../ui/format"
+import { reader } from "./useChain"
+
+export type FeedItem = { id: string; at: number; kind: "witness" | "extend"; who: string; href: string }
+export type LiveState = "connecting" | "live" | "down"
+
+export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]) {
+  const [exam, setExam] = useState<Exam | null>()
+  const [reveals, setReveals] = useState<Row[]>([])
+  const [witnesses, setWitnesses] = useState<Row[]>([])
+  const [cursor, setCursor] = useState<string>()
+  const [error, setError] = useState<string>()
+  const [times, setTimes] = useState<Map<bigint, number>>(new Map())
+  const [feed, setFeed] = useState<FeedItem[]>([])
+  const [live, setLive] = useState<LiveState>("connecting")
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const load = useCallback(async () => {
+    try {
+      const r = await examRecords(reader, examId)
+      setExam(groupExams(r.commits, issuer)[0] ?? openExamFrom(r.entries))
+      setReveals(r.reveals.filter((x) => sameAddr(x.creator, issuer)))
+      setWitnesses(r.witnesses)
+      setCursor(r.next)
+      setError(undefined)
+    } catch (e) {
+      setError(errText(e))
+    }
+  }, [examId, issuer])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const loadMore = useCallback(async () => {
+    if (!cursor) return
+    setLoadingMore(true)
+    try {
+      const next = await examRecords(reader, examId, cursor)
+      setWitnesses((ws) => [...ws, ...next.witnesses])
+      setCursor(next.next)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [cursor, examId])
+
+  useEffect(() => {
+    const blocks = [...(exam?.sets ?? []), ...(exam?.forged ?? []), ...reveals, ...witnesses].map((r) => r.createdAt)
+    const missing = [...new Set(blocks)].filter((b) => !times.has(b))
+    if (missing.length === 0) return
+    let stop = false
+    Promise.all(missing.map(async (b) => [b, await blockTimeMs(reader, b)] as const))
+      .then((pairs) => !stop && setTimes((t) => new Map([...t, ...pairs])))
+      .catch(() => undefined)
+    return () => {
+      stop = true
+    }
+  }, [exam, reveals, witnesses, times])
+
+  const sealed = exam?.kind === "sealed"
+  const paper = useMemo(() => (sealed ? (exam && reveals.length ? openReveals(exam.sets, reveals) : []) : pasted), [sealed, exam, reveals, pasted])
+  const revealMs = sealed && reveals[0] ? times.get(reveals[0].createdAt) : undefined
+  const deadlineMs = exam ? (sealed ? deadlineOf(exam.opensAtMs, revealMs) : exam.opensAtMs) : 0
+  const hasPaper = paper.length > 0
+
+  const verdicts = useMemo(() => {
+    const out = new Map<Hex, Verdict>()
+    if (!exam || (sealed && reveals.length > 0 && revealMs === undefined)) return out
+    for (const w of witnesses) {
+      const t = times.get(w.createdAt)
+      if (t !== undefined) out.set(w.key, judge(w, t, deadlineMs, paper))
+    }
+    return out
+  }, [exam, sealed, reveals.length, revealMs, witnesses, times, deadlineMs, paper])
+
+  const known = useRef(new Set<string>())
+  useEffect(() => {
+    known.current = new Set([...(exam?.sets ?? []), ...reveals, ...witnesses].map((r) => r.key.toLowerCase()))
+  }, [exam, reveals, witnesses])
+
+  useEffect(() => {
+    let pending: ReturnType<typeof setTimeout> | undefined
+    let unwatch: (() => void) | undefined
+    let last = 0
+    const refetch = (ms: number) => {
+      if (pending || document.visibilityState !== "visible") return
+      const wait = Math.max(ms, last + 15_000 - Date.now())
+      pending = setTimeout(() => {
+        pending = undefined
+        last = Date.now()
+        load()
+      }, wait)
+    }
+    try {
+      unwatch = liveClient().watchEntityEvents({
+        // events carry no attributes, so any create on the chain might be ours; refetch at most every 15s
+        onEntityCreated: () => {
+          setLive("live")
+          refetch(4000)
+        },
+        onExpiryExtended: (ev) => {
+          setLive("live")
+          if (!known.current.has(ev.entityKey.toLowerCase())) return
+          setFeed((f) => [{ id: `${ev.transactionHash}${ev.logIndex}`, at: Date.now(), kind: "extend" as const, who: "", href: `${EXPLORER}/tx/${ev.transactionHash}` }, ...f].slice(0, 12))
+          refetch(2500)
+        },
+        onError: () => setLive("down"),
+      })
+      setLive("live")
+    } catch {
+      setLive("down")
+    }
+    return () => {
+      clearTimeout(pending)
+      unwatch?.()
+    }
+  }, [load])
+
+  const seen = useRef<Set<string> | null>(null)
+  useEffect(() => {
+    if (exam === undefined) return
+    if (seen.current === null) {
+      seen.current = new Set(witnesses.map((w) => w.key))
+      return
+    }
+    const fresh = witnesses.filter((w) => !seen.current!.has(w.key))
+    if (fresh.length === 0) return
+    fresh.forEach((w) => seen.current!.add(w.key))
+    setFeed((f) => [...fresh.map((w) => ({ id: w.key, at: Date.now(), kind: "witness" as const, who: w.creator, href: `${EXPLORER}/entity/${w.key}` })), ...f].slice(0, 12))
+  }, [witnesses, exam])
+
+  const status = error && exam === undefined ? "error" : exam === undefined ? "loading" : exam === null ? "missing" : "ready"
+  return { status, error, exam, reveals, witnesses, paper, hasPaper, verdicts, times, revealMs, deadlineMs, cursor, loadMore, loadingMore, reload: load, live, feed } as const
+}
