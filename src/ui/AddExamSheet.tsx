@@ -18,7 +18,7 @@ export function AddExamSheet({ open, onClose, onAdded }: { open: boolean; onClos
   const [notice, setNotice] = useState("")
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string>()
-  const { address, wei, refresh } = useBurnerBalance(open)
+  const { address, wei, refresh, drip } = useBurnerBalance(open)
   const funded = wei !== undefined && wei > 0n
   const opensAtMs = start ? istToMs(start) : NaN
   const now = useNow(10_000)
@@ -59,7 +59,12 @@ export function AddExamSheet({ open, onClose, onAdded }: { open: boolean; onClos
           <input className="input" type="url" value={notice} onChange={(e) => setNotice(e.target.value)} placeholder="https://" />
         </label>
 
-        {!funded && wei !== undefined && (
+        {!funded && drip === "dripping" && (
+                <div className="small fund-steps">
+                  <Spinner size={13} /> {t("w.dripping")}
+                </div>
+              )}
+              {!funded && wei !== undefined && drip === "failed" && (
           <div className="wallet-card wallet-empty">
             <Wallet size={18} />
             <div className="small fund-steps">

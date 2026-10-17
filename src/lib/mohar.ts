@@ -9,7 +9,7 @@ import {
 import { bytes32, i32, str, u64 } from "@arkiv-network/sdk/attr"
 import { tiramisu } from "@arkiv-network/sdk/chains"
 import { and, eq, gte } from "@arkiv-network/sdk/query"
-import { type Address, type Hex, http, webSocket } from "viem"
+import { type Address, fallback, type Hex, http, webSocket } from "viem"
 import { commitHash, questionHash, randomSalt, rootHash, splitQuestions } from "./hash"
 import { type CommitPayload, type ExamSpec, newOpenExamId, type OpenExamPayload, type RevealPayload, type Row, type SealSecrets, type WitnessPayload } from "./rules"
 
@@ -28,9 +28,14 @@ const nodeEnv = (globalThis as { process?: { env: Record<string, string | undefi
 const KEY = viteEnv.VITE_ARKIV_KEY || nodeEnv.ARKIV_KEY
 export const RPC_URL = KEY ? `${tiramisu.rpcUrls.default.http[0]}/${KEY}` : undefined
 
+// The deployed site reads through its own /api/rpc proxy (key stays server-side) and falls back to
+// the public RPC if that's down, so the site never depends on our proxy to show the evidence.
+const viaProxy = Boolean((import.meta as { env?: { PROD?: boolean } }).env?.PROD) && typeof window !== "undefined"
+
 export function publicClient(rpc = RPC_URL): PublicArkivClient {
   // retryCount 0: on a keyless 429 viem would otherwise sit on a ~40 min Retry-After without telling anyone
-  return createPublicClient({ chain: tiramisu, transport: http(rpc, { retryCount: 0 }) })
+  const direct = http(rpc, { retryCount: 0 })
+  return createPublicClient({ chain: tiramisu, transport: viaProxy ? fallback([http("/api/rpc", { retryCount: 0 }), direct], { retryCount: 0 }) : direct })
 }
 
 export function liveClient(): PublicArkivClient {

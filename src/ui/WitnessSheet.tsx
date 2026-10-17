@@ -21,7 +21,7 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string>()
   const [receipt, setReceipt] = useState<{ key: Hex; tx: Hex; at: number }>()
-  const { address, wei, refresh } = useBurnerBalance(open)
+  const { address, wei, refresh, drip } = useBurnerBalance(open)
   const qs = splitQuestions(text)
   const now = useNow(5000)
   const late = now >= deadlineMs
@@ -120,7 +120,12 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
               <div className="muted small">
                 {t("w.walletNote")} <Mono value={address} kind="address" />
               </div>
-              {!funded && wei !== undefined && (
+              {!funded && drip === "dripping" && (
+                <div className="small fund-steps">
+                  <Spinner size={13} /> {t("w.dripping")}
+                </div>
+              )}
+              {!funded && wei !== undefined && drip === "failed" && (
                 <div className="small fund-steps">
                   {t("w.fund")} <CopyButton value={address} label="Copy address" />{" "}
                   <a href={FAUCET} target="_blank" rel="noreferrer">
