@@ -1,6 +1,6 @@
 # Friction report: building Mohar on Arkiv
 
-Everything here is something I actually hit while building Mohar on 17 October 2026, with block numbers or tx hashes where it happened on chain. Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
+Everything here is something I actually hit while building Mohar on 17 October 2026, with block numbers or tx hashes where it happened on chain. Every SDK/RPC item has a script in [`repro/`](repro/) that reproduces it on Tiramisu; I re-ran all of them on 18 October. Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
 
 **Environment:** `@arkiv-network/sdk@0.8.1` (pinned), `viem@2.57.7`, Node 24.19.0, Vite 8, Chrome on Windows 11, Tiramisu testnet (chain 7738577).
 
@@ -37,6 +37,7 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **Actual:** `expiresAt = 1295219`, only about 30 blocks (one minute) more. The lifetime is measured from the block the extension is built on, not from the current expiry. My UI button said "+14d" and was wrong until I caught it.
 - **Workaround (in [`src/lib/mohar.ts`](../src/lib/mohar.ts) `keepAlive`):** `ExpirationTime.atBlock(currentExpiresAt + days * 86400 / blockDuration)`, with `blockDuration` read from `getBlockTiming()` rather than hard-coded. After the fix, the same button moved the witness from 13d 23h to 27d 23h left.
 - **Fix:** add `ExpirationTime.by(lifetime)` (relative to the current expiry), or rename the parameter on extend to make "from now" explicit, and say so in the `extendEntity` JSDoc.
+- **Repro:** `npx tsx arkiv/repro/3-extend-sets-not-adds.ts`. Re-run on 18 Oct: created with `fromDays(14)`, extended with `fromDays(14)`, **gained 3 blocks** (entity `0xcb90b782…`).
 
 ## 4. `predictEntityKeys` is missing from the wallet client
 
@@ -46,6 +47,7 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **Actual:** TypeScript error *Property 'predictEntityKeys' does not exist on type WalletArkivClient*. It exists only on the public client.
 - **Workaround:** a second `createPublicClient` just for key prediction.
 - **Fix:** expose `predictEntityKeys` (and the other read actions) on the wallet client, the way viem's wallet clients can be extended with public actions.
+- **Repro:** `npx tsx arkiv/repro/4-predict-missing-on-wallet.ts` prints `wallet.predictEntityKeys: undefined`, `reader.predictEntityKeys: function`.
 
 ## 5. `readonly` doesn't make an entity undeletable, and there is no flag that does
 
@@ -53,12 +55,14 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **Context:** an exam seal must survive its own issuer. `readonly` blocks patches, but per `src/entity/flags.ts` the owner can still delete.
 - **Workaround:** the seal batch creates the entity and transfers ownership to `0x…dEaD` in the same transaction (predicted keys + `ownershipChanges`). It works (see the smooth paths below), but burning ownership also blocks extension unless `permissionlessExtension` is set. That's fine for Mohar but surprising.
 - **Fix:** an `undeletable` (or `sealed`) creation flag, or a documented "burn ownership" recipe.
+- **Repro:** `npx tsx arkiv/repro/5-readonly-is-deletable.ts`: the patch is rejected (*"was created readonly, so its contents can never change"*), then the owner deletes it anyway (tx `0xcd38ea2a…`).
 
 ## 6. Entity events can't be filtered by attribute
 
 - **Surface:** `watchEntityEvents`
 - **Observation:** `EntityCreated` carries `entityKey`, `owner`, `expiresAt` and `creationFlags`, but no attributes and no project. To show "a new witness for *this* exam" live, the app has to re-run a query after *any* create on the chain. Combined with the keyless read budget (#7) that's dangerous, so Mohar now refetches at most once every 15 seconds, only while the tab is visible, and with a single query.
 - **Fix:** let `watchEntityEvents` take a query predicate (`where(eq("project", …))`), or include attributes in the event.
+- **Repro:** `npx tsx arkiv/repro/6-events-without-attributes.ts`. The event's fields are `type, blockNumber, transactionHash, logIndex, entityKey, owner, expiresAt, creationFlags`; no attributes.
 
 ## 7. Keyless read budget runs out in normal use, and the 429 hides behind a long Retry-After
 
@@ -69,6 +73,7 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **Why it matters:** anyone who clicks around a live app for ten minutes can lock themselves out, and on a shared network (college Wi-Fi, mobile carrier NAT) one heavy user locks everyone out.
 - **What I changed:** one query per exam page instead of four (`project AND exam_id = X`, split by type on the client), live refetch throttled to 15 seconds, the network badge on `eth_blockNumber`, and optional `VITE_ARKIV_KEY` support.
 - **Fix:** put the budget and window on the Tiramisu docs page; have the SDK surface `Arkiv-Quota-Used-Percent` (already in `access-control-expose-headers`) so apps can back off before hitting zero.
+- **Repro:** `npx tsx arkiv/repro/7-keyless-budget.ts` (stops after 5 queries). Two more things it shows: for keyless calls `Arkiv-Quota-Used-Percent` is **empty**, so an app can't see the 10,000-unit budget draining before the 429, and the only `ratelimit` header is a separate 600-per-minute request limit whose `remaining` jumps around (512, 529, 511, 528, 510), which looks like separate counters per backend node.
 
 ---
 
