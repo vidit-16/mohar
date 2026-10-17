@@ -8,6 +8,16 @@ Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.net
 
 **Backup:** https://vidit-16.github.io/mohar/ is the same app as a static copy on GitHub Pages, reading Arkiv directly. If the main site is ever down or blocked, the evidence is still one link away.
 
+<p align="center"><img src="docs/media/home.jpg" alt="Mohar home page: prove who had the paper before the exam" width="900"></p>
+
+| Leak caught on the exam page | The evidence for one witness |
+|---|---|
+| <img src="docs/media/exam.jpg" alt="Exam page in dark mode: leak evidence banner, official seal, witnesses, timeline" width="440"> | <img src="docs/media/evidence.jpg" alt="Evidence drawer: held 3 real questions 2 minutes before the exam" width="440"> |
+| **Exam bodies seal a paper from a CSV** | **One-file checker, no site needed** |
+| <img src="docs/media/issuer.jpg" alt="Issuer console: seal a question paper from a CSV" width="440"> | <img src="docs/media/check.jpg" alt="check.html rebuilding the verdicts in the browser" width="440"> |
+
+<p align="center"><img src="docs/media/exam-hindi-phone.jpg" alt="The exam page in Hindi on a phone" width="260"></p>
+
 ## Why I built this
 
 Paper leaks are basically a recurring event in India now. The Indian Express counted 41 recruitment exam leaks across 15 states in five years, hitting around 1.4 crore applicants. Every time it happens, the argument ends up being about *time*: did this "leaked paper" on Telegram exist before the exam, or did someone make it after?
