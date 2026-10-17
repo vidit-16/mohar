@@ -432,6 +432,15 @@ export function ExamPage({ examId, issuer, issuerName, homeHref }: { examId: str
         </summary>
         <p className="muted small">{t("exam.verifyHint")}</p>
         <div className="verify">
+          <div className="verify-row">
+            <div className="row-between">
+              <b className="small">check.html</b>
+              <a className="btn btn-ghost btn-sm" href={`check.html?exam=${encodeURIComponent(examId)}`} target="_blank" rel="noopener">
+                {t("exam.checker")}
+              </a>
+            </div>
+            <p className="muted small">{t("exam.checkerHint")}</p>
+          </div>
           {(sealed ? (["commits", "reveals", "witnesses"] as const) : (["openExam", "witnesses"] as const)).map((k) => {
             const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "arkiv_query", params: [QUERIES[k](examId), { select: { key: true, creator: true, createdAt: true, attributes: true, payload: true } }] })
             const cmd = `curl -s ${RPC} -H 'content-type: application/json' -d '${body.replace(/'/g, "'\\''")}'`

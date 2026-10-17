@@ -112,6 +112,8 @@ const en = {
   "exam.checkClear": "Clear",
   "exam.verify": "Check it without us",
   "exam.verifyHint": "If this site is ever blocked, the records aren't. Run these against the public network and check who created each record.",
+  "exam.checker": "Open the one-file checker",
+  "exam.checkerHint": "A single page that rebuilds these verdicts in your browser. Save it and it works without this site.",
   "exam.missing": "No official seal for this exam",
   "exam.missingHint": "Nothing matches this ID. If someone sent you this as an \"official\" exam, be careful.",
 
@@ -356,6 +358,8 @@ const hi: Record<Key, string> = {
   "exam.checkClear": "हटाएँ",
   "exam.verify": "हमारे बिना जाँचें",
   "exam.verifyHint": "अगर यह साइट बंद भी हो जाए, रिकॉर्ड नहीं होंगे। इन्हें सार्वजनिक नेटवर्क पर चलाएँ और देखें किसने बनाया।",
+  "exam.checker": "एक-फ़ाइल जाँच खोलें",
+  "exam.checkerHint": "एक ही पेज जो ये नतीजे आपके ब्राउज़र में दोबारा बनाता है। इसे सेव कर लें, यह इस साइट के बिना भी चलेगा।",
   "exam.missing": "इस परीक्षा की कोई आधिकारिक मोहर नहीं",
   "exam.missingHint": "इस ID से कुछ नहीं मिला। अगर किसी ने इसे \"आधिकारिक\" बताकर भेजा है, सावधान रहें।",
 
