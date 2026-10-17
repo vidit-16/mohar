@@ -1,0 +1,32 @@
+
+[09:38:02] 1 SEAL
+  issuer 0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6 sealed 2 sets of DSPSC-PRE26-10170937
+  keys 0x170d8d607143ffed4ce0f39dd458e2964fdef87a69f49df854537fc8506e880f, 0x2ea77ea0c1ff21734a1be9cc10befa4ea11b7356f64cbb331acd5af67e02141e
+  https://tiramisu.explorer.arkiv.network/tx/0xbabd2dab589ca9d03a59081b1e5d0d1bb64f72da32927fdd8dcb0e4985f03c95
+
+[09:38:11] 2 WITNESS (before)
+  witness A sealed 4 question hashes, key 0x518da20dea6de595ad70e631b9263b6d154ad18f235e77c0869be83fc7429d6a
+  https://tiramisu.explorer.arkiv.network/tx/0x5a61a269c1204fadde52d6c5f7f6740f30949184cf95de1718c81d5cfa18b0fc
+
+[09:38:19] 3 FORGED SEAL
+  wallet 0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013 wrote a look-alike commit
+  https://tiramisu.explorer.arkiv.network/tx/0xcc102dd00f903a8c47a399e2471e3b0352a9229d8c21977b820d4513889331b6
+
+[09:38:19] … waiting
+  159 s until the exam opens
+
+[09:41:04] 4 REVEAL
+  all 2 sets revealed in one transaction
+  https://tiramisu.explorer.arkiv.network/tx/0x236bd1ade0b8efe84f20e075e0d874e1df70feeae539c05a0cec635391849aa7
+
+[09:41:10] 5 WITNESS (after)
+  witness B sealed 1 hash after the exam opened, key 0x0dbab71656f2258d061350996188d49fb80d7e5283821a68345f3021741ce339
+  https://tiramisu.explorer.arkiv.network/tx/0xf1c9cefac67fc4f7c2c796a9309274a8a1ed857abaa65310dfc92edd734596de
+
+[09:41:11] 6 VERIFY
+  2 trusted sets, 1 forged look-alike(s) ignored, 10/10 revealed questions match their seal
+  witness 0x0dbab716… by 0xCf1bbb… at block 690151: AFTER the exam, 1/1 match official B-Q3
+  witness 0x518da20d… by 0xA1BeFA… at block 690061: BEFORE the exam, 3/4 match official A-Q2, A-Q4, A-Q5
+
+Open the site with ?exam=DSPSC-PRE26-10170937
+EXIT 0
