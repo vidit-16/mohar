@@ -24,7 +24,7 @@ witness hash  = sha256(utf8(normalise(question)))
 commit hash   = sha256(utf8(salt + "|" + normalise(question)))     // salt is the 0x-prefixed hex string
 ```
 
-[`verify.mjs`](../verify.mjs) is a dependency-free reference implementation, and a test checks it against the app on 2000 random mixed-script strings.
+[`verify.mjs`](../verify/verify.mjs) is a dependency-free reference implementation, and a test checks it against the app on 2000 random mixed-script strings.
 
 ## Recipes
 
@@ -43,7 +43,7 @@ curl -s https://rpc.tiramisu.db-chain.testnet.arkiv.network -H 'content-type: ap
 project = str('mohar-v1') AND opens_at_ms >= u64(<now>) AND opens_at_ms <= u64(<now + 30d>)
 ```
 
-**Verdicts without this repo:** `node verify.mjs <exam-id> [issuer] [--paper official.txt]`
+**Verdicts without this repo:** `npx mohar-verify <exam-id> [issuer] [--paper official.txt]`, or open [`check.html`](../public/check.html) in any browser
 
 **Examples you can run as-is** (Node 18+, no install):
 

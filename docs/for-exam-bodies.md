@@ -58,7 +58,7 @@ It refuses to run before the announced start. All sets are revealed in one trans
 
 **After the exam**
 
-The exam page now shows every witness: who held real questions before the start, which rumours were fake, and which claims came too late. Link it from your notice board; it works without our site too (`node verify.mjs <exam-id>`).
+The exam page now shows every witness: who held real questions before the start, which rumours were fake, and which claims came too late. Link it from your notice board; it works without our site too (`npx mohar-verify <exam-id>`, or the one-file `check.html`).
 
 ## Things to know
 

@@ -104,7 +104,7 @@ describe("bilingual paper sealed from a CSV", () => {
 
 describe("verify.mjs parity on live data", () => {
   it("prints the same verdicts as the app", () => {
-    const out = execFileSync(process.execPath, ["verify.mjs", HELD], { env: { ...process.env, ...(RPC_URL ? { ARKIV_RPC: RPC_URL } : {}) }, encoding: "utf8" })
+    const out = execFileSync(process.execPath, ["verify/verify.mjs", HELD], { env: { ...process.env, ...(RPC_URL ? { ARKIV_RPC: RPC_URL } : {}) }, encoding: "utf8" })
     expect(out).toContain("2 set(s) by 0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6, 1 look-alike(s)")
     expect(out).toContain("10/10 questions match the seal")
     expect(out).toMatch(/BEFORE: LEAK A-Q2, A-Q4, A-Q5/)

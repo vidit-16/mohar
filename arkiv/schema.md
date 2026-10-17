@@ -1,7 +1,7 @@
 # Mohar data model
 
 Network: Tiramisu (chain 7738577). SDK: `@arkiv-network/sdk@0.8.1`, pinned exactly. Every entity has `project = 'mohar-v1'`.
-All reads and writes live in [`src/lib/mohar.ts`](../src/lib/mohar.ts). The zero-dependency verifier [`verify.mjs`](../verify.mjs) re-implements the reads from raw JSON-RPC.
+All reads and writes live in [`src/lib/mohar.ts`](../src/lib/mohar.ts). The zero-dependency verifier [`verify.mjs`](../verify/verify.mjs) re-implements the reads from raw JSON-RPC.
 
 The model answers three questions:
 
@@ -125,7 +125,7 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 | Duplicate open-exam entry with a different start time | First entry by `createdAt` wins; later ones are listed as conflicts. |
 | Guessing what a witness holds from their hashes | Hashes are of single questions, so someone who already has the paper can check them. Before the exam that lets the exam body see its real questions circulating, which works as an early warning. Witnesses use burner wallets, so nothing links back to a person. |
 | Witness evidence expires during a dispute | Anyone can extend a witness (`permissionlessExtension`), and the creation tx stays in history regardless. |
-| This website is blocked or taken down | Every exam page has raw `curl` commands, and `node verify.mjs <exam-id>` rebuilds every verdict from the public RPC with zero dependencies. |
+| This website is blocked or taken down | Every exam page has raw `curl` commands, and `npx mohar-verify <exam-id>` rebuilds every verdict from the public RPC with zero dependencies. |
 
 Known limits: matching is exact after normalisation, so a reworded or translated question won't match. Tiramisu is a single-sequencer testnet, so time is only as trustworthy as its sequencing.
 

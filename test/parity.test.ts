@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { readFileSync } from "node:fs"
 import { normalise, questionHash, splitQuestions } from "../src/lib/hash"
 // @ts-expect-error plain JS on purpose, it has to run with zero dependencies
-import * as standalone from "../verify.mjs"
+import * as standalone from "../verify/verify.mjs"
 
 // verify.mjs re-implements the rules so it can run without this repo; it must never drift from the app
 const corpus = [

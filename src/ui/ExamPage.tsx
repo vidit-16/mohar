@@ -456,10 +456,10 @@ export function ExamPage({ examId, issuer, issuerName, homeHref }: { examId: str
           })}
           <div className="verify-row">
             <div className="row-between">
-              <b className="small">verify.mjs</b>
-              <CopyButton value={`node verify.mjs ${examId}`} label="Copy command" />
+              <b className="small">mohar-verify</b>
+              <CopyButton value={`npx mohar-verify ${examId}`} label="Copy command" />
             </div>
-            <pre className="code">node verify.mjs {examId}</pre>
+            <pre className="code">npx mohar-verify {examId}</pre>
           </div>
         </div>
       </details>

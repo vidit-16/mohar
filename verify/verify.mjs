@@ -3,12 +3,13 @@
 // Zero dependencies on purpose: copy this one file anywhere with Node 18+ and run it,
 // even if the website and this repo are gone.
 //
-//   node verify.mjs <exam-id> [issuer-address] [--paper paper.txt]
+//   npx mohar-verify <exam-id> [issuer-address] [--paper paper.txt]
+//   node verify.mjs <exam-id> ...   (same thing, from a copy of this file)
 //
 // For an open exam (no issuer seal), pass the official paper as a text file, one question per line.
 
 import { createHash } from "node:crypto"
-import { readFileSync } from "node:fs"
+import { readFileSync, realpathSync } from "node:fs"
 import { pathToFileURL } from "node:url"
 
 const RPC = process.env.ARKIV_RPC ?? "https://rpc.tiramisu.db-chain.testnet.arkiv.network"
@@ -42,7 +43,7 @@ async function main() {
   const paperFile = paperAt >= 0 ? args.splice(paperAt, 2)[1] : undefined
   const [examId, issuer = DEFAULT_ISSUER] = args
   if (!examId) {
-    console.error("usage: node verify.mjs <exam-id> [issuer-address] [--paper paper.txt]")
+    console.error("usage: mohar-verify <exam-id> [issuer-address] [--paper paper.txt]")
     process.exit(1)
   }
 
@@ -101,4 +102,5 @@ async function main() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main()
+// realpath: npx runs the file through a symlink in node_modules/.bin
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) await main()
