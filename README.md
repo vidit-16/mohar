@@ -2,7 +2,7 @@
 
 Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.network).
 
-**Live:** https://vidit-16.github.io/mohar/ (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
+**Live:** https://mohar-in.vercel.app (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
 
 ## Why I built this
 

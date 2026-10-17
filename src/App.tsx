@@ -90,7 +90,6 @@ function Footer() {
     <footer className="footer">
       <div className="container footer-inner">
         <Wordmark size={22} />
-        <span className="muted small">{t("footer.demo")}</span>
         <span className="grow" />
         <a href={REPO}>{t("footer.source")}</a>
         <a href={`${REPO}/blob/main/arkiv/schema.md`}>{t("footer.data")}</a>

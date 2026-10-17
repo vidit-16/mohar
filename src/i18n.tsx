@@ -57,7 +57,6 @@ const en = {
 
   "footer.source": "Source",
   "footer.data": "Data model",
-  "footer.demo": "Testnet demo · synthetic data",
 
   "exam.back": "All exams",
   "exam.witness": "Witness a leak",
@@ -270,7 +269,6 @@ const hi: Record<Key, string> = {
 
   "footer.source": "सोर्स",
   "footer.data": "डेटा मॉडल",
-  "footer.demo": "टेस्टनेट डेमो · काल्पनिक डेटा",
 
   "exam.back": "सभी परीक्षाएँ",
   "exam.witness": "लीक की गवाही दें",

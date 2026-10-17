@@ -46,7 +46,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
   return (
     <>
-      <section className="hero">
+      <section className="hero bleed">
         <div className="hero-copy">
           <div className="eyebrow">
             <Mark size={18} />
@@ -70,7 +70,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         </div>
       </section>
 
-      <section className="proof" data-tour="proof">
+      <section className="proof bleed" data-tour="proof">
         <div>
           <b>41</b>
           <span>{t("proof.leaks")}</span>
@@ -194,7 +194,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         </div>
       </section>
 
-      <section className="section trust" data-tour="trust">
+      <section className="section trust band bleed" data-tour="trust">
         <h2>{t("trust.title")}</h2>
         <ul className="trust-grid">
           <li>
