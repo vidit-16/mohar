@@ -9,10 +9,11 @@ export default defineConfig({
   workers: 2,
   fullyParallel: false,
   reporter: [["list"]],
-  use: { baseURL: "http://localhost:4174", channel: "chrome", trace: "retain-on-failure" },
+  use: { baseURL: process.env.E2E_BASE_URL ?? "http://localhost:4174", channel: "chrome", trace: "retain-on-failure" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], channel: "chrome" } },
     { name: "phone", use: { ...devices["Pixel 7"], channel: "chrome" } },
   ],
-  webServer: { command: "npx vite preview --port 4174 --strictPort", url: "http://localhost:4174", reuseExistingServer: true },
+  // E2E_BASE_URL=https://mohar-in.vercel.app runs the same suite against production
+  webServer: process.env.E2E_BASE_URL ? undefined : { command: "npx vite preview --port 4174 --strictPort", url: "http://localhost:4174", reuseExistingServer: true },
 })

@@ -19,7 +19,8 @@
     "test:chain": "vitest run --config vitest.chain.config.ts",
     "test:e2e": "npm run build && playwright test",
     "seal": "tsx scripts/seal.ts",
-    "reveal": "tsx scripts/reveal.ts"
+    "reveal": "tsx scripts/reveal.ts",
+    "test:e2e:prod": "E2E_BASE_URL=https://mohar-in.vercel.app playwright test"
   },
   "dependencies": {
     "@arkiv-network/sdk": "0.8.1",

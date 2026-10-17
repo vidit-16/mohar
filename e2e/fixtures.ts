@@ -6,7 +6,8 @@ import { POST as rpc } from "../api/rpc"
 // /api/drip is stubbed: the live drip is covered by the chain tests and shouldn't spend GLM per run.
 export const test = base.extend({
   page: async ({ page }, provide) => {
-    await page.route("**/api/rpc", async (route) => {
+    // production has the real functions; locally, vite preview doesn't, so serve the same handler
+    if (!process.env.E2E_BASE_URL) await page.route("**/api/rpc", async (route) => {
       const req = route.request()
       const res = await rpc(new Request("http://local/api/rpc", { method: "POST", headers: { "content-type": "application/json" }, body: req.postData() ?? "" }))
       await route.fulfill({ status: res.status, contentType: "application/json", body: await res.text() })
