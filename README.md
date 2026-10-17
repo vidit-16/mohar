@@ -71,7 +71,7 @@ Optional: put an Arkiv access key in `.env` as `VITE_ARKIV_KEY` (site) and `ARKI
 
 ### For exam bodies
 
-Seal a real paper from a CSV (bilingual papers supported) and reveal it at the exam:
+Seal a real paper from a CSV (bilingual papers supported) and reveal it at the exam, either in the browser at **[/?issue=1](https://mohar-in.vercel.app/?issue=1)** (MetaMask or the browser's own wallet) or from the command line:
 
 ```sh
 npm run seal -- paper.csv --exam-id UPPSC-PRE-2026-S1 --title "UPPSC Prelims 2026" --opens 2026-11-02T09:30+05:30

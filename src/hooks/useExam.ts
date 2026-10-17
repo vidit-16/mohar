@@ -31,6 +31,7 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   const [times, setTimes] = useState<Map<bigint, number>>(new Map())
   const [feed, setFeed] = useState<FeedItem[]>([])
   const [live, setLive] = useState<LiveState>("connecting")
+  const [attempt, setAttempt] = useState(0)
   const [loadingMore, setLoadingMore] = useState(false)
 
   const apply = useCallback(
@@ -122,10 +123,17 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
       }, wait)
     }
     let unwatchBlocks: (() => void) | undefined
+    let retry: ReturnType<typeof setTimeout> | undefined
+    // a rate-limited or dropped socket shouldn't leave the page offline for good: resubscribe with backoff
+    const down = () => {
+      setLive("down")
+      if (retry || attempt >= 6) return
+      retry = setTimeout(() => setAttempt((a) => a + 1), Math.min(60_000, 5000 * 2 ** attempt))
+    }
     try {
       const client = liveClient()
       // "Connected" means blocks are actually arriving over the socket, not just that we asked
-      unwatchBlocks = watchBlockNumber(client, { onBlockNumber: () => setLive("live"), onError: () => setLive("down") })
+      unwatchBlocks = watchBlockNumber(client, { onBlockNumber: () => setLive("live"), onError: down })
       unwatch = client.watchEntityEvents({
         // events carry no attributes, so any create on the chain might be ours; refetch at most every 15s
         onEntityCreated: () => {
@@ -138,17 +146,18 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
           setFeed((f) => [{ id: `${ev.transactionHash}${ev.logIndex}`, at: Date.now(), kind: "extend" as const, who: "", href: `${EXPLORER}/tx/${ev.transactionHash}` }, ...f].slice(0, 12))
           refetch(2500)
         },
-        onError: () => setLive("down"),
+        onError: down,
       })
     } catch {
-      Promise.resolve().then(() => setLive("down"))
+      Promise.resolve().then(down)
     }
     return () => {
       clearTimeout(pending)
+      clearTimeout(retry)
       unwatch?.()
       unwatchBlocks?.()
     }
-  }, [load])
+  }, [load, attempt])
 
   const seen = useRef<Set<string> | null>(null)
   useEffect(() => {

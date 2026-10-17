@@ -10,5 +10,13 @@ const mount = () =>
     </StrictMode>,
   )
 
-// index.html ships a static nav + headline; let the browser paint it before React takes over
-requestAnimationFrame(() => setTimeout(mount, 0))
+// index.html ships a static nav + headline; let the browser paint it before React takes over.
+// Background tabs don't run animation frames, so a timer makes sure the app still starts there.
+let started = false
+const start = () => {
+  if (started) return
+  started = true
+  mount()
+}
+requestAnimationFrame(() => setTimeout(start, 0))
+setTimeout(start, 200)

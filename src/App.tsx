@@ -10,6 +10,7 @@ import { Wordmark } from "./ui/brand"
 import { ExamPage } from "./ui/ExamPage"
 import { EXPLORER, REPO } from "./ui/format"
 import { Home } from "./ui/Home"
+import { IssuerPage } from "./ui/IssuerPage"
 import { ToastHost } from "./ui/primitives"
 import { Tour } from "./ui/Tour"
 
@@ -39,7 +40,13 @@ function Shell() {
       </a>
       <Nav home={home} />
       <main id="main" className="container">
-        {examId ? <ExamPage key={examId} examId={examId} issuer={issuer} issuerName={issuerName} homeHref={home} /> : <Home issuer={issuer} issuerName={issuerName} />}
+        {params.has("issue") ? (
+          <IssuerPage homeHref={home} />
+        ) : examId ? (
+          <ExamPage key={examId} examId={examId} issuer={issuer} issuerName={issuerName} homeHref={home} />
+        ) : (
+          <Home issuer={issuer} issuerName={issuerName} />
+        )}
       </main>
       <Footer />
       <Tour search={search} />

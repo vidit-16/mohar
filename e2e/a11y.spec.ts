@@ -7,6 +7,7 @@ const pages = [
   ["held exam", "/?exam=DSPSC-PRE26-10170937"],
   ["upcoming exam", "/?exam=DSPSC-PRE26-U10170941"],
   ["open exam", "/?exam=open-demo-mock-test-open-exam-e96c10"],
+  ["issuer console", "/?issue=1"],
   ["evidence drawer", "/?exam=DSPSC-PRE26-10170937&w=0x518da20dea6de595ad70e631b9263b6d154ad18f235e77c0869be83fc7429d6a"],
 ] as const
 

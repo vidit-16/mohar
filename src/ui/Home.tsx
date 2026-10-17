@@ -224,9 +224,14 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         <div>
           <h2>{t("bodies.title")}</h2>
           <p className="muted">{t("bodies.lead")}</p>
-          <a className="btn btn-secondary" href={examHref(DEMO_EXAM)}>
-            {t("bodies.demo")} <ArrowRight size={16} />
-          </a>
+          <div className="row-gap">
+            <a className="btn btn-primary" href="?issue=1">
+              <Stamp size={16} /> {t("iss.nav")}
+            </a>
+            <a className="btn btn-secondary" href={examHref(DEMO_EXAM)}>
+              {t("bodies.demo")} <ArrowRight size={16} />
+            </a>
+          </div>
         </div>
         <pre className="code">
           git clone {REPO}

@@ -21,6 +21,11 @@ The paper itself is never published before the exam, not even encrypted. Only sa
 
 **T − 24h to T − 1h: seal**
 
+Two ways to do it, same result on chain:
+
+- **In the browser:** open [mohar-in.vercel.app/?issue=1](https://mohar-in.vercel.app/?issue=1), connect MetaMask (a hardware wallet behind MetaMask works) or use the browser's own wallet, paste or upload the CSV, and click *Seal paper*. The salts file downloads straight away. The paper text never leaves your machine before the reveal.
+- **From the command line**, for air-gapped or scripted setups:
+
 Export the paper as `set,question`, one row per question, in printed order. Bilingual papers: give each language its own set code (`A-en`, `A-hi`) so a leak in either language matches.
 
 ```csv
@@ -42,6 +47,8 @@ This writes one sealed record per set, read-only and with ownership burned in th
 - don't run the reveal from a machine that's online before the exam
 
 **T = 0: reveal**
+
+In the browser: *Reveal* tab, load the salts file, click *Reveal paper* (it stays disabled until the announced start). Or:
 
 ```sh
 npm run reveal -- secrets/UPPSC-PRE-2026-S1.json

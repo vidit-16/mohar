@@ -10,7 +10,8 @@ import { createWalletClient } from "@arkiv-network/sdk"
 import { tiramisu } from "@arkiv-network/sdk/chains"
 import { type Hex, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import { type PaperSet, sealExam } from "../src/lib/mohar"
+import { parsePaperCsv } from "../src/lib/csv"
+import { sealExam } from "../src/lib/mohar"
 
 const args = process.argv.slice(2)
 const flag = (name: string) => {
@@ -30,22 +31,7 @@ if (!Number.isFinite(opensAtMs) || opensAtMs <= Date.now()) throw new Error("--o
 if (!/^[A-Za-z0-9._-]{3,100}$/.test(examId)) throw new Error("--exam-id: letters, digits, . _ - only")
 if (existsSync(`secrets/${examId}.json`)) throw new Error(`secrets/${examId}.json already exists; this exam was sealed before`)
 
-export function parseCsv(text: string): PaperSet[] {
-  const rows = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim())
-  if (!/^set\s*,\s*question/i.test(rows.shift() ?? "")) throw new Error('first line must be "set,question"')
-  const sets = new Map<string, string[]>()
-  for (const [n, row] of rows.entries()) {
-    const comma = row.indexOf(",")
-    if (comma < 1) throw new Error(`line ${n + 2}: expected "set,question"`)
-    const code = row.slice(0, comma).trim()
-    const question = row.slice(comma + 1).trim().replace(/^"(.*)"$/s, "$1").replace(/""/g, '"')
-    if (!question) throw new Error(`line ${n + 2}: empty question`)
-    sets.set(code, [...(sets.get(code) ?? []), question])
-  }
-  return [...sets].map(([code, questions]) => ({ code, questions }))
-}
-
-const sets = parseCsv(readFileSync(file, "utf8"))
+const sets = parsePaperCsv(readFileSync(file, "utf8"))
 const key = process.env.ISSUER_KEY as Hex
 if (!key) throw new Error("ISSUER_KEY missing from .env")
 const issuer = createWalletClient({ chain: tiramisu, transport: http(), account: privateKeyToAccount(key) })
