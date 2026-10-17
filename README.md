@@ -107,7 +107,7 @@ node verify.mjs <open-exam-id> --paper official-paper.txt
 
 ## Building on it
 
-The data model is in [`arkiv/schema.md`](arkiv/schema.md): entity types, attributes, lifetimes and the exact queries. A coaching institute, a newsroom or anyone else can read Mohar's records, or write their own witnesses and open exams, without asking anyone. `verify.mjs` is a working reference reader in about 100 lines.
+Everything is public and documented, so nobody needs permission. Start with **[docs/build-on-mohar.md](docs/build-on-mohar.md)**: the data contract, the hashing rules, `curl` recipes and two zero-dependency examples (a witness counter and a leak-alert feed for coaching institutes). Payloads have a [JSON Schema](arkiv/schemas/payloads.schema.json) that's tested against every record on chain, and `verify.mjs` is a reference reader in about 100 lines. See [CONTRIBUTING.md](CONTRIBUTING.md) to work on the code.
 
 ## Data
 

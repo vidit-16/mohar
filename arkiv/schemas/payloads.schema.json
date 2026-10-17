@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vidit-16/mohar/blob/main/arkiv/schemas/payloads.schema.json",
+  "title": "Mohar v1 payloads",
+  "description": "JSON payloads of every Mohar entity on Arkiv (project = 'mohar-v1'). Attributes are documented in arkiv/schema.md. Breaking changes ship as a new project label (mohar-v2), never in place.",
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^0x[0-9a-f]{64}$" },
+    "paper_commit": {
+      "type": "object",
+      "required": ["v", "title", "commits"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "const": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "commits": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/hash" }, "description": "sha256(salt + '|' + normalise(question)) per question, in paper order" }
+      }
+    },
+    "reveal": {
+      "type": "object",
+      "required": ["v", "salts", "questions"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "const": 1 },
+        "salts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/hash" } },
+        "questions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "open_exam": {
+      "type": "object",
+      "required": ["v", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "const": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "notice": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "witness": {
+      "type": "object",
+      "required": ["v", "hashes"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "const": 1 },
+        "hashes": { "type": "array", "minItems": 1, "maxItems": 500, "items": { "$ref": "#/$defs/hash" }, "description": "sha256(normalise(question)) per question held" }
+      }
+    }
+  }
+}
