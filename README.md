@@ -4,6 +4,8 @@ Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.net
 
 **Live:** https://mohar-in.vercel.app (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
 
+**Backup:** https://vidit-16.github.io/mohar/ is the same app as a static copy on GitHub Pages, reading Arkiv directly. If the main site is ever down or blocked, the evidence is still one link away.
+
 ## Why I built this
 
 Paper leaks are basically a recurring event in India now. The Indian Express counted 41 recruitment exam leaks across 15 states in five years, hitting around 1.4 crore applicants. Every time it happens, the argument ends up being about *time*: did this "leaked paper" on Telegram exist before the exam, or did someone make it after?
@@ -109,7 +111,7 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 
 Lighthouse on the live site: desktop **98** performance, mobile (simulated slow 4G) **80**; **100** accessibility, best practices and SEO on both; layout shift ~0. `npm run test:e2e:prod` runs the whole e2e + accessibility suite against production.
 
-CI runs lint (zero warnings), unit tests and the build on every push.
+CI runs lint (zero warnings), unit tests and the build on every push. CodeQL (security-extended) scans every push to main and once a week.
 
 ### Check everything without the site
 
