@@ -141,4 +141,4 @@ test/                 unit tests
 arkiv/                schema.md, friction.md, demo transcript
 ```
 
-MIT license.
+MIT license. Issues and pull requests welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
