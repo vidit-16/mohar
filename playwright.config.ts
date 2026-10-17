@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test"
 
 // runs the production build in the system Chrome against live Tiramisu data (read-only, nothing is written)
 export default defineConfig({
-  testDir: "e2e",
+  testDir: "test/e2e",
   timeout: 60_000,
   expect: { timeout: 20_000 },
   retries: 1,

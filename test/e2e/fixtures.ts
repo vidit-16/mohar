@@ -1,6 +1,6 @@
 import "dotenv/config"
 import { test as base } from "@playwright/test"
-import { POST as rpc } from "../api/rpc"
+import { POST as rpc } from "../../api/rpc"
 
 // vite preview has no serverless functions, so serve /api/rpc with the real handler (same code Vercel runs).
 // /api/drip is stubbed: the live drip is covered by the chain tests and shouldn't spend GLM per run.
