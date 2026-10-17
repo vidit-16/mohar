@@ -36,3 +36,13 @@ describe("commitHash", () => {
     expect(commitHash("0x01", q)).not.toBe(questionHash(q))
   })
 })
+
+describe("Hindi question numbering", () => {
+  const plain = "किस नदी को दक्षिण गंगा कहा जाता है?"
+  it.each(["प्रश्न 1. ", "प्रश्न १। ", "प्र. 3) ", "प्र 12 ", "(४) ", "१. ", "Q No. 7: ", "No. 7) "])("strips %j", (prefix) => {
+    expect(questionHash(prefix + plain)).toBe(questionHash(plain))
+  })
+  it("keeps a number that is part of the question", () => {
+    expect(normalise("1857 का विद्रोह कहाँ शुरू हुआ?")).toBe("1857 का विद्रोह कहाँ शुरू हुआ")
+  })
+})

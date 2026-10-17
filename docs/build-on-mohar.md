@@ -16,7 +16,7 @@ So your hashes match everyone else's:
 
 ```js
 normalise = (t) => t.normalize("NFKC").toLowerCase()
-  .replace(/^\s*(q(uestion)?\s*)?\(?\d{1,3}[).:-]?\s+/u, "")   // leading "Q4)", "12.", "(3)"
+  .replace(/^\s*(q(uestion)?\s*|प्रश्न\s*|प्र\.?\s*)?(no\.?\s*)?\(?[0-9०-९]{1,3}[).:।-]?\s+/u, "")   // leading "Q4)", "12.", "(3)", "प्रश्न ४।"
   .replace(/[^\p{L}\p{N}\p{M}]+/gu, " ")                         // keep letters, digits, Indic marks
   .trim()
 

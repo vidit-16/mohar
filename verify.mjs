@@ -16,7 +16,7 @@ const DEFAULT_ISSUER = "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6"
 
 export const sha = (s) => "0x" + createHash("sha256").update(s, "utf8").digest("hex")
 export const normalise = (t) =>
-  t.normalize("NFKC").toLowerCase().replace(/^\s*(q(uestion)?\s*)?\(?\d{1,3}[).:-]?\s+/u, "").replace(/[^\p{L}\p{N}\p{M}]+/gu, " ").trim()
+  t.normalize("NFKC").toLowerCase().replace(/^\s*(q(uestion)?\s*|प्रश्न\s*|प्र\.?\s*)?(no\.?\s*)?\(?[0-9०-९]{1,3}[).:।-]?\s+/u, "").replace(/[^\p{L}\p{N}\p{M}]+/gu, " ").trim()
 export const lines = (t) => t.split(/\r?\n/).map((l) => l.trim()).filter((l) => normalise(l))
 const same = (a, b) => a?.toLowerCase() === b?.toLowerCase()
 
