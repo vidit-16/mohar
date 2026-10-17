@@ -87,6 +87,21 @@ describe("open demo exam", () => {
   })
 })
 
+describe("bilingual paper sealed from a CSV", () => {
+  it("matches a witness who pasted the Hindi version with Hindi numbering", async () => {
+    const data = await examRecords(client, "DEMO-BILINGUAL-2")
+    const [exam] = groupExams(data.commits, ISSUER)
+    expect(exam.sets.map((s) => s.attrs.set_code)).toEqual(["A-en", "A-hi"])
+    const reveals = data.reveals.filter((r) => sameAddr(r.creator, ISSUER))
+    const paper = openReveals(exam.sets, reveals)
+    expect(paper.every((q) => q.sealed)).toBe(true)
+    const deadline = deadlineOf(exam.opensAtMs, await blockTimeMs(client, reveals[0].createdAt))
+    const [v] = await Promise.all(data.witnesses.map(async (w) => judge(w, await blockTimeMs(client, w.createdAt), deadline, paper)))
+    expect(v.before).toBe(true)
+    expect(v.matches.map((m) => `${m.set}-Q${m.index}`)).toEqual(["A-hi-Q1"])
+  })
+})
+
 describe("verify.mjs parity on live data", () => {
   it("prints the same verdicts as the app", () => {
     const out = execFileSync(process.execPath, ["verify.mjs", HELD], { env: { ...process.env, ...(RPC_URL ? { ARKIV_RPC: RPC_URL } : {}) }, encoding: "utf8" })

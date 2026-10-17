@@ -69,6 +69,17 @@ npm test        # normaliser, seal checks, deadline rules, open-exam conflicts
 
 Optional: put an Arkiv access key in `.env` as `VITE_ARKIV_KEY` (site) and `ARKIV_KEY` (scripts). Without one, reads are capped at about 100 queries per IP (see [friction #7](arkiv/friction.md)).
 
+### For exam bodies
+
+Seal a real paper from a CSV (bilingual papers supported) and reveal it at the exam:
+
+```sh
+npm run seal -- paper.csv --exam-id UPPSC-PRE-2026-S1 --title "UPPSC Prelims 2026" --opens 2026-11-02T09:30+05:30
+npm run reveal -- secrets/UPPSC-PRE-2026-S1.json   # refuses to run before the start
+```
+
+The runbook, salt handling and key safety are in **[docs/for-exam-bodies.md](docs/for-exam-bodies.md)**.
+
 ### Run the whole flow on chain yourself (~4 min)
 
 ```sh
