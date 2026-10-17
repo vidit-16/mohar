@@ -1,5 +1,7 @@
 # Mohar (मोहर)
 
+[![ci](https://github.com/vidit-16/mohar/actions/workflows/ci.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/ci.yml) [![codeql](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml) [![pages](https://github.com/vidit-16/mohar/actions/workflows/pages.yml/badge.svg)](https://vidit-16.github.io/mohar/) [![license: MIT](https://img.shields.io/badge/license-MIT-b4532a.svg)](LICENSE)
+
 Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.network).
 
 **Live:** https://mohar-in.vercel.app (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
