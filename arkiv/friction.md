@@ -108,6 +108,19 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 | Reads from a static site | `select(...).where(...).fetch()` from the browser, no backend | Worked first time; now 1 query per exam page (see #7 for the budget) |
 | Shipped TypeScript source | `node_modules/@arkiv-network/sdk/src` | The fastest documentation available: flag semantics, expiry helpers and query rendering were all clearer there than in the docs |
 
+## What writes cost (real receipts)
+
+From the demo run in [`demo-run.txt`](demo-run.txt), read back with `eth_getTransactionReceipt` on 18 Oct. Gas price was 1 gwei on every one.
+
+| Write | Gas used | Test GLM | Calldata |
+|---|---|---|---|
+| Seal: 2 sets + ownership burn, one batch ([`0xbabd2dab…`](https://tiramisu.explorer.arkiv.network/tx/0xbabd2dab589ca9d03a59081b1e5d0d1bb64f72da32927fdd8dcb0e4985f03c95)) | 293,664 | 0.00029 | 5,764 B |
+| Reveal: 2 sets, 10 questions, one batch ([`0x236bd1ad…`](https://tiramisu.explorer.arkiv.network/tx/0x236bd1ade0b8efe84f20e075e0d874e1df70feeae539c05a0cec635391849aa7)) | 272,432 | 0.00027 | 5,188 B |
+| Witness, 4 hashes ([`0x5a61a269…`](https://tiramisu.explorer.arkiv.network/tx/0x5a61a269c1204fadde52d6c5f7f6740f30949184cf95de1718c81d5cfa18b0fc)) | 104,960 | 0.00010 | 1,860 B |
+| Witness, 1 hash ([`0xf1c9cefa…`](https://tiramisu.explorer.arkiv.network/tx/0xf1c9cefac67fc4f7c2c796a9309274a8a1ed857abaa65310dfc92edd734596de)) | 101,648 | 0.00010 | 1,636 B |
+
+So the 0.02 GLM the site drips into a fresh browser wallet covers roughly 190 witnesses, and a whole exam (seal + reveal) costs under 0.0006 GLM. A witness is mostly fixed overhead: 4 hashes cost only 3% more than 1.
+
 ## The one thing to improve first
 
 **Item 3:** make "extend" mean extend. Every "keep alive" or lease product built on Arkiv will reach for `extendEntity(…fromDays(n))` and silently get "n days from now".
