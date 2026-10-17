@@ -39,7 +39,7 @@ The UI is in English and Hindi, and the guided tour can narrate in either.
 - **A subgraph:** needs a contract and someone running an indexer.
 - **OpenTimestamps or a plain contract:** honestly, these give you a timestamp more cheaply. What they don't give is a queryable index scoped to one issuer, different lifetimes per record type, anyone being able to keep evidence alive, and a live feed, all without me running a server.
 
-What Mohar actually depends on: `$creator` can't change, block time is set by the chain, and anyone can read everything over public JSON-RPC. If this site gets blocked, the evidence doesn't: every exam page lists raw `curl` commands, and [`verify.mjs`](verify.mjs) rebuilds every verdict with zero dependencies.
+What Mohar actually depends on: `$creator` can't change, block time is set by the chain, and anyone can read everything over public JSON-RPC. If this site gets blocked, the evidence doesn't: every exam page lists raw `curl` commands, and [`mohar-verify`](verify/) (`npx mohar-verify <exam-id>`) or the one-file [`check.html`](public/check.html) rebuild every verdict with zero dependencies.
 
 **Kept off Arkiv on purpose:** the paper and salts before the exam, witness text, any identity, images. Details and a full threat model are in [`arkiv/schema.md`](arkiv/schema.md#threat-model).
 
@@ -106,7 +106,7 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 
 | Command | What it checks |
 |---|---|
-| `npm test` | 74 unit tests: normaliser (incl. Hindi numbering), salted commits, deadline rules, forged seals, open-exam conflicts, the `/api` proxy and drip guards, translations (every Hindi key and placeholder matches English), and **parity** between `verify.mjs` and the app, incl. 2000 random mixed-script strings |
+| `npm test` | 79 unit tests: normaliser (incl. Hindi numbering), salted commits, deadline rules, forged seals, open-exam conflicts, the `/api` proxy and drip guards, translations (every Hindi key and placeholder matches English), and **parity** between the app, `verify.mjs` and `check.html`, incl. 2000 random mixed-script strings |
 | `npm run test:chain` | 14 checks on live Tiramisu: demo seals are burned and read-only, every question matches its seal, the leak and late claims are judged right, the bilingual CSV paper matches a Hindi witness, every record outlives 23 Oct, every payload on chain validates against the published JSON Schema, the proxy forwards reads and the drip funds a fresh wallet exactly once |
 | `npm run test:e2e` | Builds the site and drives it in Chrome on desktop and phone (66 tests): every main flow, plus an **axe** WCAG 2.1 AA audit of every page and sheet in light and dark, English and Hindi. Fails on any console error, horizontal overflow or accessibility violation |
 | `npm run test:mutation` | Stryker plants bugs in the verdict logic (`hash.ts`, `rules.ts`, `verdict.ts`); **96.6%** are caught, and the survivors are equivalent mutants |
@@ -118,13 +118,15 @@ CI runs lint (zero warnings), unit tests and the build on every push. CodeQL (se
 ### Check everything without the site
 
 ```sh
-node verify.mjs DSPSC-PRE26-10170937
-node verify.mjs <open-exam-id> --paper official-paper.txt
+npx mohar-verify DSPSC-PRE26-10170937
+npx mohar-verify <open-exam-id> --paper official-paper.txt
 ```
+
+Or in a browser, with nothing installed: [mohar-in.vercel.app/check.html](https://mohar-in.vercel.app/check.html?exam=DSPSC-PRE26-10170937). It's one self-contained file, so you can save it and it keeps working without either site.
 
 ## Building on it
 
-Everything is public and documented, so nobody needs permission. Start with **[docs/build-on-mohar.md](docs/build-on-mohar.md)**: the data contract, the hashing rules, `curl` recipes and two zero-dependency examples (a witness counter and a leak-alert feed for coaching institutes). Payloads have a [JSON Schema](arkiv/schemas/payloads.schema.json) that's tested against every record on chain, and `verify.mjs` is a reference reader in about 100 lines. See [CONTRIBUTING.md](CONTRIBUTING.md) to work on the code.
+Everything is public and documented, so nobody needs permission. Start with **[docs/build-on-mohar.md](docs/build-on-mohar.md)**: the data contract, the hashing rules, `curl` recipes and two zero-dependency examples (a witness counter and a leak-alert feed for coaching institutes). Payloads have a [JSON Schema](arkiv/schemas/payloads.schema.json) that's tested against every record on chain, and [`verify/verify.mjs`](verify/verify.mjs) is a reference reader in about 100 lines. See [CONTRIBUTING.md](CONTRIBUTING.md) to work on the code.
 
 ## Data
 
@@ -133,16 +135,18 @@ Everything in the demo is synthetic: a made-up "Demo State Public Service Commis
 ## Code layout
 
 ```
-src/lib/hash.ts       normalising + hashing questions
-src/lib/mohar.ts      every Arkiv read/write, verdict rules
-src/lib/burner.ts     throwaway wallet per browser
-src/hooks/            exam data, live events, chain clock
-src/ui/               pages, sheets, timeline, tour, seal artwork
-src/i18n.tsx          English + Hindi
-verify.mjs            zero-dependency verifier
-scripts/              demo run, wallets, funding, brand assets
-test/                 unit tests
-arkiv/                schema.md, friction.md, demo transcript
+src/lib/          hashing, verdict rules, every Arkiv read/write, wallets
+src/hooks/        exam data, live events, chain clock
+src/ui/           pages, sheets, timeline, tour, seal artwork
+src/i18n.tsx      English + Hindi
+api/              Vercel functions: read-only RPC proxy, test-GLM drip
+public/check.html one-file browser checker
+verify/           mohar-verify, the zero-dependency CLI verifier (npm)
+arkiv/            schema.md, friction.md, repro scripts, JSON Schema, demo transcript
+docs/             guides for builders and exam bodies, screenshots
+examples/         witness counter, leak-alert feed
+scripts/          seal/reveal CLI, demo run, wallets, funding, brand assets
+test/             unit, chain (live Tiramisu) and e2e (Playwright + axe) tests
 ```
 
 MIT license. Issues and pull requests welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
