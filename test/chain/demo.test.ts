@@ -6,7 +6,7 @@ const ISSUER = "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6"
 const HELD = "DSPSC-PRE26-10170937"
 const UPCOMING = "DSPSC-PRE26-U10170941"
 const OPEN = "open-demo-mock-test-open-exam-e96c10"
-// judging runs 19-22 Oct and winners are announced 23 Oct; evidence has to outlive that
+// the demo records have to stay readable until at least 23 Oct
 const MUST_LIVE_UNTIL = Date.parse("2026-10-24T00:00:00+05:30")
 
 const client = publicClient()
@@ -59,13 +59,13 @@ describe("held demo exam", () => {
     expect(late.matches.map((m) => `${m.set}-Q${m.index}`)).toEqual(["B-Q3"])
   })
 
-  it("keeps every record alive past judging", () => {
+  it("keeps every record alive past 23 Oct", () => {
     for (const r of [...data.commits, ...data.reveals, ...data.witnesses]) expect(expiryMs(r), r.key).toBeGreaterThan(MUST_LIVE_UNTIL)
   })
 })
 
 describe("upcoming demo exam", () => {
-  it("is sealed, not revealed, and alive past judging", async () => {
+  it("is sealed, not revealed, and alive past 23 Oct", async () => {
     const data = await examRecords(client, UPCOMING)
     const [exam] = groupExams(data.commits, ISSUER)
     expect(exam.sets).toHaveLength(2)
@@ -76,7 +76,7 @@ describe("upcoming demo exam", () => {
 })
 
 describe("open demo exam", () => {
-  it("has its entry, a witness from before the start, and both outlive judging", async () => {
+  it("has its entry, a witness from before the start, and both outlive 23 Oct", async () => {
     const data = await examRecords(client, OPEN)
     const exam = openExamFrom(data.entries)!
     expect(exam.kind).toBe("open")

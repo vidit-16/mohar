@@ -4,8 +4,6 @@ Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.net
 
 **Live:** https://vidit-16.github.io/mohar/ (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
 
-**Tracks:** Best Indian Use Case · Security · Censorship Resistance · Open Source
-
 ## Why I built this
 
 Paper leaks are basically a recurring event in India now. The Indian Express counted 41 recruitment exam leaks across 15 states in five years, hitting around 1.4 crore applicants. Every time it happens, the argument ends up being about *time*: did this "leaked paper" on Telegram exist before the exam, or did someone make it after?
@@ -94,7 +92,7 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 | Command | What it checks |
 |---|---|
 | `npm test` | 60 unit tests: normaliser (incl. Hindi), salted commits, deadline rules, forged seals, open-exam conflicts, translations (every Hindi key and placeholder matches English), and **parity** between `verify.mjs` and the app, incl. 2000 random mixed-script strings |
-| `npm run test:chain` | Live Tiramisu sanity: the demo seals are burned and read-only, 10/10 questions match, the leak and the late claim are judged right, every record stays alive past judging, and `verify.mjs` prints the same verdicts as the app |
+| `npm run test:chain` | Live Tiramisu sanity: the demo seals are burned and read-only, 10/10 questions match, the leak and the late claim are judged right, every demo record stays alive past 23 Oct, and `verify.mjs` prints the same verdicts as the app |
 | `npm run test:e2e` | Builds the site and drives it in Chrome, desktop and phone: landing, language and theme, the leak, the evidence drawer and shared links, technical details, the witness sheet, open-exam paper check, unknown exam IDs, the tour. Fails on any console error or horizontal overflow |
 | `npm run test:mutation` | Stryker plants bugs in the verdict logic (`hash.ts`, `rules.ts`, `verdict.ts`) and checks the tests catch them |
 
@@ -109,7 +107,7 @@ node verify.mjs <open-exam-id> --paper official-paper.txt
 
 ## Building on it
 
-The data model is in [`arkiv/schema.md`](arkiv/schema.md): entity types, attributes, lifetimes and the exact queries. A coaching institute, a newsroom or another hackathon team can read Mohar's records, or write their own witnesses and open exams, without asking anyone. `verify.mjs` is a working reference reader in about 100 lines.
+The data model is in [`arkiv/schema.md`](arkiv/schema.md): entity types, attributes, lifetimes and the exact queries. A coaching institute, a newsroom or anyone else can read Mohar's records, or write their own witnesses and open exams, without asking anyone. `verify.mjs` is a working reference reader in about 100 lines.
 
 ## Data
 
@@ -129,7 +127,5 @@ scripts/              demo run, wallets, funding, brand assets
 test/                 unit tests
 arkiv/                schema.md, friction.md, demo transcript
 ```
-
-Built during the hackathon window, 9 to 18 Oct 2026. No earlier code.
 
 MIT license.

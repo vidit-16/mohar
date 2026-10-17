@@ -87,7 +87,7 @@ project = str('mohar-v1') AND type = str('paper_commit') AND opens_at_ms >= u64(
 project = str('mohar-v1') AND type = str('open_exam') AND opens_at_ms >= u64(<now - 30d>)
 ```
 
-The exam page used to make four queries. With keyless reads capped at about 100 per IP (friction.md #7), one query per page is the difference between a judge being able to click around and getting locked out. Commits and reveals are then kept only if `creator` equals the issuer, which is the same `$creator` check, just done after the query.
+The exam page used to make four queries. With keyless reads capped at about 100 per IP (friction.md #7), one query per page is the difference between a visitor being able to click around and getting locked out. Commits and reveals are then kept only if `creator` equals the issuer, which is the same `$creator` check, just done after the query.
 
 There's no server-side ordering, so witnesses are sorted by `createdAt` on the client.
 
