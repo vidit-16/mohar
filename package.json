@@ -1,0 +1,45 @@
+{
+  "name": "mohar",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "wallets": "tsx scripts/wallets.ts",
+    "balance": "tsx scripts/balance.ts",
+    "demo": "tsx scripts/demo.ts",
+    "fund": "tsx scripts/fund.ts",
+    "send": "tsx scripts/send.ts",
+    "brand": "tsx scripts/brand-assets.ts",
+    "test": "vitest run",
+    "test:mutation": "stryker run",
+    "test:chain": "vitest run --config vitest.chain.config.ts",
+    "test:e2e": "npm run build && playwright test"
+  },
+  "dependencies": {
+    "@arkiv-network/sdk": "0.8.1",
+    "lucide-react": "^1.59.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "viem": "^2.57.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@stryker-mutator/core": "^10.0.0",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "dotenv": "^18.0.8",
+    "oxlint": "^1.81.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.5"
+  },
+  "description": "Prove who had the exam paper before the exam. Built on Arkiv.",
+  "license": "MIT"
+}
