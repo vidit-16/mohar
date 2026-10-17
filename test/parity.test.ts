@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { readFileSync } from "node:fs"
 import { normalise, questionHash, splitQuestions } from "../src/lib/hash"
 // @ts-expect-error plain JS on purpose, it has to run with zero dependencies
 import * as standalone from "../verify.mjs"
@@ -46,5 +47,25 @@ describe("verify.mjs parity", () => {
   it("splits a pasted paper into the same lines", () => {
     const paper = "Q1. one\n\n  ---  \r\nQ2. two\n😀\nतीन"
     expect(standalone.lines(paper)).toEqual(splitQuestions(paper))
+  })
+})
+
+describe("check.html", () => {
+  // the browser checker is one self-contained file, so it carries its own copy of the rules
+  const src = readFileSync(new URL("../public/check.html", import.meta.url), "utf8")
+  const fn = src.match(/const normalise = \(t\) =>\s*([^\n]+)/)?.[1]
+  const lines = src.match(/const lines = \(t\) => ([^\n]+)/)?.[1]
+
+  it("uses the same normaliser as the app", () => {
+    expect(fn).toBeTruthy()
+    const browserNormalise = new Function("t", `return ${fn}`) as (t: string) => string
+    for (const s of corpus) expect(browserNormalise(s)).toBe(normalise(s))
+  })
+
+  it("splits a pasted paper the same way", () => {
+    const browserNormalise = new Function("t", `return ${fn}`)
+    const browserLines = new Function("normalise", "t", `return ${lines}`) as (n: unknown, t: string) => string[]
+    const paper = corpus.join("\n")
+    expect(browserLines(browserNormalise, paper)).toEqual(splitQuestions(paper))
   })
 })
