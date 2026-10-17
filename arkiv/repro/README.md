@@ -8,6 +8,7 @@ npx tsx arkiv/repro/4-predict-missing-on-wallet.ts
 npx tsx arkiv/repro/5-readonly-is-deletable.ts
 npx tsx arkiv/repro/6-events-without-attributes.ts
 npx tsx arkiv/repro/7-keyless-budget.ts
+npx tsx arkiv/repro/8-created-at-is-a-block.ts
 ```
 
 Output from 18 Oct 2026 (`@arkiv-network/sdk 0.8.1`, Node 24.19.0, Windows 11):
@@ -38,6 +39,12 @@ query 3: HTTP 200, ratelimit="limit=600, remaining=511, reset=3", Arkiv-Cost=100
 query 4: HTTP 200, ratelimit="limit=600, remaining=528, reset=3", Arkiv-Cost=100, Arkiv-Quota-Used-Percent=null
 query 5: HTTP 200, ratelimit="limit=600, remaining=510, reset=3", Arkiv-Cost=100, Arkiv-Quota-Used-Percent=null
 eth_blockNumber is not budgeted: 0xac80b
+
+=== 8-created-at-is-a-block
+exam DSPSC-PRE26-10170937: 7 entities in 1 query, createdAt is a bigint block number (690151)
+raw arkiv_getEntity fields: key, owner, creator, createdAt, updatedAt, expiresAt, creationFlags, contentType, payload, attributes | createdAt: 0xa87e7 updatedAt: 0xa87e7
+to turn them into times: 5 extra eth_getBlockByNumber calls, 1253 ms
+getBlockTiming only describes the current block (blockDuration 2s), so estimating past times from it drifts
 ```
 
 Items 1 and 2 are about the Hub faucet page, so they're steps in `friction.md`, not scripts.
