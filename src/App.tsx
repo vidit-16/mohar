@@ -1,7 +1,8 @@
 import { Moon, Sun } from "lucide-react"
 import type { Address } from "viem"
 import { useChain } from "./hooks/useChain"
-import { LangProvider, useT } from "./i18n"
+import { useT } from "./i18n"
+import { LangProvider } from "./LangProvider"
 import { ISSUERS } from "./lib/mohar"
 import { useLinkInterception, useSearch } from "./router"
 import { useTheme } from "./theme"
@@ -53,7 +54,7 @@ function Nav({ home }: { home: string }) {
   return (
     <header className="nav">
       <div className="container nav-inner">
-        <a href={home} className="logo" aria-label="Mohar">
+        <a href={home} className="logo">
           <Wordmark size={34} />
         </a>
         <nav className="nav-links">

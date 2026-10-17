@@ -9,8 +9,8 @@ export default defineConfig({
       output: {
         codeSplitting: {
           groups: [
-            { name: "chain", test: /node_modules[\/](viem|@arkiv-network|@noble|@scure|abitype|ox)/ },
-            { name: "react", test: /node_modules[\/](react|react-dom|scheduler)[\/]/ },
+            { name: "chain", test: /node_modules.(viem|@arkiv-network|@noble|@scure|abitype|ox)/ },
+            { name: "react", test: /node_modules.(react|react-dom|scheduler)./ },
           ],
         },
       },

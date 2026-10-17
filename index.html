@@ -6,6 +6,7 @@
     <title>Mohar · Prove who had the paper before the exam</title>
     <meta name="description" content="Tamper-proof records for exam paper leaks. Exam bodies seal the paper before the exam; anyone can privately prove they had a leaked paper before it started." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="canonical" href="https://mohar-in.vercel.app/" />
     <script>
       try {
         const t = localStorage.getItem("mohar.theme")
@@ -13,6 +14,7 @@
         const l = localStorage.getItem("mohar.lang")
         if (l === "hi") document.documentElement.lang = "hi"
       } catch {}
+      if (/[?&](exam|tour)=/.test(location.search) || document.documentElement.lang === "hi") document.documentElement.classList.add("no-shell")
     </script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Mohar · Prove who had the paper before the exam" />
@@ -24,10 +26,13 @@
     <meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!-- fonts never block the first paint; the display serif is only used if it arrives in time, so headings don't jump -->
+    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&display=optional" />
+    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <style>.no-shell [data-shell] { display: none }</style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><a class="skip" href="#main">Skip to content</a><header class="nav"><div class="container nav-inner"><a href="./" class="logo"><span class="wordmark"><svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><defs><radialGradient id="shell-m0" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="var(--seal-hi)"></stop><stop offset="1" stop-color="var(--seal)"></stop></radialGradient></defs><path d="M32.00 3.00 A6.11 6.11 0 0 1 43.10 5.21 A6.11 6.11 0 0 1 52.51 11.49 A6.11 6.11 0 0 1 58.79 20.90 A6.11 6.11 0 0 1 61.00 32.00 A6.11 6.11 0 0 1 58.79 43.10 A6.11 6.11 0 0 1 52.51 52.51 A6.11 6.11 0 0 1 43.10 58.79 A6.11 6.11 0 0 1 32.00 61.00 A6.11 6.11 0 0 1 20.90 58.79 A6.11 6.11 0 0 1 11.49 52.51 A6.11 6.11 0 0 1 5.21 43.10 A6.11 6.11 0 0 1 3.00 32.00 A6.11 6.11 0 0 1 5.21 20.90 A6.11 6.11 0 0 1 11.49 11.49 A6.11 6.11 0 0 1 20.90 5.21 A6.11 6.11 0 0 1 32.00 3.00 Z" fill="url(#shell-m0)"></path><circle cx="32" cy="32" r="20" fill="none" stroke="var(--seal-ink)" stroke-opacity="0.35" stroke-width="1"></circle><g transform="translate(32 33)"><g transform="scale(0.53125)" fill="none" stroke="var(--seal-ink)" stroke-width="4.894117647058824" stroke-linecap="round"><path d="M-22 6c0-14 10-25 22-25s22 11 22 25"></path><path d="M-15 18c-2-4-3-8-3-12 0-10 8-18 18-18s18 8 18 18c0 6-1 11-3 16"></path><path d="M-8 24c-2-5-4-11-4-18 0-6.6 5.4-12 12-12s12 5.4 12 12c0 9-2 17-6 23"></path><path d="M0 28c-3-7-5-14-5-22 0-2.8 2.2-5 5-5s5 2.2 5 5c0 10-1.5 18-4 25"></path><path d="M-27 -4c3-7 8-13 15-17"></path><path d="M12 -21c8 3 14 9 17 17"></path></g></g></svg><span class="wm-text">Mohar <span class="wm-hi">मोहर</span></span></span></a><nav class="nav-links"><a href="./#how">How it works</a><a href="./#exams">Exams</a><a href="./#issuers">For exam bodies</a></nav></div></header><main id="main" class="container" data-shell=""><section class="hero bleed"><div class="hero-copy"><div class="eyebrow">Tamper-proof exam records</div><h1>Prove who had the paper <em>before</em> the exam.</h1><p class="lead">A shared clock for paper leaks that neither the exam body nor the leakers control.</p><div class="hero-cta"><a class="btn btn-primary btn-lg" href="?tour=1&amp;step=0">See a leak get caught</a><a class="btn btn-ghost btn-lg" href="#exams">Browse exams</a></div></div><div class="hero-art"></div></section></main></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

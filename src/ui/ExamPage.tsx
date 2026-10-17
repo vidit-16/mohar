@@ -455,7 +455,9 @@ export function ExamPage({ examId, issuer, issuerName, homeHref }: { examId: str
         </div>
       </details>
 
-      <WitnessSheet open={witnessOpen} onClose={() => setWitnessOpen(false)} examId={exam.examId} examTitle={exam.title} deadlineMs={x.deadlineMs} onSealed={x.reload} prefill={prefill} />
+      {witnessOpen && (
+        <WitnessSheet key={prefill ?? "manual"} open onClose={() => (setWitnessOpen(false), setPrefill(undefined))} examId={exam.examId} examTitle={exam.title} deadlineMs={x.deadlineMs} onSealed={x.reload} prefill={prefill} />
+      )}
       <EvidenceDrawer
         row={pickedRow?.w}
         verdict={pickedRow?.v}

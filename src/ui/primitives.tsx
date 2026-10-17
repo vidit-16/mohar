@@ -1,5 +1,6 @@
 import { Check, Copy, ExternalLink, LoaderCircle, X } from "lucide-react"
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react"
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { type Toast, ToastCtx } from "./toast"
 import { EXPLORER, short } from "./format"
 
 export function Spinner({ size = 16 }: { size?: number }) {
@@ -10,7 +11,8 @@ export function Skeleton({ w = "100%", h = 14, r = 6 }: { w?: string | number; h
   return <span className="skeleton" style={{ width: w, height: h, borderRadius: r }} aria-hidden />
 }
 
-export type Tone = "neutral" | "seal" | "good" | "warn" | "danger" | "info"
+export type { Tone } from "./toast"
+import type { Tone } from "./toast"
 export function Badge({ tone = "neutral", icon, children }: { tone?: Tone; icon?: ReactNode; children: ReactNode }) {
   return (
     <span className={`badge badge-${tone}`}>
@@ -110,9 +112,6 @@ export function Sheet({ open, onClose, title, subtitle, children }: { open: bool
   )
 }
 
-type Toast = { id: number; tone: Tone; title: string; body?: ReactNode }
-const ToastCtx = createContext<(t: Omit<Toast, "id">) => void>(() => undefined)
-export const useToast = () => useContext(ToastCtx)
 
 export function ToastHost({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])

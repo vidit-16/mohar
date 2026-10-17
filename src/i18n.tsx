@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useState } from "react"
+import { createContext, useContext } from "react"
 
 export type Lang = "en" | "hi"
 
@@ -213,7 +213,6 @@ const en = {
   "tour.captions": "Captions",
 }
 
-type Key = keyof typeof en
 
 const hi: Record<Key, string> = {
   "nav.exams": "परीक्षाएँ",
@@ -428,43 +427,8 @@ const hi: Record<Key, string> = {
 
 export const DICT = { en, hi }
 
-function initialLang(): Lang {
-  try {
-    const saved = localStorage.getItem("mohar.lang")
-    if (saved === "en" || saved === "hi") return saved
-  } catch {
-    /* storage blocked */
-  }
-  return "en"
-}
-
-type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (k: Key, vars?: Record<string, string | number>) => string }
-const LangCtx = createContext<Ctx>({ lang: "en", setLang: () => undefined, t: (k) => en[k] })
-
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang)
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l)
-    document.documentElement.lang = l
-    try {
-      localStorage.setItem("mohar.lang", l)
-    } catch {
-      /* storage blocked */
-    }
-  }, [])
-  const t = useCallback(
-    (k: Key, vars?: Record<string, string | number>) => {
-      let s = DICT[lang][k] ?? en[k]
-      if (vars) {
-        const n = Number(vars.n)
-        const plural = { qs: n === 1 ? "question" : "questions", ws: n === 1 ? "witness" : "witnesses", fps: n === 1 ? "fingerprint" : "fingerprints" }
-        for (const [name, v] of Object.entries({ ...plural, ...vars })) s = s.replaceAll(`{${name}}`, String(v))
-      }
-      return s
-    },
-    [lang],
-  )
-  return <LangCtx.Provider value={{ lang, setLang, t }}>{children}</LangCtx.Provider>
-}
+export type Key = keyof typeof en
+export type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (k: Key, vars?: Record<string, string | number>) => string }
+export const LangCtx = createContext<Ctx>({ lang: "en", setLang: () => undefined, t: (k) => en[k] })
 
 export const useT = () => useContext(LangCtx)

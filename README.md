@@ -102,12 +102,14 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 
 | Command | What it checks |
 |---|---|
-| `npm test` | 60 unit tests: normaliser (incl. Hindi), salted commits, deadline rules, forged seals, open-exam conflicts, translations (every Hindi key and placeholder matches English), and **parity** between `verify.mjs` and the app, incl. 2000 random mixed-script strings |
-| `npm run test:chain` | Live Tiramisu sanity: the demo seals are burned and read-only, 10/10 questions match, the leak and the late claim are judged right, every demo record stays alive past 23 Oct, and `verify.mjs` prints the same verdicts as the app |
-| `npm run test:e2e` | Builds the site and drives it in Chrome, desktop and phone: landing, language and theme, the leak, the evidence drawer and shared links, technical details, the witness sheet, open-exam paper check, unknown exam IDs, the tour. Fails on any console error or horizontal overflow |
-| `npm run test:mutation` | Stryker plants bugs in the verdict logic (`hash.ts`, `rules.ts`, `verdict.ts`) and checks the tests catch them |
+| `npm test` | 74 unit tests: normaliser (incl. Hindi numbering), salted commits, deadline rules, forged seals, open-exam conflicts, the `/api` proxy and drip guards, translations (every Hindi key and placeholder matches English), and **parity** between `verify.mjs` and the app, incl. 2000 random mixed-script strings |
+| `npm run test:chain` | 14 checks on live Tiramisu: demo seals are burned and read-only, every question matches its seal, the leak and late claims are judged right, the bilingual CSV paper matches a Hindi witness, every record outlives 23 Oct, every payload on chain validates against the published JSON Schema, the proxy forwards reads and the drip funds a fresh wallet exactly once |
+| `npm run test:e2e` | Builds the site and drives it in Chrome on desktop and phone (66 tests): every main flow, plus an **axe** WCAG 2.1 AA audit of every page and sheet in light and dark, English and Hindi. Fails on any console error, horizontal overflow or accessibility violation |
+| `npm run test:mutation` | Stryker plants bugs in the verdict logic (`hash.ts`, `rules.ts`, `verdict.ts`); **96.6%** are caught, and the survivors are equivalent mutants |
 
-CI runs lint, unit tests and the build on every push.
+Lighthouse on the production build: desktop **97–100** performance, **100** accessibility, **100** SEO, layout shift 0; mobile (simulated slow 4G) 74 performance, 100 accessibility.
+
+CI runs lint (zero warnings), unit tests and the build on every push.
 
 ### Check everything without the site
 

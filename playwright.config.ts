@@ -7,6 +7,7 @@ export default defineConfig({
   expect: { timeout: 20_000 },
   retries: 1,
   workers: 2,
+  fullyParallel: false,
   reporter: [["list"]],
   use: { baseURL: "http://localhost:4174", channel: "chrome", trace: "retain-on-failure" },
   projects: [

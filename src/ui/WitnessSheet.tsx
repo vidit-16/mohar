@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, CircleCheck, EyeOff, Fingerprint, Lock, RefreshCw, Wallet } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { formatEther, type Hex } from "viem"
 import { useBurnerBalance } from "../hooks/useBurnerBalance"
 import { useNow } from "../hooks/useChain"
@@ -9,15 +9,16 @@ import { normalise, questionHash, splitQuestions } from "../lib/hash"
 import { witnessPaper } from "../lib/mohar"
 import { Mark } from "./brand"
 import { errText, FAUCET, fmtDateTime } from "./format"
-import { Badge, CopyButton, Mono, Sheet, Spinner, useToast } from "./primitives"
+import { Badge, CopyButton, Mono, Sheet, Spinner, } from "./primitives"
+import { useToast } from "./toast"
 
 type Props = { open: boolean; onClose: () => void; examId: string; examTitle: string; deadlineMs: number; onSealed: () => void; prefill?: string }
 
 export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onSealed, prefill }: Props) {
   const { t } = useT()
   const toast = useToast()
-  const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [text, setText] = useState("")
+  const [step, setStep] = useState<1 | 2 | 3>(prefill ? 2 : 1)
+  const [text, setText] = useState(prefill ?? "")
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string>()
   const [receipt, setReceipt] = useState<{ key: Hex; tx: Hex; at: number }>()
@@ -27,21 +28,7 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
   const late = now >= deadlineMs
   const funded = wei !== undefined && wei > 0n
 
-  useEffect(() => {
-    if (open && prefill) {
-      setText(prefill)
-      setStep(2)
-    }
-  }, [open, prefill])
-
-  const close = () => {
-    onClose()
-    if (step === 3) {
-      setStep(1)
-      setText("")
-      setReceipt(undefined)
-    }
-  }
+  const close = onClose
 
   const seal = async () => {
     setBusy(true)

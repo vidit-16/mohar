@@ -6,7 +6,7 @@
   --border-strong: #d6cfc0;
   --text: #1a1814;
   --text-2: #5c564a;
-  --text-3: #8a8374;
+  --text-3: #6e675a;
   --ink: #1f1c17;
   --ink-hover: #3a352c;
   --on-ink: #faf7f1;
@@ -20,7 +20,8 @@
   --good-soft: #e3f3ea;
   --warn: #a45a06;
   --warn-soft: #fbefdc;
-  --danger: #d0243a;
+  --danger: #c01f33;
+  --danger-btn: #b81d31;
   --danger-soft: #fce6e8;
   --info: #2c57c9;
   --info-soft: #e5ecfb;
@@ -30,8 +31,8 @@
   --radius: 14px;
   --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --display: "Fraunces", Georgia, serif;
-  --deva: "Noto Sans Devanagari", var(--font);
-  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --deva: "Noto Sans Devanagari", "Nirmala UI", "Mangal", var(--font);
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, "Roboto Mono", monospace;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
@@ -42,7 +43,7 @@
     --border-strong: #3a362f;
     --text: #f3efe7;
     --text-2: #b8b1a3;
-    --text-3: #857e70;
+    --text-3: #9d9585;
     --ink: #f3efe7;
     --ink-hover: #ffffff;
     --on-ink: #14120f;
@@ -54,7 +55,8 @@
     --good-soft: #13291d;
     --warn: #f0a640;
     --warn-soft: #2e2212;
-    --danger: #ff5a6e;
+    --danger: #ff6b7d;
+    --danger-btn: #c42a3d;
     --danger-soft: #3a1520;
     --info: #86a3ff;
     --info-soft: #18213d;
@@ -73,7 +75,7 @@
     --border-strong: #3a362f;
     --text: #f3efe7;
     --text-2: #b8b1a3;
-    --text-3: #857e70;
+    --text-3: #9d9585;
     --ink: #f3efe7;
     --ink-hover: #ffffff;
     --on-ink: #14120f;
@@ -85,7 +87,8 @@
     --good-soft: #13291d;
     --warn: #f0a640;
     --warn-soft: #2e2212;
-    --danger: #ff5a6e;
+    --danger: #ff6b7d;
+    --danger-btn: #c42a3d;
     --danger-soft: #3a1520;
     --info: #86a3ff;
     --info-soft: #18213d;
@@ -184,8 +187,8 @@ html[lang="hi"] .btn { font-family: var(--deva); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 .btn-primary { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
 .btn-primary:hover { background: var(--ink-hover); border-color: var(--ink-hover); }
-.btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-.btn-danger:hover { background: var(--danger); filter: brightness(1.08); }
+.btn-danger { background: var(--danger-btn); border-color: var(--danger-btn); color: #fff; }
+.btn-danger:hover { background: var(--danger-btn); filter: brightness(1.1); }
 .btn-ghost { background: transparent; border-color: transparent; }
 .btn-ghost:hover { background: var(--surface-2); }
 .btn-lg { height: 48px; padding: 0 20px; font-size: 0.96rem; border-radius: 12px; }

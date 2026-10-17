@@ -5,7 +5,8 @@ import { useT } from "../i18n"
 import { burner } from "../lib/burner"
 import { keepAlive, type Row, type Verdict, type WitnessPayload } from "../lib/mohar"
 import { errText, fmtDateTime, fmtDuration } from "./format"
-import { Badge, Mono, Sheet, Spinner, useToast } from "./primitives"
+import { Badge, Mono, Sheet, Spinner, } from "./primitives"
+import { useToast } from "./toast"
 import { describe } from "./verdict"
 
 type Props = {

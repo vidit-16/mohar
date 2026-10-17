@@ -30,7 +30,7 @@ export function Timeline({ startMs, startLabel, official = true, opensAtMs, dead
   const when = (ms: number) => (sameDay ? fmtTime(ms) : fmtDate(ms))
 
   return (
-    <div className="timeline" role="img" aria-label={t("exam.timeline")} data-tour="timeline">
+    <div className="timeline" role="group" aria-label={t("exam.timeline")} data-tour="timeline">
       <div className="tl-track">
         <div className="tl-before" style={{ left: 0, width: at(deadlineMs) }} />
         <div className="tl-after" style={{ left: at(deadlineMs), right: 0 }} />

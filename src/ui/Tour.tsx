@@ -36,11 +36,11 @@ export function Tour({ search }: { search: string }) {
   const active = params.get("tour") === "1"
   const step = Math.max(0, Math.min(Number(params.get("step") ?? 0) || 0, STEPS.length - 1))
   const s = STEPS[step]
-  const [rect, setRect] = useState<Rect>()
+  const [spot, setSpot] = useState<{ step: number; rect: Rect }>()
   const [playing, setPlaying] = useState(true)
   const [voice, setVoice] = useState(() => pref("voice", false))
   const [captions, setCaptions] = useState(() => pref("captions", true))
-  const [progress, setProgress] = useState(0)
+  const [tick, setTick] = useState<{ step: number; value: number }>({ step: -1, value: 0 })
   const target = useRef<Element | null>(null)
 
   const exit = useCallback(() => {
@@ -63,7 +63,6 @@ export function Tour({ search }: { search: string }) {
   // find the step's element (data loads async, so poll), fire its action, and follow it on scroll
   useEffect(() => {
     if (!active) return
-    setRect(undefined)
     target.current = null
     let raf = 0
     let tries = 0
@@ -89,7 +88,7 @@ export function Tour({ search }: { search: string }) {
         }
         const track = () => {
           const r = el.getBoundingClientRect()
-          setRect({ top: r.top - 8, left: r.left - 8, width: r.width + 16, height: r.height + 16 })
+          setSpot({ step, rect: { top: r.top - 8, left: r.left - 8, width: r.width + 16, height: r.height + 16 } })
           raf = requestAnimationFrame(track)
         }
         track()
@@ -105,7 +104,6 @@ export function Tour({ search }: { search: string }) {
   useEffect(() => {
     if (!active) return
     speechSynthesis.cancel()
-    setProgress(0)
     if (!playing) return
     const text = s[lang]
     const ms = Math.max(4500, text.length * (lang === "hi" ? 75 : 62))
@@ -116,7 +114,7 @@ export function Tour({ search }: { search: string }) {
       if (!s.end) setTimeout(() => go(step + 1), 700)
     }
     const started = Date.now()
-    const tick = setInterval(() => setProgress(Math.min(1, (Date.now() - started) / ms)), 100)
+    const tick = setInterval(() => setTick({ step, value: Math.min(1, (Date.now() - started) / ms) }), 100)
     let timer: ReturnType<typeof setTimeout> | undefined
     if (voice && "speechSynthesis" in window) {
       const u = new SpeechSynthesisUtterance(text)
@@ -155,6 +153,8 @@ export function Tour({ search }: { search: string }) {
   }, [active, go, exit])
 
   if (!active) return null
+  const rect = spot?.step === step ? spot.rect : undefined
+  const progress = tick.step === step ? tick.value : 0
 
   return (
     <div className="tour" aria-live="polite">

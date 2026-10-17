@@ -34,9 +34,5 @@ export function useBurnerBalance(active: boolean) {
     })
   }, [active, wei, address])
 
-  useEffect(() => {
-    if (wei !== undefined && wei > 0n && drip === "dripping") setDrip("idle")
-  }, [wei, drip])
-
-  return { address, wei, refresh, drip }
+  return { address, wei, refresh, drip: wei !== undefined && wei > 0n ? ("idle" as const) : drip }
 }

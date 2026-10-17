@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { Address, Hex } from "viem"
+import { watchBlockNumber } from "viem/actions"
 import {
   blockTimeMs,
   deadlineOf,
@@ -32,22 +33,34 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   const [live, setLive] = useState<LiveState>("connecting")
   const [loadingMore, setLoadingMore] = useState(false)
 
-  const load = useCallback(async () => {
-    try {
-      const r = await examRecords(reader, examId)
+  const apply = useCallback(
+    (r: Awaited<ReturnType<typeof examRecords>>) => {
       setExam(groupExams(r.commits, issuer)[0] ?? openExamFrom(r.entries))
       setReveals(r.reveals.filter((x) => sameAddr(x.creator, issuer)))
       setWitnesses(r.witnesses)
       setCursor(r.next)
       setError(undefined)
-    } catch (e) {
-      setError(errText(e))
-    }
-  }, [examId, issuer])
+    },
+    [issuer],
+  )
+
+  const load = useCallback(
+    () =>
+      examRecords(reader, examId)
+        .then(apply)
+        .catch((e) => setError(errText(e))),
+    [examId, apply],
+  )
 
   useEffect(() => {
-    load()
-  }, [load])
+    let current = true
+    examRecords(reader, examId)
+      .then((r) => current && apply(r))
+      .catch((e) => current && setError(errText(e)))
+    return () => {
+      current = false
+    }
+  }, [examId, apply])
 
   const loadMore = useCallback(async () => {
     if (!cursor) return
@@ -108,8 +121,12 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
         load()
       }, wait)
     }
+    let unwatchBlocks: (() => void) | undefined
     try {
-      unwatch = liveClient().watchEntityEvents({
+      const client = liveClient()
+      // "Connected" means blocks are actually arriving over the socket, not just that we asked
+      unwatchBlocks = watchBlockNumber(client, { onBlockNumber: () => setLive("live"), onError: () => setLive("down") })
+      unwatch = client.watchEntityEvents({
         // events carry no attributes, so any create on the chain might be ours; refetch at most every 15s
         onEntityCreated: () => {
           setLive("live")
@@ -123,13 +140,13 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
         },
         onError: () => setLive("down"),
       })
-      setLive("live")
     } catch {
-      setLive("down")
+      Promise.resolve().then(() => setLive("down"))
     }
     return () => {
       clearTimeout(pending)
       unwatch?.()
+      unwatchBlocks?.()
     }
   }, [load])
 

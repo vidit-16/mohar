@@ -24,7 +24,6 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
   const now = useNow(30_000)
 
   const load = () => {
-    setErr(undefined)
     const since = Date.now() - 30 * DAY_MS
     Promise.all([examsFrom(reader, issuer, since), openExamsSince(reader, since)])
       .then(([commits, entries]) => {
@@ -36,6 +35,10 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
       .catch((e) => setErr(errText(e)))
   }
   useEffect(load, [issuer])
+  const retry = () => {
+    setErr(undefined)
+    load()
+  }
 
   const list = tab === "sealed" ? sealed : open
   const shown = useMemo(() => {
@@ -147,7 +150,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
           {err && (
             <Empty icon={<Globe size={22} />} title={t("exams.offline")}>
               {err}{" "}
-              <button className="link" onClick={load}>
+              <button className="link" onClick={retry}>
                 {t("exams.retry")}
               </button>
             </Empty>
