@@ -335,6 +335,7 @@ a.exam-row:hover { background: var(--surface-2); border-radius: 10px; }
 .issuer .exam-head h1 { margin-top: 0; }
 .issuer-tabs { margin: 4px 0 16px; }
 .form-grid { display: grid; grid-template-columns: 2fr 1.4fr 1.2fr 0.6fr; gap: 14px; }
+.form-grid .field { align-content: start; }
 @media (max-width: 860px) { .form-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
 .mono-input { font-family: var(--mono); font-size: 0.85rem; }
