@@ -1,6 +1,6 @@
 # Friction report: building Mohar on Arkiv
 
-Everything here is something I actually hit while building Mohar on 17 October 2026, with block numbers or tx hashes where it happened on chain. Every SDK/RPC item has a script in [`repro/`](repro/) that reproduces it on Tiramisu; I re-ran all of them on 18 October and filed items 1 to 7 upstream (links under each item). Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
+Everything here is something I actually hit while building Mohar on 17 October 2026, with block numbers or tx hashes where it happened on chain. Every SDK/RPC item has a script in [`repro/`](repro/) that reproduces it on Tiramisu; I re-ran all of them on 18 October and filed each one upstream (links under each item). Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
 
 **Environment:** `@arkiv-network/sdk@0.8.1` (pinned), `viem@2.57.7`, Node 24.19.0, Vite 8, Chrome on Windows 11, Tiramisu testnet (chain 7738577).
 
@@ -91,6 +91,7 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **What I changed:** a block-time cache in the app, and the `/api/rpc` proxy lets the CDN cache block reads for a day, since a mined block never changes.
 - **Fix:** return a `createdAtTimestamp` (block timestamp) in query results, or let `select` ask for it.
 - **Repro:** `npx tsx arkiv/repro/8-created-at-is-a-block.ts`: `7 entities in 1 query, createdAt is a bigint block number (690151)` → `5 extra eth_getBlockByNumber calls`, a bit over a second.
+- **Filed:** [Arkiv-Network/reported-issues#22](https://github.com/Arkiv-Network/reported-issues/issues/22).
 
 ---
 
