@@ -107,7 +107,7 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 | `npm run test:e2e` | Builds the site and drives it in Chrome on desktop and phone (66 tests): every main flow, plus an **axe** WCAG 2.1 AA audit of every page and sheet in light and dark, English and Hindi. Fails on any console error, horizontal overflow or accessibility violation |
 | `npm run test:mutation` | Stryker plants bugs in the verdict logic (`hash.ts`, `rules.ts`, `verdict.ts`); **96.6%** are caught, and the survivors are equivalent mutants |
 
-Lighthouse on the production build: desktop **97–100** performance, **100** accessibility, **100** SEO, layout shift 0; mobile (simulated slow 4G) 74 performance, 100 accessibility.
+Lighthouse on the live site: desktop **98** performance, mobile (simulated slow 4G) **80**; **100** accessibility, best practices and SEO on both; layout shift ~0. `npm run test:e2e:prod` runs the whole e2e + accessibility suite against production.
 
 CI runs lint (zero warnings), unit tests and the build on every push.
 
