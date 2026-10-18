@@ -91,6 +91,6 @@ describe("domain proof edge cases", () => {
   it("asks for json", async () => {
     let init: RequestInit | undefined
     await fetchProof("x.co", (async (_: string, i?: RequestInit) => ((init = i), new Response(JSON.stringify({ name: "x", issuers: [A] })))) as typeof fetch)
-    expect((init?.headers as Record<string, string>).accept).toBe("application/json")
+    expect(new Headers(init?.headers).get("accept")).toBe("application/json")
   })
 })
