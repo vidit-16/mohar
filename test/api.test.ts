@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { GET as challengeFor, POST as drip } from "../api/drip"
-import { solve, solves, zeroBits } from "../src/lib/pow"
+import { sha256, stringToBytes } from "viem"
+import { powInput, solve, solves, zeroBits } from "../src/lib/pow"
 import { POST as rpc } from "../api/rpc"
 
 const post = (body: unknown, headers: Record<string, string> = {}) =>
@@ -94,5 +95,20 @@ describe("proof of work", () => {
     expect(solves({ ...c, address: c.address.toLowerCase() }, n)).toBe(true)
     expect(solves({ ...c, bits: 64 }, n)).toBe(false)
     for (let i = 0; i < n; i++) expect(solves(c, i)).toBe(false)
+  })
+})
+
+describe("proof of work edges", () => {
+  const c = { salt: "0x" + "cd".repeat(16), address: "0x00000000000000000000000000000000000000Bb" } as const
+  it("lowercases the address in the hashed input", () => expect(powInput(c.salt, "0xAbC", 7)).toBe(`${c.salt}:0xabc:7`))
+  it("accepts nonce 0 at exactly its own difficulty, and nothing harder", () => {
+    const k = zeroBits(sha256(stringToBytes(powInput(c.salt, c.address, 0)), "bytes"))
+    expect(solves({ ...c, bits: k }, 0)).toBe(true)
+    expect(solves({ ...c, bits: k + 1 }, 0)).toBe(false)
+  })
+  it("rejects nonces that aren't whole non-negative numbers", () => {
+    expect(solves({ ...c, bits: 0 }, -1)).toBe(false)
+    expect(solves({ ...c, bits: 0 }, 1.5)).toBe(false)
+    expect(solves({ ...c, bits: 0 }, Number.MAX_SAFE_INTEGER + 2)).toBe(false)
   })
 })

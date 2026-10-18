@@ -161,4 +161,8 @@ describe("packBatches", () => {
     expect(() => packBatches([kb(10), kb(101)], (n) => n, undefined, (_, i) => (i ? "A-hi" : "A-en"))).toThrow(/A-hi is 101 KB/)
   })
   it("handles nothing", () => expect(packBatches([], () => 1)).toEqual([]))
+  it("accepts one set exactly at the budget", () => expect(packBatches([BATCH_BUDGET_BYTES], (n) => n)).toEqual([[BATCH_BUDGET_BYTES]]))
+  it("names sets by position by default and states the limit in KB", () => {
+    expect(() => packBatches([1, BATCH_BUDGET_BYTES + 1], (n) => n)).toThrow("Set #2 is 101 KB, more than fits in one transaction (100 KB). Split it into two set codes.")
+  })
 })

@@ -19,9 +19,9 @@ describe("dueForTopUp", () => {
     for (const r of extend) expect(r.left + r.add).toBeGreaterThanOrEqual(35)
   })
   it("skips rows it can't extend: not extendable, or already expired", () => {
-    const { extend, skipped } = dueForTopUp([row("locked", 5, false), row("gone", -1), row("fine", 3)], 1_000_000n, 2)
+    const { extend, skipped } = dueForTopUp([row("locked", 5, false), row("gone", -1), row("now", 0), row("fine", 3)], 1_000_000n, 2)
     expect(extend.map((r) => r.label)).toEqual(["fine"])
-    expect(skipped.map((r) => r.label).sort()).toEqual(["gone", "locked"])
+    expect(skipped.map((r) => r.label).sort()).toEqual(["gone", "locked", "now"])
   })
   it("does nothing when everything is healthy", () => {
     expect(dueForTopUp([row("a", 40), row("b", 22)], 1_000_000n, 2)).toEqual({ extend: [], skipped: [] })
