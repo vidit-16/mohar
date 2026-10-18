@@ -18,12 +18,12 @@ Q7. Who was the first Chief Election Commissioner of India?`
 export const STEPS: TourStep[] = [
   {
     target: ".hero",
-    en: "This May, NEET was cancelled over a leaked paper. It always starts the same way: a 'leaked paper' on Telegram the night before, and afterwards nobody can prove when it existed.",
+    en: "This May, NEET, India's national medical entrance exam, was cancelled over a leaked paper. It always starts the same way: a 'leaked paper' on Telegram the night before, and afterwards nobody can prove when it existed.",
     hi: "इस मई NEET एक लीक पेपर की वजह से रद्द हुई। हर बार कहानी एक-सी होती है: परीक्षा से पहले की रात टेलीग्राम पर 'लीक' पेपर, और बाद में कोई साबित नहीं कर पाता कि वह कब से था।",
   },
   {
     target: "[data-tour=proof]",
-    en: "Forty-one recruitment exam leaks in five years, fifteen states, 1.4 crore applicants. Every time, the fight is about one thing: time.",
+    en: "Forty-one recruitment exam leaks in five years, across fifteen states, affecting 14 million applicants. Every time, the fight is about one thing: time.",
     hi: "पाँच साल में इकतालीस भर्ती परीक्षा लीक, पंद्रह राज्य, 1.4 करोड़ अभ्यर्थी। हर बार झगड़ा एक ही बात पर होता है: समय।",
   },
   {
