@@ -4,7 +4,7 @@ import { formatEther, type Hex } from "viem"
 import { useBurnerBalance } from "../hooks/useBurnerBalance"
 import { useNow } from "../hooks/useChain"
 import { useT } from "../i18n"
-import { burner } from "../lib/burner"
+import { burner, type BurnerKind, retireWitnessWallet } from "../lib/burner"
 import { normalise, questionHash, splitQuestions } from "../lib/hash"
 import { witnessPaper } from "../lib/mohar"
 import { Mark } from "./brand"
@@ -22,7 +22,10 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string>()
   const [receipt, setReceipt] = useState<{ key: Hex; tx: Hex; at: number }>()
-  const { address, wei, refresh, drip } = useBurnerBalance(open)
+  // a fresh wallet per witness keeps one person's witnesses unlinkable; the main wallet is the fallback
+  const [kind, setKind] = useState<BurnerKind>("witness")
+  const { address, wei, refresh, drip } = useBurnerBalance(open, kind)
+  const main = useBurnerBalance(open && kind === "witness" && drip === "failed", "main")
   const qs = splitQuestions(text)
   const now = useNow(5000)
   const late = now >= deadlineMs
@@ -34,7 +37,8 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
     setBusy(true)
     setErr(undefined)
     try {
-      const r = await witnessPaper(burner(), examId, text)
+      const r = await witnessPaper(burner(kind), examId, text)
+      if (kind === "witness") retireWitnessWallet()
       setReceipt({ key: r.entityKey, tx: r.txHash, at: Date.now() })
       setStep(3)
       onSealed()
@@ -122,6 +126,14 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
                   <button className="link" onClick={refresh}>
                     <RefreshCw size={12} /> {t("w.recheck")}
                   </button>
+                  {kind === "witness" && main.wei !== undefined && main.wei > 0n && (
+                    <div className="muted small">
+                      <button className="link" onClick={() => setKind("main")}>
+                        {t("w.useMain")}
+                      </button>{" "}
+                      {t("w.useMainNote")}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
