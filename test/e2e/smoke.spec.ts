@@ -100,6 +100,15 @@ test("open exam checks witnesses against a pasted official paper", async ({ page
   await expect(page.locator(".wrow").first()).toContainText("Leak · 1/2")
 })
 
+test("a later entry that moves an open exam's start is shown and ignored", async ({ page }) => {
+  await page.goto(OPEN)
+  const conflicts = page.locator(".conflicts")
+  await expect(conflicts).toContainText("1 later entry with this ID ignored")
+  await conflicts.locator("summary").click()
+  await expect(conflicts).toContainText("3h later")
+  await expect(page.getByText("Started 17 Oct 2026, 07:18:00 pm IST")).toBeVisible()
+})
+
 test("an unknown exam id is handled, not crashed", async ({ page }) => {
   await page.goto("/?exam=does-not-exist-123")
   await expect(page.getByText("No official seal for this exam")).toBeVisible()
