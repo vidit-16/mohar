@@ -40,7 +40,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
       let s = DICT[lang][k] ?? DICT.en[k]
       if (vars) {
         const n = Number(vars.n)
-        const plural = { qs: n === 1 ? "question" : "questions", ws: n === 1 ? "witness" : "witnesses", fps: n === 1 ? "fingerprint" : "fingerprints", es: n === 1 ? "entry" : "entries" }
+        const plural = { qs: n === 1 ? "question" : "questions", ws: n === 1 ? "witness" : "witnesses", fps: n === 1 ? "fingerprint" : "fingerprints", es: n === 1 ? "entry" : "entries", ss: n === 1 ? "seal" : "seals" }
         for (const [name, v] of Object.entries({ ...plural, ...vars })) s = s.replaceAll(`{${name}}`, String(v))
       }
       return s

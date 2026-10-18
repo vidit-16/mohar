@@ -14,7 +14,7 @@ describe("translations", () => {
   })
 
   it("Hindi strings use the same placeholders, except English-only plural words", () => {
-    const englishOnly = new Set(["qs", "ws", "fps", "es"])
+    const englishOnly = new Set(["qs", "ws", "fps", "es", "ss"])
     for (const k of Object.keys(DICT.en) as (keyof typeof DICT.en)[]) {
       const en = vars(DICT.en[k]).filter((v) => !englishOnly.has(v))
       expect(vars(DICT.hi[k]).filter((v) => !englishOnly.has(v)), k).toEqual(en)
