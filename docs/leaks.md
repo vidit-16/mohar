@@ -1,0 +1,26 @@
+# Paper leaks Mohar is built for
+
+Real cases from public reporting, with links. Mohar can't stop a leak. What it changes is the argument afterwards: whether a "leaked paper" really existed before the exam, which is the question every one of these cases turned on, and how long it took to answer.
+
+Nothing below goes on chain. The on-chain demo uses a made-up exam body and questions I wrote.
+
+## The scale
+
+In February 2024 the Indian Express counted **41 documented leaks in five years of recruitment exams across 15 states**, disrupting about **1.4 crore applicants** for a little over 1.04 lakh posts ([Indian Express](https://x.com/IndianExpress/status/1754781339642183793)). A Newslaundry count of media reports found 89 cases over a decade ([Newslaundry, Jul 2024](https://newslaundry.com/2024/07/31/10-years-89-paper-leak-cases-48-retests-from-centre-to-states-few-plugs-for-a-leaky-record)).
+
+## Cases
+
+| When | Exam | What happened | Where Mohar fits |
+|---|---|---|---|
+| Sep 2021 → Feb 2022 | **Rajasthan REET 2021, Level 2** | The paper leaked two days before the 26 Sep 2021 exam. Level 2 was cancelled in Feb 2022 and re-held; Level 1 was kept because no leak was shown there ([Careers360](https://news.careers360.com/reet-2021-rajasthan-govt-cancels-level-2-exam)). | Deciding which level was hit took months. With sealed sets, a witness holding Level 2 questions before the start is a public match against the Level 2 seal, and Level 1 shows none. |
+| Feb 2024 | **UPPSC RO/ARO prelims** | Held 11 Feb, cancelled in early March over leak allegations and handed to the STF; the re-exam was scheduled for December ([Careers360](https://news.careers360.com/uppsc-ro-aro-exam-cancelled-over-paper-leak-allegations-re-exam-in-six-months)). | Allegations were the only evidence for weeks. A witness sealed before 11 Feb either matches the revealed paper or it doesn't. |
+| Feb 2024 | **UP Police Constable** | About 48 lakh candidates sat the 17–18 Feb exam. The board first dismissed leak claims, then the state cancelled it on 24 Feb ([Business Today](https://www.businesstoday.in/india/story/up-police-constable-exam-2024-rescheduled-due-to-paper-leak-cm-yogi-adityanath-418824-2024-02-24)). | The board's "no leak" and the protesters' "leak" were both unverifiable. Mohar gives both sides the same public record to point at. |
+| Mar 2024 | **Bihar BPSC TRE-3** | The 15 Mar teacher recruitment exam was cancelled after the EOU reported the papers reached an organised gang before the exam. The commission had first said there wasn't enough evidence of a pre-exam leak ([Deccan Herald](https://www.deccanherald.com/india/bihar/bihar-cancels-teachers-recruitment-exam-following-question-paper-leak-2945031)). | "Before the exam?" was the exact point in dispute. That's the question Mohar answers with a block time nobody controls. |
+| May–Aug 2024 | **NEET-UG 2024** | The CBI said the paper leaked on exam day, 5 May, in Hazaribagh, and travelled to Patna. The Supreme Court refused to cancel the exam, holding the leak was limited to Patna and Hazaribagh ([WION](https://www.wionews.com/india-news/india-neet-ug-2024-paper-leak-was-limited-to-patna-and-hazaribagh-rules-supreme-court-746481/amp)). | How far the leak spread decided whether lakhs of candidates had to resit. Witness records carry the exact time and which set and questions they held, so the spread is on the record instead of reconstructed months later. |
+| Jun 2024 → 2025 | **UGC-NET June 2024** | Cancelled on 19 June after an alert that the paper was on the darknet and Telegram ([Business Today](https://www.businesstoday.in/education/story/ugc-net-paper-sold-for-rs-5000-rs-10000-on-dark-web-leaked-two-days-before-exam-434189-2024-06-21)). The CBI later filed a closure report: the "leaked paper" was a digitally altered screenshot made by a student ([Tribune](https://www.tribuneindia.com/news/india/no-proof-of-ugc-net-leak-cbi-closes-case)). | **This is Mohar's core case.** A fake leak cancelled a national exam. With a sealed paper, the screenshot could have been checked the same day: was it sealed on Mohar before the exam, and does it match? If not, it proves nothing. |
+
+## The law caught up, partly
+
+The Public Examinations (Prevention of Unfair Means) Act, 2024 came into force on 21 June 2024, with 3–5 years in jail for leaking and up to ₹1 crore in fines for organised groups ([SCC Online](https://scconline.com/blog/post/2024/06/22/government-notifies-public-examinations-prevention-of-unfair-means-act-2024/)). It punishes leaks after they're proven. Mohar is about the step before that: proving, quickly and publicly, whether there was a leak at all.
+
+*Compiled 18 Oct 2026 from the linked reports. Where reports disagree, the table uses the cited one.*
