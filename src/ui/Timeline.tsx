@@ -58,7 +58,7 @@ export function Timeline({ startMs, startLabel, official = true, opensAtMs, dead
           <button
             key={p.key}
             className={`tl-dot tone-${p.tone}`}
-            style={{ left: at(p.ms), top: `${70 + ((i % 2) * 2 - 1) * 8}%`, animationDelay: `${0.5 + i * 0.12}s` }}
+            style={{ left: at(p.ms), top: `${70 + ((i % 2) * 2 - 1) * 11}%`, animationDelay: `${0.5 + i * 0.12}s` }}
             title={`${p.label} · ${fmtTime(p.ms)}`}
             aria-label={`${p.label}, ${fmtTime(p.ms)}`}
             onClick={() => onPick?.(p.key)}
