@@ -81,7 +81,7 @@ lines.push("## Unit and chain tests by file\n", "| File | Tests |", "|---|---|",
 lines.push("## Browser tests\n", "| Test | Desktop | Phone |", "|---|---|---|")
 for (const title of [...new Set(browser.map((t) => t.title))]) {
   const s = (p: string) => (browser.find((t) => t.title === title && t.project === p)?.status === "passed" ? "pass" : (browser.find((t) => t.title === title && t.project === p)?.status ?? "-"))
-  lines.push(`| ${title.replace(/\|/g, "\\|")} | ${s("desktop")} | ${s("phone")} |`)
+  lines.push(`| ${title.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")} | ${s("desktop")} | ${s("phone")} |`)
 }
 if (mut) {
   lines.push("", "## Mutation testing\n", "| File | Mutants | Killed | Survived |", "|---|---|---|---|", ...mut.map((m) => `| \`${m.file}\` | ${m.total} | ${m.killed} | ${m.survived} |`))
