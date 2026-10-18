@@ -1,9 +1,8 @@
-import { Moon, Sun } from "lucide-react"
-import type { Address } from "viem"
+import { Globe, Moon, Sun } from "lucide-react"
 import { useChain } from "./hooks/useChain"
+import { useIssuer } from "./hooks/useIssuer"
 import { useT } from "./i18n"
 import { LangProvider } from "./LangProvider"
-import { ISSUERS } from "./lib/mohar"
 import { useLinkInterception, useSearch } from "./router"
 import { useTheme } from "./theme"
 import { Wordmark } from "./ui/brand"
@@ -11,7 +10,7 @@ import { ExamPage } from "./ui/ExamPage"
 import { EXPLORER, REPO } from "./ui/format"
 import { Home } from "./ui/Home"
 import { IssuerPage } from "./ui/IssuerPage"
-import { ToastHost } from "./ui/primitives"
+import { Empty, Spinner, ToastHost } from "./ui/primitives"
 import { Tour } from "./ui/Tour"
 
 export default function App() {
@@ -27,10 +26,10 @@ export default function App() {
 function Shell() {
   const search = useSearch()
   useLinkInterception()
+  const { t } = useT()
   const params = new URLSearchParams(search)
-  const issuer = (params.get("issuer") as Address | null) ?? (Object.keys(ISSUERS)[0] as Address)
-  const issuerName = ISSUERS[issuer] ?? "Custom issuer"
-  const home = params.get("issuer") ? `?issuer=${issuer}` : "./"
+  const trust = useIssuer(params)
+  const home = trust.status === "ready" ? trust.value.home : "./"
   const examId = params.get("exam")
 
   return (
@@ -42,10 +41,17 @@ function Shell() {
       <main id="main" className="container">
         {params.has("issue") ? (
           <IssuerPage homeHref={home} />
+        ) : trust.status === "loading" ? (
+          <Empty icon={<Spinner size={22} />} title={t("domain.loading").replace("{domain}", trust.domain)} />
+        ) : trust.status === "failed" ? (
+          <Empty icon={<Globe size={22} />} title={t("domain.failed").replace("{domain}", trust.domain)}>
+            <p className="muted small">{trust.error}</p>
+            <p className="muted small">{t("domain.failedHint")}</p>
+          </Empty>
         ) : examId ? (
-          <ExamPage key={examId} examId={examId} issuer={issuer} issuerName={issuerName} homeHref={home} />
+          <ExamPage key={examId} examId={examId} issuer={trust.value.issuer} issuerName={trust.value.issuerName} source={trust.value.source} domain={trust.value.domain} homeHref={home} />
         ) : (
-          <Home issuer={issuer} issuerName={issuerName} />
+          <Home issuer={trust.value.issuer} issuerName={trust.value.issuerName} />
         )}
       </main>
       <Footer />

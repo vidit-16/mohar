@@ -531,3 +531,7 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+.trust { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.trust-domain, .trust-registry { color: var(--good); }
+.trust-link { color: var(--warn, var(--text-2)); }

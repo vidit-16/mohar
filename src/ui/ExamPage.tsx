@@ -1,8 +1,9 @@
-import { ArrowLeft, BadgeCheck, Ban, Bell, ChevronRight, CircleCheck, CircleX, ExternalLink, FileText, Fingerprint, Info, Radio, ShieldAlert, Terminal, TriangleAlert, Users } from "lucide-react"
+import { ArrowLeft, BadgeCheck, Ban, Bell, ChevronRight, CircleCheck, CircleX, ExternalLink, FileText, Fingerprint, Globe, Info, Radio, ShieldAlert, Terminal, TriangleAlert, Users } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import type { Address, Hex } from "viem"
 import { useChain, useNow } from "../hooks/useChain"
 import { useExam } from "../hooks/useExam"
+import type { IssuerSource } from "../hooks/useIssuer"
 import { useT } from "../i18n"
 import { BURN, pastedPaper, QUERIES, sameAddr, type WitnessPayload } from "../lib/mohar"
 import { EvidenceDrawer, KeepAlive } from "./EvidenceDrawer"
@@ -15,7 +16,7 @@ import { WitnessSheet } from "./WitnessSheet"
 type Filter = "all" | "leak" | "before" | "late"
 export type TourAction = { action: "evidence-leak" | "close" | "witness" | "tech-on" | "tech-off" | "forged-open"; prefill?: string }
 
-export function ExamPage({ examId, issuer, issuerName, homeHref }: { examId: string; issuer: Address; issuerName: string; homeHref: string }) {
+export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref }: { examId: string; issuer: Address; issuerName: string; source: IssuerSource; domain?: string; homeHref: string }) {
   const { t } = useT()
   const [pasteText, setPasteText] = useState("")
   const [pasteApplied, setPasteApplied] = useState("")
@@ -294,6 +295,10 @@ export function ExamPage({ examId, issuer, issuerName, homeHref }: { examId: str
                 </Badge>
               </div>
               <p className="muted small">{t("exam.sealNote")}</p>
+              <p className={`small trust trust-${source}`}>
+                {source === "domain" ? <Globe size={14} /> : source === "link" ? <TriangleAlert size={14} /> : <BadgeCheck size={14} />}{" "}
+                {source === "domain" ? t("trust.domain").replace("{domain}", domain ?? "") : source === "link" ? t("trust.link") : t("trust.registry")}
+              </p>
               <p className="small tech-only">
                 <Mono value={issuer} kind="address" /> {issuerName}
               </p>
