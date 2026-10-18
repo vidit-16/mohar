@@ -18,13 +18,13 @@ Q7. Who was the first Chief Election Commissioner of India?`
 export const STEPS: TourStep[] = [
   {
     target: ".hero",
-    en: "The night before an exam, a 'leaked paper' goes round Telegram. After the exam, nobody can prove when it actually existed.",
-    hi: "परीक्षा से पहले की रात टेलीग्राम पर एक 'लीक' पेपर घूमता है। परीक्षा के बाद कोई साबित नहीं कर पाता कि वह कब से था।",
+    en: "This May, NEET was cancelled over a leaked paper. It always starts the same way: a 'leaked paper' on Telegram the night before, and afterwards nobody can prove when it existed.",
+    hi: "इस मई NEET एक लीक पेपर की वजह से रद्द हुई। हर बार कहानी एक-सी होती है: परीक्षा से पहले की रात टेलीग्राम पर 'लीक' पेपर, और बाद में कोई साबित नहीं कर पाता कि वह कब से था।",
   },
   {
     target: "[data-tour=proof]",
-    en: "Forty-one leaks in five years, across fifteen states. Every time, the fight is about one thing: time.",
-    hi: "पाँच साल में इकतालीस लीक, पंद्रह राज्यों में। हर बार झगड़ा एक ही बात पर होता है: समय।",
+    en: "Forty-one recruitment exam leaks in five years, fifteen states, 1.4 crore applicants. Every time, the fight is about one thing: time.",
+    hi: "पाँच साल में इकतालीस भर्ती परीक्षा लीक, पंद्रह राज्य, 1.4 करोड़ अभ्यर्थी। हर बार झगड़ा एक ही बात पर होता है: समय।",
   },
   {
     target: "#how",
@@ -34,8 +34,8 @@ export const STEPS: TourStep[] = [
   {
     exam: DEMO_EXAM,
     target: "[data-tour=exam-head]",
-    en: "Here's a demo state prelims. Everything on this page lives on a public network, not on our server.",
-    hi: "यह एक डेमो राज्य प्रारंभिक परीक्षा है। इस पेज की हर चीज़ एक सार्वजनिक नेटवर्क पर है, हमारे सर्वर पर नहीं।",
+    en: "Here's a demo state exam. Everything on this page lives on Arkiv, a public network, not on our server.",
+    hi: "यह एक डेमो राज्य परीक्षा है। इस पेज की हर चीज़ Arkiv पर है, एक सार्वजनिक नेटवर्क पर, हमारे सर्वर पर नहीं।",
   },
   {
     exam: DEMO_EXAM,
@@ -92,15 +92,15 @@ export const STEPS: TourStep[] = [
   {
     exam: DEMO_EXAM,
     target: "[data-tour=verify]",
-    en: "And if this website is ever blocked, anyone can check all of it straight from the network.",
-    hi: "और अगर यह वेबसाइट कभी बंद भी हो जाए, कोई भी सीधे नेटवर्क से सब जाँच सकता है।",
+    en: "And if this website is ever blocked, anyone can rebuild every verdict straight from the network, with one command or one saved page.",
+    hi: "और अगर यह वेबसाइट कभी बंद भी हो जाए, कोई भी हर फ़ैसला सीधे नेटवर्क से दोबारा बना सकता है, एक कमांड या एक सेव किए पेज से।",
   },
   {
     exam: LIVE_EXAM,
     target: "[data-tour=seal-btn]",
     action: { action: "witness", prefill: LEAK_SAMPLE },
-    en: "Your turn. Got a leaked paper before an exam? Paste it here. Only fingerprints leave your phone, never the questions or your name.",
-    hi: "अब आपकी बारी। परीक्षा से पहले लीक पेपर मिला? यहाँ डालें। सिर्फ़ फ़िंगरप्रिंट जाते हैं, न प्रश्न, न आपका नाम।",
+    en: "Your turn. It works for any exam today, even without the exam body. Paste a leaked paper here: only fingerprints leave your phone, never the questions or your name.",
+    hi: "अब आपकी बारी। यह आज किसी भी परीक्षा के लिए काम करता है, परीक्षा संस्था के बिना भी। लीक पेपर यहाँ डालें: सिर्फ़ फ़िंगरप्रिंट जाते हैं, न प्रश्न, न आपका नाम।",
   },
   {
     end: true,
