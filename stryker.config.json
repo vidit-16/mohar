@@ -7,7 +7,10 @@
   "mutate": [
     "src/lib/hash.ts",
     "src/lib/rules.ts",
-    "src/ui/verdict.ts"
+    "src/ui/verdict.ts",
+    "src/lib/pow.ts",
+    "src/lib/domain.ts",
+    "scripts/upkeep.ts"
   ],
   "coverageAnalysis": "off",
   "concurrency": 4,
