@@ -532,7 +532,7 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 
-.trust { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.trust-line { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
 .trust-domain, .trust-registry { color: var(--good); }
 .trust-link { color: var(--warn, var(--text-2)); }
 
@@ -541,3 +541,7 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 .conflicts ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 8px; }
 .conflicts li { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; line-height: 1.6; overflow-wrap: anywhere; }
 .conflicts .badge { margin-left: 6px; }
+
+/* collapsible rows on cards: at least a 24px tap target on phones */
+.forged summary, .conflicts summary { min-height: 28px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.paper-more { margin-top: 10px; }

@@ -56,6 +56,12 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
   const integrity = sealed && x.paper.length ? x.paper.filter((q) => q.sealed).length : 0
   const pickedRow = rows.find((r) => r.w.key === picked)
 
+  // a NEET-sized paper is hundreds of questions: show the first ones plus anything that leaked or
+  // doesn't match its seal, and let people expand the rest
+  const [showAllPaper, setShowAllPaper] = useState(false)
+  const allPaper = x.paper.map((q) => ({ q, hits: leaks.filter((r) => r.v!.matches.some((m) => m.set === q.set && m.index === q.index)).length }))
+  const paperRows = showAllPaper || allPaper.length <= 60 ? allPaper : allPaper.filter(({ q, hits }, i) => i < 30 || hits > 0 || !q.sealed)
+
   useEffect(() => {
     const onTour = (e: Event) => {
       const d = (e as CustomEvent<TourAction>).detail
@@ -299,7 +305,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                 </Badge>
               </div>
               <p className="muted small">{t("exam.sealNote")}</p>
-              <p className={`small trust trust-${source}`}>
+              <p className={`small trust-line trust-${source}`}>
                 {source === "domain" ? <Globe size={14} /> : source === "link" ? <TriangleAlert size={14} /> : <BadgeCheck size={14} />}{" "}
                 {source === "domain" ? t("trust.domain").replace("{domain}", domain ?? "") : source === "link" ? t("trust.link") : t("trust.registry")}
               </p>
@@ -329,7 +335,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               {exam.forged.length > 0 && (
                 <details className="forged" open={forgedOpen} onToggle={(e) => setForgedOpen((e.target as HTMLDetailsElement).open)} data-tour="forged">
                   <summary>
-                    <Ban size={14} /> {exam.forged.length} {t("exam.forgedTitle")}
+                    <Ban size={14} /> {t("exam.forgedTitle", { n: exam.forged.length })}
                   </summary>
                   <p className="muted small">{t("exam.forgedNote")}</p>
                   {exam.forged.map((f) => (
@@ -431,10 +437,9 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             </span>
           </div>
           <div className="paper">
-            {x.paper.map((q, i) => {
-              const hits = rows.filter((r) => r.d.kind === "leak" && r.v!.matches.some((m) => m.set === q.set && m.index === q.index)).length
+            {paperRows.map(({ q, hits }, i) => {
               return (
-                <div key={`${q.set}${q.index}`} className={`pq ${hits ? "hit" : ""}`} style={{ animationDelay: `${i * 0.04}s` }}>
+                <div key={`${q.set}${q.index}`} className={`pq ${hits ? "hit" : ""}`} style={{ animationDelay: `${Math.min(i, 20) * 0.04}s` }}>
                   <span className="pq-n">
                     {q.set}-Q{q.index}
                   </span>
@@ -449,6 +454,11 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               )
             })}
           </div>
+          {paperRows.length < x.paper.length && (
+            <button className="btn btn-ghost btn-sm paper-more" onClick={() => setShowAllPaper(true)}>
+              {t("exam.paperAll", { n: x.paper.length })}
+            </button>
+          )}
         </section>
       )}
 
