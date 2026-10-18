@@ -13,8 +13,14 @@ The paper itself is never published before the exam, not even encrypted. Only sa
 ## One-time setup
 
 1. **Create a dedicated issuer wallet.** Use it for nothing else. A hardware wallet or a key in an HSM is ideal; on testnet, `npm run wallets` is fine.
-2. **Publish the issuer address on your official website**, for example on the exam notice page. That's what makes your seals trustworthy: Mohar shows a seal as official only if its on-chain creator is your published address. Anyone can post a look-alike; it shows up as "fake seal ignored".
-3. **Get the address added to Mohar's registry** (`ISSUERS` in `src/lib/mohar.ts`), so the site badges it. Until then the site can be opened with `?issuer=<your address>`.
+2. **Publish the issuer address on your own website** at `https://<your domain>/.well-known/mohar.json`:
+
+   ```json
+   { "name": "Uttar Pradesh Public Service Commission", "issuers": ["0xYourIssuerAddress"] }
+   ```
+
+   Serve it with `Access-Control-Allow-Origin: *` so browsers can read it. That file is what makes your seals trustworthy: Mohar shows a seal as official only if its on-chain creator is an address your own domain lists. Anyone can post a look-alike; it shows up as "fake seal ignored". Link your exams as `https://mohar-in.vercel.app/?domain=<your domain>&exam=<exam id>`; the page then says "Address confirmed by <your domain>". The same check works without our site: `npx mohar-verify <exam id> --domain <your domain>`, or `check.html` with the website field filled in. When you rotate keys, list the new address first and keep the old one until its exams are done.
+3. **Optionally, get the address added to Mohar's built-in registry** (`ISSUERS` in `src/lib/mohar.ts`), so it's the default on the home page. The domain file is still the stronger proof, because it doesn't depend on us.
 4. Fund the wallet with a little gas. Sealing a whole paper is one transaction.
 
 ## Exam runbook

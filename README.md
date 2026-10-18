@@ -134,6 +134,10 @@ npx mohar-verify <open-exam-id> --paper official-paper.txt
 
 Or in a browser, with nothing installed: [mohar-in.vercel.app/check.html](https://mohar-in.vercel.app/check.html?exam=DSPSC-PRE26-10170937). It's one self-contained file, so you can save it and it keeps working without either site.
 
+### Exam bodies prove their own address
+
+An exam body publishes its seal address at `https://<its domain>/.well-known/mohar.json`, and Mohar trusts that file instead of a list we control. Open any exam with `?domain=<domain>`, run `npx mohar-verify <exam id> --domain <domain>`, or fill in the website field in `check.html`: all three read the same file and apply the same rule. The demo body's file is at [mohar-in.vercel.app/.well-known/mohar.json](https://mohar-in.vercel.app/.well-known/mohar.json). Details in [docs/for-exam-bodies.md](docs/for-exam-bodies.md).
+
 ## Building on it
 
 Everything is public and documented, so nobody needs permission. Start with **[docs/build-on-mohar.md](docs/build-on-mohar.md)**: the data contract, the hashing rules, `curl` recipes and two zero-dependency examples (a witness counter and a leak-alert feed for coaching institutes). Payloads have a [JSON Schema](arkiv/schemas/payloads.schema.json) that's tested against every record on chain, and [`verify/verify.mjs`](verify/verify.mjs) is a reference reader in about 100 lines. See [CONTRIBUTING.md](CONTRIBUTING.md) to work on the code.
