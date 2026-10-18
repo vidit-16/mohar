@@ -1,6 +1,6 @@
 # Friction report: building Mohar on Arkiv
 
-Everything here is something I actually hit while building Mohar on 17 October 2026, with block numbers or tx hashes where it happened on chain. Every SDK/RPC item has a script in [`repro/`](repro/) that reproduces it on Tiramisu; I re-ran all of them on 18 October and filed each one upstream (links under each item). Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
+Everything here is something I actually hit while building Mohar on 17–18 October 2026, with block numbers or tx hashes where it happened on chain. Every SDK/RPC item has a script in [`repro/`](repro/) that reproduces it on Tiramisu; I re-ran all of them on 18 October and filed each one upstream (links under each item). Each item has steps, expected vs actual, and what I think would fix it. The stuff that just worked is at the bottom, because that's useful to know too.
 
 **Environment:** `@arkiv-network/sdk@0.8.1` (pinned), `viem@2.57.7`, Node 24.19.0, Vite 8, Chrome on Windows 11, Tiramisu testnet (chain 7738577).
 
@@ -92,6 +92,17 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **Fix:** return a `createdAtTimestamp` (block timestamp) in query results, or let `select` ask for it.
 - **Repro:** `npx tsx arkiv/repro/8-created-at-is-a-block.ts`: `7 entities in 1 query, createdAt is a bigint block number (690151)` → `5 extra eth_getBlockByNumber calls`, a bit over a second.
 - **Filed:** [Arkiv-Network/reported-issues#22](https://github.com/Arkiv-Network/reported-issues/issues/22).
+
+## 9. One transaction holds about 128 KB, and when it's over the SDK says "Execution error without revert data"
+
+- **Surface:** public RPC (request size), `executeBatch` / `createEntity` error handling
+- **Context:** NEET-UG is 180 questions set in 13 languages. Mohar seals every language set and later reveals them all at once, ideally in one atomic `executeBatch`.
+- **Steps:** build reveal-shaped batches of 180 questions per set and send 1, 2, 4, 8 and 13 sets in one `executeBatch`.
+- **Expected:** either it fits, or a clear "too large" error with the limit.
+- **Actual:** 1 set (39 KB) and 2 sets (77 KB) go through. 4 sets (154 KB) and up fail with `Transaction failed: Execution error without revert data`. It isn't gas: a 77 KB batch used 3.2M gas against a 36M block limit. Sending the same data straight to the RPC shows the real reason: a request body of 256 KB or more gets `HTTP 413 {"error":"BAD_REQUEST","message":"request body too large"}`, and transaction data travels as hex (2 characters per byte), so one transaction tops out around **128 KB** of payload. Indian scripts take 3 bytes per character in UTF-8, so a 180-question set in Hindi or Tamil is already 60–80 KB: two such sets per transaction, at most.
+- **What I changed:** seal and reveal now pack sets into as few transactions as fit under a 100 KB budget (`packBatches` in `src/lib/rules.ts`, unit tested), with a clear error if a single set can't fit. Verdicts now use the **earliest** reveal block instead of the first in query order, so a split reveal can't move the deadline. Proven on chain with `npm run big-paper`: a 5-language, 900-question paper sealed in 1 transaction and revealed in 5 back-to-back ones within 15 blocks, 900/900 questions matching.
+- **Fix:** document the per-request limit next to the other RPC limits, and have the SDK pass the HTTP 413 through (or check the encoded size before sending) instead of turning it into "Execution error without revert data", which reads like a contract revert.
+- **Repro:** `npx tsx arkiv/repro/9-batch-size-limit.ts`, plus the raw `eth_estimateGas` probe in [`repro/README.md`](repro/README.md).
 
 ---
 

@@ -9,6 +9,7 @@ npx tsx arkiv/repro/5-readonly-is-deletable.ts
 npx tsx arkiv/repro/6-events-without-attributes.ts
 npx tsx arkiv/repro/7-keyless-budget.ts
 npx tsx arkiv/repro/8-created-at-is-a-block.ts
+npx tsx arkiv/repro/9-batch-size-limit.ts
 ```
 
 Output from 18 Oct 2026 (`@arkiv-network/sdk 0.8.1`, Node 24.19.0, Windows 11):
@@ -45,6 +46,21 @@ exam DSPSC-PRE26-10170937: 7 entities in 1 query, createdAt is a bigint block nu
 raw arkiv_getEntity fields: key, owner, creator, createdAt, updatedAt, expiresAt, creationFlags, contentType, payload, attributes | createdAt: 0xa87e7 updatedAt: 0xa87e7
 to turn them into times: 5 extra eth_getBlockByNumber calls, 1253 ms
 getBlockTiming only describes the current block (blockDuration 2s), so estimating past times from it drifts
+
+=== 9-batch-size-limit
+ 1 language sets, 39 KB of payload: OK, tx 0xbc7415cefc4a431d73acee26143742673e5513cd120af317f2f5604155baaced
+ 2 language sets, 77 KB of payload: OK, tx 0x6650f10810f60e51812ec9d8353436b915f3752da239cd5e17b2170f50b5b15a
+ 4 language sets, 154 KB of payload: FAILED: Transaction failed: Execution error without revert data
+ 8 language sets, 309 KB of payload: FAILED: Transaction failed: Execution error without revert data
+13 language sets, 502 KB of payload: FAILED: Transaction failed: Execution error without revert data
 ```
 
 Items 1 and 2 are about the Hub faucet page, so they're steps in `friction.md`, not scripts.
+
+The same limit, straight against the RPC (`eth_estimateGas` with N KB of `data`):
+
+```
+120KB data, body 240KB -> 200 {"jsonrpc":"2.0","id":1,"result":"0x4bef9f"}
+127KB data, body 254KB -> 200 {"jsonrpc":"2.0","id":1,"result":"0x505883"}
+128KB data, body 256KB -> 413 {"error":"BAD_REQUEST","message":"request body too large"}
+```
