@@ -4,6 +4,7 @@ import { useT } from "../i18n"
 import { navigate } from "../router"
 import { Emblem } from "./brand"
 import { STEPS, tourHref } from "./tourSteps"
+import { pickVoice } from "./speech"
 
 type Rect = { top: number; left: number; width: number; height: number }
 
@@ -21,13 +22,6 @@ const savePref = (k: string, v: boolean) => {
   } catch {
     /* storage blocked */
   }
-}
-
-function pickVoice(lang: "en" | "hi") {
-  const want = lang === "hi" ? "hi" : "en-IN"
-  const voices = speechSynthesis.getVoices()
-  const match = voices.filter((v) => v.lang.toLowerCase().startsWith(want.toLowerCase()))
-  return match.find((v) => /natural|online/i.test(v.name)) ?? match[0] ?? voices.find((v) => v.lang.startsWith(lang))
 }
 
 export function Tour({ search }: { search: string }) {
