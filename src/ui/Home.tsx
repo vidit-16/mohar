@@ -86,7 +86,12 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
           <b>1.4 cr</b>
           <span>{t("proof.applicants")}</span>
         </div>
-        <p className="proof-src">{t("proof.src")}</p>
+        <p className="proof-src">
+          {t("proof.src")} ·{" "}
+          <a href={`${REPO}/blob/main/docs/leaks.md`} target="_blank" rel="noopener">
+            {t("proof.cases")}
+          </a>
+        </p>
       </section>
 
       <section id="how" className="section">
