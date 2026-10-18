@@ -48,6 +48,7 @@ describe("fetchProof", () => {
     await expect(fetchProof("https://Demo.gov.in/anything", get)).resolves.toMatchObject({ domain: "demo.gov.in", issuers: [A] })
     expect(seen?.[0]).toBe("https://demo.gov.in/.well-known/mohar.json")
     expect(seen?.[1]?.redirect).toBe("error")
+    expect(seen?.[1]?.credentials).toBe("omit")
   })
 
   it("reports a missing file and a bad domain", async () => {

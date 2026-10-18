@@ -32,7 +32,7 @@ export async function fetchProof(input: string, get: typeof fetch = fetch): Prom
   const domain = normaliseDomain(input)
   if (!domain) throw new Error("not a valid domain")
   const url = `https://${domain}${PROOF_PATH}`
-  const res = await get(url, { headers: { accept: "application/json" }, redirect: "error" }).catch(() => {
+  const res = await get(url, { headers: { accept: "application/json" }, redirect: "error", credentials: "omit" }).catch(() => {
     // browsers hide the reason: offline, DNS, a redirect, or no Access-Control-Allow-Origin header on the file
     throw new Error(`couldn't load ${url} (offline, redirected, or the file isn't served with Access-Control-Allow-Origin: *)`)
   })
