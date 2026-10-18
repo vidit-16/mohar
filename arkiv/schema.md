@@ -118,7 +118,7 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 | Exam body edits or deletes its seal after a leak | `readonly` blocks edits; ownership is burned in the same tx, so nobody can delete. |
 | Exam body swaps a question after sealing | The reveal's `hash(salt \| question)` won't match the commit; the UI shows ✗ and "Paper matches seal" drops below 100%. Unit tested. |
 | Exam body announces a later start to discredit a leak | The deadline is the earlier of the announced start and the actual reveal block. |
-| Exam body reveals one set early | All sets are revealed in one atomic batch; a reveal before the announced start is flagged. |
+| Exam body reveals one set early | All sets are revealed in one atomic batch, or back-to-back batches when a paper exceeds one transaction; the deadline is the earliest reveal block, so revealing a set early only makes the deadline earlier. A reveal before the announced start is flagged. |
 | Witness backdates a claim | Time comes from the block, which only the chain sets. |
 | Someone claims a leak after the paper is out | Sealed after the deadline means "too late", whatever matches. |
 | Fake rumour papers flood the exam | Spam can't create a leak verdict, because only hashes matching the sealed paper count. Fake rumours show up as "no match". |

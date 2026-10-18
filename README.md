@@ -32,7 +32,7 @@ Mohar puts that clock somewhere neither side controls.
 
 1. **Seal.** Before the exam, the exam body writes `sha256(salt | question)` for every question. The record is `readonly` and its ownership goes to `0x…dEaD` in the same transaction, so nobody can edit or delete it later, not even the exam body.
 2. **Witness.** Got a "leaked paper" the night before? Paste it in. Your browser hashes each question and writes only the hashes, from a throwaway wallet. The text never leaves your phone.
-3. **Reveal.** At the exam, the exam body publishes every set's salts and questions in one transaction.
+3. **Reveal.** At the exam, the exam body publishes every set's salts and questions in one transaction. A paper too big for one (the RPC caps a transaction at about 128 KB, so a 180-question paper in several Indian languages) goes out in back-to-back transactions, and verdicts use the earliest.
 4. **Verdict.** The page checks, with no backend:
    - Does the revealed paper match what was sealed?
    - Which witnesses held real questions *before* the exam? Time comes from the block, not from anyone's claim.
@@ -65,7 +65,7 @@ What Mohar actually depends on: `$creator` can't change, block time is set by th
 | `createdBy()` / `$creator` | Every seal and reveal | "Verified exam body"; forged seals land in "fake seals ignored" |
 | `readonly` | All records | Nobody can patch them |
 | `predictEntityKeys` + `ownershipChanges` in one `executeBatch` | Sealing | "can't be deleted" on each set |
-| Atomic `executeBatch` | Revealing every set together | "All sets revealed together" |
+| Atomic `executeBatch` | Revealing every set together, split only when a paper is too big for one transaction | "All sets revealed together" |
 | `permissionlessExtension` + `extendEntity` | Every record | "Keep alive +14d", usable by anyone |
 | Different expiry per type | Seals: exam + 30d · open exams: + 60d · witnesses: 14d | Countdown on each item |
 | `watchEntityEvents` over `webSocket()`, no `fromBlock` | Exam page | Live panel |

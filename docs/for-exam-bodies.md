@@ -21,7 +21,7 @@ The paper itself is never published before the exam, not even encrypted. Only sa
 
    Serve it with `Access-Control-Allow-Origin: *` so browsers can read it. That file is what makes your seals trustworthy: Mohar shows a seal as official only if its on-chain creator is an address your own domain lists. Anyone can post a look-alike; it shows up as "fake seal ignored". Link your exams as `https://mohar-in.vercel.app/?domain=<your domain>&exam=<exam id>`; the page then says "Address confirmed by <your domain>". The same check works without our site: `npx mohar-verify <exam id> --domain <your domain>`, or `check.html` with the website field filled in. When you rotate keys, list the new address first and keep the old one until its exams are done.
 3. **Optionally, get the address added to Mohar's built-in registry** (`ISSUERS` in `src/lib/mohar.ts`), so it's the default on the home page. The domain file is still the stronger proof, because it doesn't depend on us.
-4. Fund the wallet with a little gas. Sealing a whole paper is one transaction.
+4. Fund the wallet with a little gas. Sealing a whole paper is usually one transaction: a 180-question paper in five languages sealed in one, costing well under 0.01 test GLM.
 
 ## Exam runbook
 
@@ -60,7 +60,7 @@ In the browser: *Reveal* tab, load the salts file, click *Reveal paper* (it stay
 npm run reveal -- secrets/UPPSC-PRE-2026-S1.json
 ```
 
-It refuses to run before the announced start. All sets are revealed in one transaction, so no set is ever out on its own. Mohar computes its "before the exam" deadline as the earlier of your announced start and this reveal, so announcing a later start can't discredit a real leak.
+It refuses to run before the announced start. All sets are revealed together: in one transaction for a normal paper, or in a few back-to-back ones when it is too big for one (one transaction holds about 128 KB; a 180-question set in an Indian script is 60–80 KB). Verdicts use the earliest reveal, so splitting can never help anyone. Mohar computes its "before the exam" deadline as the earlier of your announced start and this reveal, so announcing a later start can't discredit a real leak.
 
 **After the exam**
 
