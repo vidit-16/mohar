@@ -550,3 +550,5 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 .tour-rec-start { position: fixed; inset: 0; z-index: 80; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg); border: 0; cursor: pointer; pointer-events: auto; color: var(--text); font: inherit; }
 .tour-rec-title { font: 600 1.6rem/1.2 var(--display); }
 .tour-controls[hidden] { display: none; }
+.tour-end-url { margin: -10px 0 0; font: 500 1.05rem/1.2 var(--mono); color: var(--text-2); letter-spacing: 0.02em; }
+.tour-end .row-gap[hidden] { display: none; }
