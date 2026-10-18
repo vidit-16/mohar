@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
-import { POST as drip } from "../../api/drip"
+import { GET as challengeFor, POST as drip } from "../../api/drip"
+import { solve } from "../../src/lib/pow"
 import { POST as rpc } from "../../api/rpc"
 import { publicClient } from "../../src/lib/mohar"
 
@@ -20,12 +21,15 @@ describe("/api/drip against Tiramisu", () => {
   it("funds a fresh wallet once and refuses to fund it again", async () => {
     if (!process.env.DRIP_KEY) return
     const fresh = privateKeyToAccount(generatePrivateKey()).address
-    const first = await drip(post({ address: fresh }, `198.51.100.${Math.floor(Math.random() * 250)}`))
+    const challenge = await (await challengeFor(new Request(`http://localhost/api/drip?address=${fresh}`))).json()
+    const nonce = await solve(challenge)
+    const first = await drip(post({ address: fresh, challenge, nonce }, `198.51.100.${Math.floor(Math.random() * 250)}`))
     expect(first.status).toBe(200)
     const { hash } = await first.json()
     await publicClient().waitForTransactionReceipt({ hash })
     expect(await publicClient().getBalance({ address: fresh })).toBeGreaterThan(0n)
-    const again = await drip(post({ address: fresh }, `198.51.100.${Math.floor(Math.random() * 250)}`))
+    // replaying the same solved puzzle doesn't help: the wallet isn't empty any more
+    const again = await drip(post({ address: fresh, challenge, nonce }, `198.51.100.${Math.floor(Math.random() * 250)}`))
     expect(again.status).toBe(409)
   })
 })
