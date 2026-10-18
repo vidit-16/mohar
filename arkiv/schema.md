@@ -125,7 +125,9 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 | Duplicate open-exam entry with a different start time | First entry by `createdAt` wins; later ones are listed as conflicts. |
 | Guessing what a witness holds from their hashes | Hashes are of single questions, so someone who already has the paper can check them. Before the exam that lets the exam body see its real questions circulating, which works as an early warning. Witnesses use burner wallets, so nothing links back to a person. |
 | Witness evidence expires during a dispute | Anyone can extend a witness (`permissionlessExtension`), and the creation tx stays in history regardless. |
-| This website is blocked or taken down | Every exam page has raw `curl` commands, and `npx mohar-verify <exam-id>` rebuilds every verdict from the public RPC with zero dependencies. |
+| This website is blocked or taken down | Every exam page has raw `curl` commands, and `npx mohar-verify <exam-id>` or the one-file `check.html` rebuild every verdict from the public RPC with zero dependencies. |
+| Someone tampers with Mohar's issuer list, or the site itself | Exam bodies publish their address at `https://<their domain>/.well-known/mohar.json`; with `?domain=`, `--domain` or the `check.html` website field, only addresses that file lists count, so trust comes from the body's own website, not from us. |
+| Evidence expires before anyone notices | A weekly GitHub Action (`npm run keep-alive`) extends any record within 3 weeks of expiry; anyone else can run the same script. |
 
 Known limits: matching is exact after normalisation, so a reworded or translated question won't match. Tiramisu is a single-sequencer testnet, so time is only as trustworthy as its sequencing.
 
