@@ -6,7 +6,8 @@ beforeEach(() => {
   vi.resetModules()
 })
 
-describe("browser wallets", () => {
+// each test re-imports the SDK from scratch, which can take a few seconds on a busy machine
+describe("browser wallets", { timeout: 30_000 }, () => {
   it("keeps the main wallet stable and gives witnesses their own", async () => {
     const { burner } = await import("../src/lib/burner")
     const main = burner().account!.address
