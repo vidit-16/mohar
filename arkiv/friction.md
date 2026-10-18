@@ -103,6 +103,7 @@ Surfaces used: TypeScript SDK, raw JSON-RPC (`arkiv_query`, `arkiv_getBlockTimin
 - **What I changed:** seal and reveal now pack sets into as few transactions as fit under a 100 KB budget (`packBatches` in `src/lib/rules.ts`, unit tested), with a clear error if a single set can't fit. Verdicts now use the **earliest** reveal block instead of the first in query order, so a split reveal can't move the deadline. Proven on chain with `npm run big-paper`: a 5-language, 900-question paper sealed in 1 transaction and revealed in 5 back-to-back ones within 15 blocks, 900/900 questions matching.
 - **Fix:** document the per-request limit next to the other RPC limits, and have the SDK pass the HTTP 413 through (or check the encoded size before sending) instead of turning it into "Execution error without revert data", which reads like a contract revert.
 - **Repro:** `npx tsx arkiv/repro/9-batch-size-limit.ts`, plus the raw `eth_estimateGas` probe in [`repro/README.md`](repro/README.md).
+- **Filed:** [Arkiv-Network/reported-issues#23](https://github.com/Arkiv-Network/reported-issues/issues/23).
 
 ---
 
