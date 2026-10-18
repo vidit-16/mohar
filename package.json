@@ -21,7 +21,8 @@
     "seal": "tsx scripts/seal.ts",
     "reveal": "tsx scripts/reveal.ts",
     "test:e2e:prod": "E2E_BASE_URL=https://mohar-in.vercel.app playwright test",
-    "shots": "node scripts/screenshots.mjs"
+    "shots": "node scripts/screenshots.mjs",
+    "keep-alive": "tsx scripts/keep-alive.ts"
   },
   "dependencies": {
     "@arkiv-network/sdk": "0.8.1",

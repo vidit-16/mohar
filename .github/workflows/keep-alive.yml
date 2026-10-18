@@ -1,0 +1,29 @@
+name: keep-alive
+
+# tops up any Mohar record that would expire within 3 weeks. records are created with
+# permissionlessExtension, so this only needs a throwaway wallet with a little test GLM.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: extend
+        env:
+          KEEPALIVE_KEY: ${{ secrets.KEEPALIVE_KEY }}
+          ARKIV_KEY: ${{ secrets.ARKIV_KEY }}
+        run: |
+          if [ -z "$KEEPALIVE_KEY" ]; then npm run keep-alive -- --dry-run; else npm run keep-alive; fi
