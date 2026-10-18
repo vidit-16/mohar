@@ -22,6 +22,10 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
   const [pasteApplied, setPasteApplied] = useState("")
   const pasted = useMemo(() => pastedPaper(pasteApplied), [pasteApplied])
   const x = useExam(examId, issuer, pasted)
+  // a paper too big for one transaction is revealed in a few back-to-back ones (see packBatches)
+  const revealBlocks = [...new Set(x.reveals.map((r) => r.createdAt))].sort((a, b) => (a < b ? -1 : 1))
+  const revealTxs = revealBlocks.length
+  const firstRevealBlock = revealBlocks[0]
   const { msUntilBlock } = useChain()
   const now = useNow(1000)
   const [witnessOpen, setWitnessOpen] = useState(false)
@@ -421,9 +425,9 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               <FileText size={16} /> {t("exam.paper")}
             </h2>
             <span className="muted small">
-              {t("exam.paperNote")}
+              {revealTxs > 1 ? t("exam.paperNoteSplit", { n: revealTxs }) : t("exam.paperNote")}
               {x.revealMs ? ` · ${fmtTime(x.revealMs)}` : ""}
-              <span className="tech-only"> · #{String(x.reveals[0].createdAt)}</span>
+              <span className="tech-only"> · #{String(firstRevealBlock)}</span>
             </span>
           </div>
           <div className="paper">
