@@ -13,17 +13,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "query",
-          "key": "w"
-        }
-      ],
-      "destination": "/api/share"
-    }
   ]
 }

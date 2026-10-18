@@ -84,3 +84,21 @@ describe("/api/share", () => {
     }
   })
 })
+
+describe("middleware", () => {
+  it("sends only shared witness links to /api/share", async () => {
+    const { default: middleware } = await import("../middleware")
+    const real = globalThis.fetch
+    const seen: string[] = []
+    globalThis.fetch = (async (u: URL | string) => (seen.push(String(u)), new Response("ok"))) as typeof fetch
+    try {
+      expect(middleware(new Request("https://m.app/"))).toBeUndefined()
+      expect(middleware(new Request("https://m.app/?exam=E"))).toBeUndefined()
+      expect(middleware(new Request("https://m.app/?w=0x1"))).toBeUndefined()
+      await middleware(new Request(`https://m.app/?exam=E&w=${K}`))
+      expect(seen).toEqual([`https://m.app/api/share?exam=E&w=${K}`])
+    } finally {
+      globalThis.fetch = real
+    }
+  })
+})
