@@ -11,7 +11,7 @@ import { tiramisu } from "@arkiv-network/sdk/chains"
 import { and, eq, gte } from "@arkiv-network/sdk/query"
 import { type Address, fallback, type Hex, http, webSocket } from "viem"
 import { commitHash, questionHash, randomSalt, rootHash, splitQuestions } from "./hash"
-import { type CommitPayload, type ExamSpec, newOpenExamId, type OpenExamPayload, type RevealPayload, type Row, type SealSecrets, type WitnessPayload } from "./rules"
+import { type CommitPayload, type ExamSpec, newOpenExamId, type OpenExamPayload, packBatches, type RevealPayload, type Row, type SealSecrets, type WitnessPayload } from "./rules"
 
 export * from "./rules"
 
@@ -48,17 +48,39 @@ const graceExpiry = (opensAtMs: number, days: number) =>
   ExpirationTime.atDate(new Date(opensAtMs + days * DAY_MS), { atLeast: ExpirationTime.fromDays(14) })
 
 
-export async function sealExam(wallet: WalletArkivClient, spec: ExamSpec) {
+type Create = Parameters<WalletArkivClient["executeBatch"]>[0]["creates"] extends (infer C)[] | undefined ? C : never
+
+// Creates entities in as few transactions as fit (see packBatches), each one handing its entities to a dead
+// address in the same tx: readonly still lets the owner delete, so ownership is burned straight away.
+async function createBurned(wallet: WalletArkivClient, creates: Omit<Create, "salt">[], label: (i: number) => string) {
   const owner = wallet.account!.address
-  const keys = await publicClient().predictEntityKeys({ owner, count: spec.sets.length })
+  const batches = packBatches(
+    creates.map((c, i) => ({ c, i })),
+    ({ c }) => c.payload?.length ?? 0,
+    undefined,
+    ({ i }) => label(i),
+  )
+  const txHashes: Hex[] = []
+  for (const batch of batches) {
+    const keys = await publicClient().predictEntityKeys({ owner, count: batch.length })
+    const res = await wallet.executeBatch({
+      creates: batch.map(({ c }, j) => ({ ...c, salt: keys[j].salt }) as Create),
+      ownershipChanges: keys.map((k) => ({ entityKey: k.key, newOwner: BURN })),
+    })
+    txHashes.push(res.txHash)
+  }
+  return { txHash: txHashes[0], txHashes }
+}
+
+export async function sealExam(wallet: WalletArkivClient, spec: ExamSpec) {
   const secrets: SealSecrets = { examId: spec.examId, sets: [] }
-  const creates = spec.sets.map((set, i) => {
+  const creates = spec.sets.map((set) => {
     const salts = set.questions.map(() => randomSalt())
     secrets.sets.push({ code: set.code, salts, questions: set.questions })
     const commits = set.questions.map((q, j) => commitHash(salts[j], q))
     return {
       payload: jsonToPayload({ v: 1, title: spec.title, commits } satisfies CommitPayload),
-      contentType: "application/json",
+      contentType: "application/json" as const,
       attributes: {
         project: str(PROJECT),
         type: str("paper_commit"),
@@ -71,23 +93,15 @@ export async function sealExam(wallet: WalletArkivClient, spec: ExamSpec) {
       },
       expires: graceExpiry(spec.opensAtMs, 30),
       flags: { readonly: true, permissionlessExtension: true },
-      salt: keys[i].salt,
     }
   })
-  // readonly still lets the owner delete, so ownership goes to a dead address in the same tx
-  const res = await wallet.executeBatch({
-    creates,
-    ownershipChanges: keys.map((k) => ({ entityKey: k.key, newOwner: BURN })),
-  })
-  return { ...res, secrets }
+  return { ...(await createBurned(wallet, creates, (i) => spec.sets[i].code)), secrets }
 }
 
 export async function revealExam(wallet: WalletArkivClient, secrets: SealSecrets, opensAtMs: number) {
-  const owner = wallet.account!.address
-  const keys = await publicClient().predictEntityKeys({ owner, count: secrets.sets.length })
-  const creates = secrets.sets.map((set, i) => ({
+  const creates = secrets.sets.map((set) => ({
     payload: jsonToPayload({ v: 1, salts: set.salts, questions: set.questions } satisfies RevealPayload),
-    contentType: "application/json",
+    contentType: "application/json" as const,
     attributes: {
       project: str(PROJECT),
       type: str("reveal"),
@@ -97,12 +111,9 @@ export async function revealExam(wallet: WalletArkivClient, secrets: SealSecrets
     },
     expires: graceExpiry(opensAtMs, 30),
     flags: { readonly: true, permissionlessExtension: true },
-    salt: keys[i].salt,
   }))
-  return wallet.executeBatch({
-    creates,
-    ownershipChanges: keys.map((k) => ({ entityKey: k.key, newOwner: BURN })),
-  })
+  // usually one transaction; a many-language paper goes out in back-to-back ones, and verdicts use the earliest
+  return createBurned(wallet, creates, (i) => secrets.sets[i].code)
 }
 
 export async function createOpenExam(wallet: WalletArkivClient, input: { title: string; opensAtMs: number; notice?: string }) {

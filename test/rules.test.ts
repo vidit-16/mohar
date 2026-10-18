@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { commitHash, questionHash } from "../src/lib/hash"
-import { groupExams, judge, newOpenExamId, openExamFrom, openReveals, pastedPaper, type Row, sameAddr } from "../src/lib/rules"
+import { BATCH_BUDGET_BYTES, groupExams, judge, newOpenExamId, openExamFrom, openReveals, packBatches, pastedPaper, type Row, sameAddr } from "../src/lib/rules"
 import { describe as describeVerdict } from "../src/ui/verdict"
 import { errText, fmtDuration, fmtRelative, short } from "../src/ui/format"
 
@@ -141,4 +141,24 @@ describe("format", () => {
     expect(errText(new Error('429 {"error":"ANON_COST_LIMITED"}'))).toMatch(/read limit/)
     expect(errText("boom\nstack")).toBe("boom")
   })
+})
+
+describe("packBatches", () => {
+  const kb = (n: number) => n * 1024
+  it("keeps a normal paper in one transaction", () => {
+    expect(packBatches([kb(39), kb(39)], (n) => n)).toEqual([[kb(39), kb(39)]])
+  })
+  it("splits in order once the budget would be passed, never reordering", () => {
+    const sets = [40, 40, 40, 40, 40].map(kb)
+    const out = packBatches(sets.map((n, i) => ({ n, i })), (s) => s.n)
+    expect(out.map((b) => b.map((s) => s.i))).toEqual([[0, 1], [2, 3], [4]])
+    for (const b of out) expect(b.reduce((a, s) => a + s.n, 0)).toBeLessThanOrEqual(BATCH_BUDGET_BYTES)
+  })
+  it("allows a batch exactly at the budget", () => {
+    expect(packBatches([kb(50), kb(50), 1], (n) => n)).toEqual([[kb(50), kb(50)], [1]])
+  })
+  it("refuses a single set that can never fit, naming it", () => {
+    expect(() => packBatches([kb(10), kb(101)], (n) => n, undefined, (_, i) => (i ? "A-hi" : "A-en"))).toThrow(/A-hi is 101 KB/)
+  })
+  it("handles nothing", () => expect(packBatches([], () => 1)).toEqual([]))
 })

@@ -142,3 +142,28 @@ export function newOpenExamId(title: string) {
   const tail = Array.from(crypto.getRandomValues(new Uint8Array(3)), (b) => b.toString(16).padStart(2, "0")).join("")
   return `open-${slug || "exam"}-${tail}`
 }
+
+// The public RPC refuses request bodies of 256 KB or more, and transaction data travels as hex (2 characters
+// per byte), so one transaction can carry roughly 128 KB. Sets are packed in order into as few transactions as
+// fit under a budget that leaves room for attributes and signatures. One transaction for a normal paper;
+// a NEET-sized paper in many languages needs a few.
+export const BATCH_BUDGET_BYTES = 100 * 1024
+
+export function packBatches<T>(items: T[], size: (item: T) => number, budget = BATCH_BUDGET_BYTES, name: (item: T, i: number) => string = (_, i) => `#${i + 1}`): T[][] {
+  const batches: T[][] = []
+  let current: T[] = []
+  let used = 0
+  items.forEach((item, i) => {
+    const n = size(item)
+    if (n > budget) throw new Error(`Set ${name(item, i)} is ${Math.ceil(n / 1024)} KB, more than fits in one transaction (${budget / 1024} KB). Split it into two set codes.`)
+    if (used + n > budget && current.length) {
+      batches.push(current)
+      current = []
+      used = 0
+    }
+    current.push(item)
+    used += n
+  })
+  if (current.length) batches.push(current)
+  return batches
+}
