@@ -107,7 +107,7 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 - The paper before the exam, not even encrypted. Only salted hashes are sealed.
 - The salts before the exam.
 - Witness question text. Only hashes go on chain, and the reveal supplies the text.
-- Any identity: witnesses sign from a burner wallet made in the browser. No names, phone numbers, roll numbers, images or PDFs.
+- Any identity: every witness is sealed from a brand-new browser wallet, funded by the shared drip and retired right after, so one person's witnesses can't be tied to each other or to the wallet they use for anything else. No names, phone numbers, roll numbers, images or PDFs. (Honest limit: the RPC and the drip see the IP address of each request, like any web server.)
 - The issuer's real-world identity. That's a static address list in the app (`ISSUERS`), overridable with `?issuer=0x…`.
 
 ## Threat model
@@ -124,6 +124,7 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 | Fake rumour papers flood the exam | Spam can't create a leak verdict, because only hashes matching the sealed paper count. Fake rumours show up as "no match". |
 | Duplicate open-exam entry with a different start time | First entry by `createdAt` wins; later ones are listed as conflicts. |
 | Guessing what a witness holds from their hashes | Hashes are of single questions, so someone who already has the paper can check them. Before the exam that lets the exam body see its real questions circulating, which works as an early warning. Witnesses use burner wallets, so nothing links back to a person. |
+| Linking one person's witnesses together | Each witness is sealed from a new wallet funded by the same public drip that funds everyone, then retired, so on chain the witnesses share nothing but that common funder. The old keys stay in the browser so the person can still extend their own records. |
 | Witness evidence expires during a dispute | Anyone can extend a witness (`permissionlessExtension`), and the creation tx stays in history regardless. |
 | This website is blocked or taken down | Every exam page has raw `curl` commands, and `npx mohar-verify <exam-id>` or the one-file `check.html` rebuild every verdict from the public RPC with zero dependencies. |
 | Someone tampers with Mohar's issuer list, or the site itself | Exam bodies publish their address at `https://<their domain>/.well-known/mohar.json`; with `?domain=`, `--domain` or the `check.html` website field, only addresses that file lists count, so trust comes from the body's own website, not from us. |
@@ -140,6 +141,6 @@ Known limits: matching is exact after normalisation, so a reworded or translated
 | Witness A | `0xA1BeFA506054F89b1eaF8e15259c90b895ecf40D` | `witness` before the exam |
 | Witness B, also the forger | `0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013` | look-alike `paper_commit` (ignored), `witness` after the exam |
 | Browser burner (my testing) | `0x368cAbd27838BA645f883076cC87A839a7457043` | `witness` on the upcoming exam, the demo `open_exam` and its `witness`, extensions |
-| Visitors | their own burner wallets | `witness`, `open_exam`, extensions |
+| Visitors | a fresh browser wallet per witness, plus one stable browser wallet | `witness` (fresh wallet each time); `open_exam` and extensions (stable wallet) |
 
 Demo exams: `DSPSC-PRE26-10170937` (sealed, held, revealed, one leak), `DSPSC-PRE26-U10170941` (sealed, upcoming, open for witnesses) `open-demo-mock-test-open-exam-e96c10` (open exam added from the site; a witness sealed 3 minutes before the start matches 1 of 2 questions when the official paper is pasted), and `DEMO-BILINGUAL-2` (sealed from a CSV with English and Hindi sets; a witness that pasted `प्रश्न १। …` matches `A-hi-Q1`). `DEMO-BILINGUAL-1` is the first run of that test: its Hindi witness was hashed before the normaliser learned Hindi numbering (`प्रश्न`, `प्र.`, `१`, `।`), so it correctly stays "no match"; on-chain hashes never change. Transcript: [`demo-run.txt`](demo-run.txt).
