@@ -1,8 +1,6 @@
 // Shared by api/card.ts and api/share.ts: what a link preview says about one witness.
 // The verdict comes from verify/verify.mjs, the zero-dependency reader that's parity-tested against the app,
 // so a shared card can't disagree with the page it opens.
-// @ts-expect-error plain JS on purpose, it has to run with zero dependencies
-import { verdicts } from "../verify/verify.mjs"
 
 export type Tone = "danger" | "good" | "warn" | "info"
 export type Card = { exam: string; headline: string; detail: string; tone: Tone; badge: string }
@@ -48,6 +46,11 @@ export function cardFor(v: Verdicts, witnessKey: string): Card {
 export async function loadCard(examId: string, witnessKey: string): Promise<Card> {
   if (!examId || examId.length > 120 || !/^0x[0-9a-fA-F]{64}$/.test(witnessKey)) return FALLBACK
   try {
+    // the verifier reads ARKIV_RPC when it loads; point it at the keyed endpoint so previews don't
+    // spend the keyless budget (~100 queries per IP, shared by every Vercel function)
+    if (!process.env.ARKIV_RPC && process.env.ARKIV_KEY) process.env.ARKIV_RPC = `https://rpc.tiramisu.db-chain.testnet.arkiv.network/${process.env.ARKIV_KEY.trim()}`
+    // @ts-expect-error plain JS on purpose, it has to run with zero dependencies
+    const { verdicts } = await import("../verify/verify.mjs")
     return cardFor((await verdicts(examId)) as Verdicts, witnessKey)
   } catch {
     return FALLBACK
