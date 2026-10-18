@@ -161,7 +161,7 @@ src/lib/          hashing, verdict rules, every Arkiv read/write, wallets
 src/hooks/        exam data, live events, chain clock
 src/ui/           pages, sheets, timeline, tour, seal artwork
 src/i18n.tsx      English + Hindi
-api/              Vercel functions: read-only RPC proxy, test-GLM drip
+api/              Vercel functions: read-only RPC proxy, test-GLM drip (with proof of work), share cards
 public/check.html one-file browser checker
 verify/           mohar-verify, the zero-dependency CLI verifier (npm)
 arkiv/            schema.md, friction.md, repro scripts, JSON Schema, demo transcript
