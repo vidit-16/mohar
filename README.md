@@ -22,7 +22,7 @@ Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.net
 
 ## Why I built this
 
-Paper leaks are basically a recurring event in India now. The Indian Express counted 41 recruitment exam leaks across 15 states in five years, hitting around 1.4 crore applicants. Every time it happens, the argument ends up being about *time*: did this "leaked paper" on Telegram exist before the exam, or did someone make it after? ([Six recent cases, with sources](docs/leaks.md): REET, UPPSC RO/ARO, UP Police, BPSC TRE-3, NEET-UG and UGC-NET, which was cancelled over what the CBI later called a doctored screenshot.)
+Paper leaks are basically a recurring event in India now. The Indian Express counted 41 recruitment exam leaks across 15 states in five years, hitting around 1.4 crore applicants. Every time it happens, the argument ends up being about *time*: did this "leaked paper" on Telegram exist before the exam, or did someone make it after? ([Seven recent cases, with sources](docs/leaks.md), most recently NEET-UG 2026, cancelled after the CBI says NTA's own subject experts walked the paper out of its office, and UGC-NET 2024, cancelled over what the CBI later called a doctored screenshot.)
 
 In the NEET-UG 2024 hearings, NTA told the Supreme Court that the Telegram video petitioners relied on had a manipulated timestamp. Maybe it did, maybe it didn't. Nobody could prove it either way, because the only clocks around were screenshots and the exam body's own servers. And the exam body is the one being accused.
 

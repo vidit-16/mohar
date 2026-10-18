@@ -20,7 +20,7 @@ const en = {
   "proof.states": "states",
   "proof.applicants": "applicants affected",
   "proof.src": "Indian Express, 2024",
-  "proof.cases": "6 recent cases, with sources",
+  "proof.cases": "7 recent cases, with sources",
 
   "exams.title": "Exams",
   "exams.sealed": "Sealed by exam bodies",
@@ -275,7 +275,7 @@ const hi: Record<Key, string> = {
   "proof.states": "राज्य",
   "proof.applicants": "अभ्यर्थी प्रभावित",
   "proof.src": "इंडियन एक्सप्रेस, 2024",
-  "proof.cases": "हाल के 6 मामले, स्रोतों के साथ",
+  "proof.cases": "हाल के 7 मामले, स्रोतों के साथ",
 
   "exams.title": "परीक्षाएँ",
   "exams.sealed": "संस्थाओं द्वारा सील",
