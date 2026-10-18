@@ -1,6 +1,6 @@
 # Mohar (मोहर)
 
-[![ci](https://github.com/vidit-16/mohar/actions/workflows/ci.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/ci.yml) [![codeql](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml) [![pages](https://github.com/vidit-16/mohar/actions/workflows/pages.yml/badge.svg)](https://vidit-16.github.io/mohar/) [![license: MIT](https://img.shields.io/badge/license-MIT-b4532a.svg)](LICENSE)
+[![ci](https://github.com/vidit-16/mohar/actions/workflows/ci.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/ci.yml) [![codeql](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml) [![pages](https://github.com/vidit-16/mohar/actions/workflows/pages.yml/badge.svg)](https://vidit-16.github.io/mohar/) [![npm: mohar-verify](https://img.shields.io/npm/v/mohar-verify?label=npm%20mohar-verify)](https://www.npmjs.com/package/mohar-verify) [![license: MIT](https://img.shields.io/badge/license-MIT-b4532a.svg)](LICENSE)
 
 Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.network).
 
