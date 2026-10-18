@@ -1,0 +1,26 @@
+name: chain
+
+# re-checks the demo evidence on live Tiramisu every night: seals still burned and read-only,
+# every revealed question still matches its seal, verdicts unchanged, payloads match the schema.
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:chain
+        env:
+          ARKIV_KEY: ${{ secrets.ARKIV_KEY }}
