@@ -361,9 +361,26 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                 )}
               </dl>
               {exam.conflicts.length > 0 && (
-                <p className="small warn-text">
-                  <TriangleAlert size={13} /> {exam.conflicts.length} {t("exam.conflicts")}
-                </p>
+                <details className="conflicts">
+                  <summary className="small warn-text">
+                    <TriangleAlert size={13} /> {t("exam.conflicts", { n: exam.conflicts.length })}
+                  </summary>
+                  <p className="muted small">{t("exam.conflictsWhy")}</p>
+                  <ul>
+                    {exam.conflicts.map((c) => {
+                      const claimed = Number(c.attrs.opens_at_ms)
+                      const at = x.times.get(c.createdAt)
+                      return (
+                        <li key={c.key} className="small">
+                          <Mono value={c.creator} kind="address" /> · {t("exam.conflictAdded")} {at ? fmtDateTime(at) : "…"}
+                          <br />
+                          {t("exam.conflictClaims")} <b>{fmtDateTime(claimed)}</b>
+                          {claimed !== exam.opensAtMs && <Badge tone="warn">{fmtDuration(Math.abs(claimed - exam.opensAtMs))} {claimed > exam.opensAtMs ? t("exam.conflictLater") : t("exam.conflictEarlier")}</Badge>}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </details>
               )}
               <KeepAlive row={exam.sets[0]} msLeft={msUntilBlock(exam.sets[0].expiresAt)} onDone={x.reload} compact />
             </section>

@@ -76,7 +76,7 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   }, [cursor, examId])
 
   useEffect(() => {
-    const blocks = [...(exam?.sets ?? []), ...(exam?.forged ?? []), ...reveals, ...witnesses].map((r) => r.createdAt)
+    const blocks = [...(exam?.sets ?? []), ...(exam?.forged ?? []), ...(exam?.conflicts ?? []), ...reveals, ...witnesses].map((r) => r.createdAt)
     const missing = [...new Set(blocks)].filter((b) => !times.has(b))
     if (missing.length === 0) return
     let stop = false
