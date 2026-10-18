@@ -1,11 +1,12 @@
-import { Clock, HeartPulse, Link2, Printer } from "lucide-react"
-import { useState } from "react"
+import { Clock, HeartPulse, Link2, Printer, Square, Volume2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useNow } from "../hooks/useChain"
 import { useT } from "../i18n"
 import { burner } from "../lib/burner"
 import { keepAlive, type Row, type Verdict, type WitnessPayload } from "../lib/mohar"
 import { errText, fmtDateTime, fmtDuration } from "./format"
-import { Badge, Mono, Sheet, Spinner, } from "./primitives"
+import { Badge, Mono, Sheet, Spinner } from "./primitives"
+import { canSpeak, speakAll } from "./speech"
 import { useToast } from "./toast"
 import { describe } from "./verdict"
 
@@ -68,7 +69,10 @@ export function EvidenceDrawer({ row, verdict, hasPaper, examTitle, msLeft, onCl
 
         {verdict && verdict.matches.length > 0 && (
           <div data-tour="matches">
-            <div className="field-label">{t("ev.matched")}</div>
+            <div className="row-between">
+              <div className="field-label">{t("ev.matched")}</div>
+              {canSpeak() && <ReadAloud parts={[d.title, ...verdict.matches.map((m) => m.text)]} />}
+            </div>
             <ul className="match-list">
               {verdict.matches.map((m) => (
                 <li key={`${m.set}${m.index}`}>
@@ -151,5 +155,25 @@ export function KeepAlive({ row, msLeft, onDone, compact }: { row: Row; msLeft: 
         </button>
       )}
     </div>
+  )
+}
+
+function ReadAloud({ parts }: { parts: string[] }) {
+  const { t } = useT()
+  const [on, setOn] = useState(false)
+  useEffect(() => () => speechSynthesis.cancel(), [])
+  const toggle = () => {
+    if (on) {
+      speechSynthesis.cancel()
+      setOn(false)
+      return
+    }
+    setOn(true)
+    speakAll(parts, 0.95, () => setOn(false))
+  }
+  return (
+    <button className="btn btn-ghost btn-sm no-print" onClick={toggle} aria-pressed={on}>
+      {on ? <Square size={14} /> : <Volume2 size={14} />} {on ? t("ev.stop") : t("ev.listen")}
+    </button>
   )
 }
