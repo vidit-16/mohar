@@ -24,7 +24,8 @@
     "shots": "node scripts/screenshots.mjs",
     "keep-alive": "tsx scripts/keep-alive.ts",
     "evidence": "tsx scripts/evidence.ts",
-    "test:report": "tsx scripts/test-report.ts"
+    "test:report": "tsx scripts/test-report.ts",
+    "big-paper": "tsx scripts/big-paper.ts"
   },
   "dependencies": {
     "@arkiv-network/sdk": "0.8.1",
