@@ -58,7 +58,8 @@ async function main() {
   const [examId, issuerArg] = args
   if (!examId) {
     console.error("usage: mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]")
-    process.exit(1)
+    process.exitCode = 1
+    return
   }
   let trusted = [issuerArg ?? DEFAULT_ISSUER]
   if (domainArg) {
@@ -107,7 +108,8 @@ async function main() {
     if (paperFile) paper = lines(readFileSync(paperFile, "utf8")).map((q, i) => ({ id: `Q${i + 1}`, hash: sha(normalise(q)), ok: true }))
   } else {
     console.log(`nothing found for ${examId}`)
-    process.exit(2)
+    process.exitCode = 2
+    return
   }
 
   const revealMs = reveals[0] ? await timeOf(reveals[0].createdAt) : undefined
@@ -126,8 +128,9 @@ async function main() {
 
 // realpath: npx runs the file through a symlink in node_modules/.bin
 if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+  // exitCode, not process.exit(): exiting with a fetch socket still open crashes node on windows
   await main().catch((e) => {
     console.error(`error: ${e.message}`)
-    process.exit(1)
+    process.exitCode = 1
   })
 }
