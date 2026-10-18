@@ -115,5 +115,7 @@ export function tourHref(step: number) {
   if (s.exam) p.set("exam", s.exam)
   p.set("tour", "1")
   p.set("step", String(step))
+  // recording mode (rec=1) survives every step
+  if (new URLSearchParams(location.search).get("rec") === "1") p.set("rec", "1")
   return `?${p.toString()}`
 }

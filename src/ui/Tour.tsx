@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pause, Play, Subtitles, Volume2, VolumeX, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, Maximize, Pause, Play, Subtitles, Volume2, VolumeX, X } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useT } from "../i18n"
 import { navigate } from "../router"
@@ -24,6 +24,11 @@ const savePref = (k: string, v: boolean) => {
   }
 }
 
+const toggleFullscreen = () => {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined)
+  else document.documentElement.requestFullscreen?.().catch(() => undefined)
+}
+
 export function Tour({ search }: { search: string }) {
   const { t, lang } = useT()
   const params = new URLSearchParams(search)
@@ -31,6 +36,9 @@ export function Tour({ search }: { search: string }) {
   const step = Math.max(0, Math.min(Number(params.get("step") ?? 0) || 0, STEPS.length - 1))
   const s = STEPS[step]
   const [spot, setSpot] = useState<{ step: number; rect: Rect }>()
+  // recording mode: a clean start screen, captions only, and a pace you can read aloud
+  const rec = params.get("rec") === "1"
+  const [started, setStarted] = useState(!rec)
   const [playing, setPlaying] = useState(true)
   const [voice, setVoice] = useState(() => pref("voice", false))
   const [captions, setCaptions] = useState(() => pref("captions", true))
@@ -98,17 +106,18 @@ export function Tour({ search }: { search: string }) {
   useEffect(() => {
     if (!active) return
     speechSynthesis.cancel()
-    if (!playing) return
+    if (!playing || !started) return
     const text = s[lang]
-    const ms = Math.max(4500, text.length * (lang === "hi" ? 75 : 62))
+    // reading pace by default; recording mode leaves time to say the line out loud (~150 words a minute)
+    const ms = Math.max(rec ? 5000 : 4500, text.length * (rec ? (lang === "hi" ? 95 : 80) : lang === "hi" ? 75 : 62))
     let done = false
     const finish = () => {
       if (done) return
       done = true
       if (!s.end) setTimeout(() => go(step + 1), 700)
     }
-    const started = Date.now()
-    const tick = setInterval(() => setTick({ step, value: Math.min(1, (Date.now() - started) / ms) }), 100)
+    const startedAt = Date.now()
+    const tick = setInterval(() => setTick({ step, value: Math.min(1, (Date.now() - startedAt) / ms) }), 100)
     let timer: ReturnType<typeof setTimeout> | undefined
     if (voice && "speechSynthesis" in window) {
       const u = new SpeechSynthesisUtterance(text)
@@ -125,7 +134,7 @@ export function Tour({ search }: { search: string }) {
       clearTimeout(timer)
       speechSynthesis.cancel()
     }
-  }, [active, step, playing, voice, lang, s, go])
+  }, [active, step, playing, started, rec, voice, lang, s, go])
 
   useEffect(() => {
     if (!active) return
@@ -141,12 +150,29 @@ export function Tour({ search }: { search: string }) {
       if (e.key === "Escape") exit()
       if (e.key.toLowerCase() === "c") setCaptions((c) => (savePref("captions", !c), !c))
       if (e.key.toLowerCase() === "v") setVoice((v) => (savePref("voice", !v), !v))
+      if (e.key.toLowerCase() === "f") toggleFullscreen()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [active, go, exit])
 
   if (!active) return null
+  if (!started)
+    return (
+      <div className="tour">
+        <button
+          className="tour-rec-start"
+          onClick={() => {
+            document.documentElement.requestFullscreen?.().catch(() => undefined)
+            setStarted(true)
+          }}
+        >
+          <Emblem size={120} />
+          <span className="tour-rec-title">{t("tour.recStart")}</span>
+          <span className="muted small">{t("tour.recHint")}</span>
+        </button>
+      </div>
+    )
   const rect = spot?.step === step ? spot.rect : undefined
   const progress = tick.step === step ? tick.value : 0
 
@@ -172,7 +198,7 @@ export function Tour({ search }: { search: string }) {
         <div className="tour-bar">
           <div className="tour-progress" style={{ transform: `scaleX(${playing ? progress : 0})` }} />
           <p className="tour-text">{s[lang]}</p>
-          <div className="tour-controls">
+          <div className="tour-controls" hidden={rec}>
             <span className="muted small">
               {step + 1} {t("tour.of")} {STEPS.length}
             </span>
@@ -188,6 +214,9 @@ export function Tour({ search }: { search: string }) {
             </button>
             <button className={`icon-btn lg ${voice ? "on" : ""}`} onClick={() => setVoice((v) => (savePref("voice", !v), !v))} aria-label={t("tour.voice")} title={`${t("tour.voice")} (V)`}>
               {voice ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            </button>
+            <button className="icon-btn lg" onClick={toggleFullscreen} aria-label={t("tour.fullscreen")} title={`${t("tour.fullscreen")} (F)`}>
+              <Maximize size={18} />
             </button>
             <button className="icon-btn lg" onClick={() => setCaptions((c) => (savePref("captions", !c), !c))} aria-label={t("tour.captions")} title={`${t("tour.captions")} (C)`}>
               <Subtitles size={18} />

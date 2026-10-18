@@ -545,3 +545,8 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 /* collapsible rows on cards: at least a 24px tap target on phones */
 .forged summary, .conflicts summary { min-height: 28px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .paper-more { margin-top: 10px; }
+
+/* recording mode start screen */
+.tour-rec-start { position: fixed; inset: 0; z-index: 80; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--bg); border: 0; cursor: pointer; pointer-events: auto; color: var(--text); font: inherit; }
+.tour-rec-title { font: 600 1.6rem/1.2 var(--display); }
+.tour-controls[hidden] { display: none; }
