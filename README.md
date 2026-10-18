@@ -1,6 +1,6 @@
 # Mohar (मोहर)
 
-[![ci](https://github.com/vidit-16/mohar/actions/workflows/ci.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/ci.yml) [![codeql](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml) [![pages](https://github.com/vidit-16/mohar/actions/workflows/pages.yml/badge.svg)](https://vidit-16.github.io/mohar/) [![npm: mohar-verify](https://img.shields.io/npm/v/mohar-verify?label=npm%20mohar-verify)](https://www.npmjs.com/package/mohar-verify) [![license: MIT](https://img.shields.io/badge/license-MIT-b4532a.svg)](LICENSE)
+[![ci](https://github.com/vidit-16/mohar/actions/workflows/ci.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/ci.yml) [![codeql](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/codeql.yml) [![chain](https://github.com/vidit-16/mohar/actions/workflows/chain.yml/badge.svg)](https://github.com/vidit-16/mohar/actions/workflows/chain.yml) [![pages](https://github.com/vidit-16/mohar/actions/workflows/pages.yml/badge.svg)](https://vidit-16.github.io/mohar/) [![npm: mohar-verify](https://img.shields.io/npm/v/mohar-verify?label=npm%20mohar-verify)](https://www.npmjs.com/package/mohar-verify) [![license: MIT](https://img.shields.io/badge/license-MIT-b4532a.svg)](LICENSE)
 
 Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.network).
 
@@ -123,7 +123,7 @@ Your run is signed by your own issuer key, so open it with `/?issuer=<your issue
 
 Lighthouse on the live site: desktop **98** performance, mobile (simulated slow 4G) **80**; **100** accessibility, best practices and SEO on both; layout shift ~0. `npm run test:e2e:prod` runs the whole e2e + accessibility suite against production.
 
-CI runs lint (zero warnings), unit tests and the build on every push. CodeQL (security-extended) scans every push to main and once a week.
+CI runs lint (zero warnings), unit tests and the build on every push. CodeQL (security-extended) scans every push to main and once a week. Every night `npm run test:chain` re-checks the demo evidence on Tiramisu, and every week `npm run keep-alive` tops up any record that would expire within three weeks (anyone can, since records are created with `permissionlessExtension`).
 
 ### Check everything without the site
 
