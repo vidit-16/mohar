@@ -4,6 +4,8 @@
 
 Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.network).
 
+*Mohar* (मोहर) is the Hindi/Urdu word for a seal: the stamp an office presses on a document to say "this is official, as of now". That's what the app does to a question paper, except the stamp is on a public chain, so nobody can forge it, backdate it or take it back.
+
 **Live:** https://mohar-in.vercel.app (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
 
 **Backup:** https://vidit-16.github.io/mohar/ is the same app as a static copy on GitHub Pages, reading Arkiv directly. If the main site is ever down or blocked, the evidence is still one link away.
