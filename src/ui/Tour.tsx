@@ -102,6 +102,13 @@ export function Tour({ search }: { search: string }) {
     }
   }, [active, step, s])
 
+  // recording mode: no scrollbar, and the page knows a subtitle strip sits at the bottom
+  useEffect(() => {
+    if (!active || !rec) return
+    document.documentElement.classList.add("tour-rec")
+    return () => document.documentElement.classList.remove("tour-rec")
+  }, [active, rec])
+
   // narration or a reading-time timer decides when to move on
   useEffect(() => {
     if (!active) return
@@ -196,7 +203,7 @@ export function Tour({ search }: { search: string }) {
         rect && <div className="tour-spot" style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }} />
       )}
       {!s.end && captions && (
-        <div className="tour-bar">
+        <div className={`tour-bar ${rec ? "tour-bar-rec" : ""}`}>
           <div className="tour-progress" style={{ transform: `scaleX(${playing ? progress : 0})` }} />
           <p className="tour-text">{s[lang]}</p>
           <div className="tour-controls" hidden={rec}>

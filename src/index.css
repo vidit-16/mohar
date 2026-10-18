@@ -552,3 +552,10 @@ html[lang="hi"] .tour-end-line { font-family: var(--deva); }
 .tour-controls[hidden] { display: none; }
 .tour-end-url { margin: -10px 0 0; font: 500 1.05rem/1.2 var(--mono); color: var(--text-2); letter-spacing: 0.02em; }
 .tour-end .row-gap[hidden] { display: none; }
+
+/* recording mode: subtitles in a full-width strip along the bottom, like a film, and no scrollbar */
+.tour-bar.tour-bar-rec { left: 0; right: 0; bottom: 0; transform: none; width: auto; border: 0; border-radius: 0; box-shadow: none; background: rgb(12 11 9 / 0.94); padding: 18px 8vw 20px; }
+.tour-bar-rec .tour-text { color: #fff; text-align: center; font-size: clamp(1.1rem, 1.55vw, 1.6rem); line-height: 1.45; font-weight: 500; }
+.tour-bar-rec .tour-progress { height: 3px; }
+html.tour-rec { scrollbar-width: none; }
+html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { display: none; }
