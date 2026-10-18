@@ -37,11 +37,16 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#f7f5f0" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- fonts never block the first paint; the display serif is only used if it arrives in time, so headings don't jump -->
-    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&display=optional" />
-    <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <!-- self-hosted fonts (see public/fonts/LICENSE.md): no extra connections before the first paint, and
+         "optional" means a slow phone keeps the system font for that visit instead of shifting the layout -->
+    <link rel="preload" href="./fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/fraunces-600-italic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 600; font-display: optional; src: url(./fonts/fraunces-600.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 600; font-display: optional; src: url(./fonts/fraunces-600-italic.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: optional; src: url(./fonts/inter.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    </style>
     <style>.no-shell [data-shell] { display: none }</style>
   </head>
   <body>
