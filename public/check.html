@@ -85,7 +85,7 @@ const json = (e) => {
   }
 }
 async function domainIssuers(input) {
-  const domain = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[/?#].*$/, "").replace(/\.$/, "")
+  const domain = input.trim().toLowerCase().slice(0, 300).replace(/^https?:\/\//, "").split(/[/?#]/, 1)[0].replace(/\.$/, "")
   if (!/^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) throw new Error(`not a valid domain: ${input}`)
   const url = `https://${domain}/.well-known/mohar.json`
   const res = await fetch(url, { redirect: "error" }).catch(() => {

@@ -10,6 +10,12 @@ describe("normaliseDomain", () => {
     expect(normaliseDomain("mohar-in.vercel.app.")).toBe("mohar-in.vercel.app")
   })
 
+  it("stays fast on hostile input", () => {
+    const t = performance.now()
+    for (const bad of ["#".repeat(100_000), "/".repeat(100_000), "a.".repeat(50_000) + "!", "a".repeat(100_000) + ".in"]) expect(normaliseDomain(bad)).toBeNull()
+    expect(performance.now() - t).toBeLessThan(200)
+  })
+
   it("rejects anything that isn't a public host name", () => {
     for (const bad of ["", "localhost", "127.0.0.1", "exam body.in", "-a.in", "a..in", "javascript:alert(1)", "x.1", "a".repeat(260) + ".in"]) {
       expect(normaliseDomain(bad), bad).toBeNull()

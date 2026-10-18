@@ -23,7 +23,7 @@ export const lines = (t) => t.split(/\r?\n/).map((l) => l.trim()).filter((l) => 
 const same = (a, b) => a?.toLowerCase() === b?.toLowerCase()
 
 export async function domainIssuers(input) {
-  const domain = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[/?#].*$/, "").replace(/\.$/, "")
+  const domain = input.trim().toLowerCase().slice(0, 300).replace(/^https?:\/\//, "").split(/[/?#]/, 1)[0].replace(/\.$/, "")
   if (!/^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) throw new Error(`not a valid domain: ${input}`)
   const res = await fetch(`https://${domain}/.well-known/mohar.json`, { redirect: "error" })
   if (!res.ok) throw new Error(`https://${domain}/.well-known/mohar.json returned HTTP ${res.status}`)

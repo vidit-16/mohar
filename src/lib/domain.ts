@@ -8,11 +8,13 @@ export type DomainProof = { domain: string; name: string; issuers: Address[] }
 export const PROOF_PATH = "/.well-known/mohar.json"
 
 export function normaliseDomain(input: string): string | null {
+  // cut at the first / ? # with split, not a /[/?#].*$/ regex, which goes quadratic on input like "####…"
   const host = input
     .trim()
     .toLowerCase()
+    .slice(0, 300)
     .replace(/^https?:\/\//, "")
-    .replace(/[/?#].*$/, "")
+    .split(/[/?#]/, 1)[0]
     .replace(/\.$/, "")
   return /^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(host) ? host : null
 }
