@@ -1,0 +1,841 @@
+{
+  "network": "Arkiv Tiramisu testnet (chain 7738577)",
+  "rpc": "https://rpc.tiramisu.db-chain.testnet.arkiv.network",
+  "project": "mohar-v1",
+  "generated_at": "2026-10-18T03:27:45.447Z",
+  "at_block": 722147,
+  "trusted_issuers": {
+    "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6": "Demo State Public Service Commission"
+  },
+  "how_to_check": "npx mohar-verify <exam_id>, or https://mohar-in.vercel.app/check.html?exam=<exam_id>",
+  "exams": [
+    {
+      "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+      "paper_commit": 2,
+      "reveal": 2,
+      "open_exam": 0,
+      "witness": 0
+    },
+    {
+      "exam_id": "DEMO-BILINGUAL-1",
+      "paper_commit": 2,
+      "reveal": 2,
+      "open_exam": 0,
+      "witness": 1
+    },
+    {
+      "exam_id": "DEMO-BILINGUAL-2",
+      "paper_commit": 2,
+      "reveal": 2,
+      "open_exam": 0,
+      "witness": 1
+    },
+    {
+      "exam_id": "DSPSC-PRE26-10170937",
+      "paper_commit": 3,
+      "reveal": 2,
+      "open_exam": 0,
+      "witness": 2
+    },
+    {
+      "exam_id": "DSPSC-PRE26-U10170941",
+      "paper_commit": 2,
+      "reveal": 0,
+      "open_exam": 0,
+      "witness": 1
+    },
+    {
+      "exam_id": "open-demo-mock-test-open-exam-e96c10",
+      "paper_commit": 0,
+      "reveal": 0,
+      "open_exam": 1,
+      "witness": 1
+    }
+  ],
+  "records": [
+    {
+      "key": "0x4cefb37e5ede876ad8768b00f219676ac2810c8a31bf036798e24e338fdf6e64",
+      "type": "paper_commit",
+      "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 708542,
+      "created_at": "2026-10-17T19:54:10.000Z",
+      "expires_block": 2004627,
+      "expires_in_days": 29.7,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+        "n_q": "1",
+        "opens_at_ms": "1792267020000",
+        "project": "mohar-v1",
+        "root": "0xf37ae7ae951deb94936dbbc29c7c4e86f5a91a2b5691cb59ad28c965b8d915d0",
+        "set_code": "A-en",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Console Test Paper, Shift 1",
+        "commits": [
+          "0x759286483efa9d70c34731df01886ca6b652625f1827325b73b85b642bf4e6bf"
+        ]
+      }
+    },
+    {
+      "key": "0x27e247c1aeb7811bd7aab331cc50c219b9c788150f744e8de5137c756bc1a6dd",
+      "type": "paper_commit",
+      "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 708542,
+      "created_at": "2026-10-17T19:54:10.000Z",
+      "expires_block": 2004627,
+      "expires_in_days": 29.7,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+        "n_q": "1",
+        "opens_at_ms": "1792267020000",
+        "project": "mohar-v1",
+        "root": "0x235bb13d5053b6a15d1bbae4cb1d937e2c0303ab570c438947dae987d9282538",
+        "set_code": "A-hi",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Console Test Paper, Shift 1",
+        "commits": [
+          "0x1b739647244dd01ec7ad197f438e92387af2ddb628ed0744978bc296658e6788"
+        ]
+      }
+    },
+    {
+      "key": "0xb4b840fda82df6d9950924932b215cd76eb01f8e27be25c3ab2ea24157b064c0",
+      "type": "reveal",
+      "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 708634,
+      "created_at": "2026-10-17T19:57:14.000Z",
+      "expires_block": 2004627,
+      "expires_in_days": 29.7,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+        "project": "mohar-v1",
+        "root": "0x235bb13d5053b6a15d1bbae4cb1d937e2c0303ab570c438947dae987d9282538",
+        "set_code": "A-hi",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0xe1012f16e22a256f7369e19fad04447ecff562ec2f38287483f9465e0d44fef3"
+        ],
+        "questions": [
+          "पौधे हवा से कौन सी गैस लेते हैं?"
+        ]
+      }
+    },
+    {
+      "key": "0x9b79ef445d7cb62209d5b301bd8c916071bbc376be4d56e9deebc07bd7edc122",
+      "type": "reveal",
+      "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 708634,
+      "created_at": "2026-10-17T19:57:14.000Z",
+      "expires_block": 2004627,
+      "expires_in_days": 29.7,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",
+        "project": "mohar-v1",
+        "root": "0xf37ae7ae951deb94936dbbc29c7c4e86f5a91a2b5691cb59ad28c965b8d915d0",
+        "set_code": "A-en",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x6a8a918d42ecafeca3059c8a48ec4f1a7f7bd122ff5880f9016397a748b2fbcb"
+        ],
+        "questions": [
+          "Which gas do plants absorb from the air?"
+        ]
+      }
+    },
+    {
+      "key": "0xb5e681ac2157a3df59da7dbb4e499103679f178c9936d940c5862d662b7800e4",
+      "type": "paper_commit",
+      "exam_id": "DEMO-BILINGUAL-1",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706620,
+      "created_at": "2026-10-17T18:50:06.000Z",
+      "expires_block": 2002678,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-1",
+        "n_q": "2",
+        "opens_at_ms": "1792263121608",
+        "project": "mohar-v1",
+        "root": "0x8bf2b067afb2ae3f138c3ce180170035a5a8c3220cedb5a80917cd02abaa46fb",
+        "set_code": "A-hi",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo bilingual paper (CSV import test)",
+        "commits": [
+          "0x9d69fefdbd7b3a9b868d971a67d13f532409427865b25af9b360d6499e23ff2d",
+          "0x033c2ed54acd3dd42302860bbcdae58bd5639bd743b81a61b93b7dcd49b01297"
+        ]
+      }
+    },
+    {
+      "key": "0x7346e580b7107468e7b8aa7b460be6be3ee83e0eb3df4f159d9fc3041bebad80",
+      "type": "paper_commit",
+      "exam_id": "DEMO-BILINGUAL-1",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706620,
+      "created_at": "2026-10-17T18:50:06.000Z",
+      "expires_block": 2002678,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-1",
+        "n_q": "2",
+        "opens_at_ms": "1792263121608",
+        "project": "mohar-v1",
+        "root": "0x26280784453cde9e503e3baa829b41dee1ef9073f63f02bad437b0d8f764e8e2",
+        "set_code": "A-en",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo bilingual paper (CSV import test)",
+        "commits": [
+          "0x16a6e2ed4c29c933c443df96995458a2720e9418e9ac2612d7bf983852aa4e28",
+          "0xe82decd18aa299a204d9bd929df615f24d4b44fdd3644152791d8f86197f511f"
+        ]
+      }
+    },
+    {
+      "key": "0x9b4d9ec4b708edec15f75265f31a0ab3f47e0dffec18200080530b5cffdb4ca4",
+      "type": "witness",
+      "exam_id": "DEMO-BILINGUAL-1",
+      "creator": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "owner": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "created_block": 706633,
+      "created_at": "2026-10-17T18:50:32.000Z",
+      "expires_block": 2261833,
+      "expires_in_days": 35.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-1",
+        "n_q": "1",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x10cf8a547537c4c396196506beb3947436bb88d864a0871515adeb419c04c9b1"
+        ]
+      }
+    },
+    {
+      "key": "0xb0a2aa47ab6b46d81aca64a5731e43db20cab931d2ec42b52b48e0eca61f33e5",
+      "type": "reveal",
+      "exam_id": "DEMO-BILINGUAL-1",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706682,
+      "created_at": "2026-10-17T18:52:10.000Z",
+      "expires_block": 2002678,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-1",
+        "project": "mohar-v1",
+        "root": "0x8bf2b067afb2ae3f138c3ce180170035a5a8c3220cedb5a80917cd02abaa46fb",
+        "set_code": "A-hi",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x8c2b30724c32837b4005890529ef3e828999cd94df6b910f3c1a47625a4ae76d",
+          "0x60fc541dba12f395ef678659ff027627f577a5ce7425f3b9419aa8292d7e68a2"
+        ],
+        "questions": [
+          "किस नदी को दक्षिण गंगा कहा जाता है?",
+          "राष्ट्रीय गीत \"वंदे मातरम्\" किसने लिखा?"
+        ]
+      }
+    },
+    {
+      "key": "0x147ce17fab4bbd68bca830625a264f1262131239301fdae3ca69d742c3d32776",
+      "type": "reveal",
+      "exam_id": "DEMO-BILINGUAL-1",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706682,
+      "created_at": "2026-10-17T18:52:10.000Z",
+      "expires_block": 2002678,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-1",
+        "project": "mohar-v1",
+        "root": "0x26280784453cde9e503e3baa829b41dee1ef9073f63f02bad437b0d8f764e8e2",
+        "set_code": "A-en",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x89150bf6000401183d4ece73417f8b137041ee2034099588994c9abe301e9e73",
+          "0xde856f617c769d8bb2e23136372036d924aaf1693958c4079dddb493cda9438d"
+        ],
+        "questions": [
+          "Which river is known as the Dakshin Ganga?",
+          "Who wrote the national song \"Vande Mataram\"?"
+        ]
+      }
+    },
+    {
+      "key": "0x663130215f84004544701d5536dd06f4135fcdeff91a0768866817603996fb61",
+      "type": "paper_commit",
+      "exam_id": "DEMO-BILINGUAL-2",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706713,
+      "created_at": "2026-10-17T18:53:12.000Z",
+      "expires_block": 2002771,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-2",
+        "n_q": "2",
+        "opens_at_ms": "1792263307587",
+        "project": "mohar-v1",
+        "root": "0x326385840fcacb5f0ec59857ecb63162a6fc6eae6f575490f32d8c601c1456c9",
+        "set_code": "A-hi",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo bilingual paper (English + Hindi)",
+        "commits": [
+          "0x5d6f952a7fd4e6cf3bfdaca2674cf66a244f400cb26f7d2fb062ee8b60c4c5ad",
+          "0xfbdb7a4ebba6d3c4c148ca707f1d5d7818963a94029bb375ced4cc640dccdffc"
+        ]
+      }
+    },
+    {
+      "key": "0x1e32c7fd4ccf8d109fb48c5f1f256c0d036df5f2245eb27049fd841799ded32a",
+      "type": "paper_commit",
+      "exam_id": "DEMO-BILINGUAL-2",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706713,
+      "created_at": "2026-10-17T18:53:12.000Z",
+      "expires_block": 2002771,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-2",
+        "n_q": "2",
+        "opens_at_ms": "1792263307587",
+        "project": "mohar-v1",
+        "root": "0x73f0620777cf0d19bd9394b5394f86a75debf279521f52aad77e7c2447990be0",
+        "set_code": "A-en",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo bilingual paper (English + Hindi)",
+        "commits": [
+          "0x9f03ee33721acfc67bdacd236b36b36af91d6cf1ae65ed127bfba317c8219ecf",
+          "0x88ffbe5069e3ad3de137040c9c31bf52bc867fd597dd169ab3ef9262866c992f"
+        ]
+      }
+    },
+    {
+      "key": "0x073357f4d3d70c3f94f37cd31ccee1b5687ef819f498bdf208372acf4965ff71",
+      "type": "witness",
+      "exam_id": "DEMO-BILINGUAL-2",
+      "creator": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "owner": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "created_block": 706721,
+      "created_at": "2026-10-17T18:53:28.000Z",
+      "expires_block": 2261921,
+      "expires_in_days": 35.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-2",
+        "n_q": "1",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x77a8ede066ef1753304279d16b3a0435db5c37a25e55f3822d3ec16a92985022"
+        ]
+      }
+    },
+    {
+      "key": "0x984d2903f88e65ae4bc53d01e6d5643c023868315f2f528ef6a06c8db3170f79",
+      "type": "reveal",
+      "exam_id": "DEMO-BILINGUAL-2",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706774,
+      "created_at": "2026-10-17T18:55:14.000Z",
+      "expires_block": 2002771,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-2",
+        "project": "mohar-v1",
+        "root": "0x326385840fcacb5f0ec59857ecb63162a6fc6eae6f575490f32d8c601c1456c9",
+        "set_code": "A-hi",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x25b4218d7bdbacc32b07fadc8e505e3a32392e8c0a7209eb4e81ef615c4536d3",
+          "0x54a6a8539ba90cfd4ff054f4ea83b7e5d051992532850641a155e576604b6003"
+        ],
+        "questions": [
+          "किस नदी को दक्षिण गंगा कहा जाता है?",
+          "राष्ट्रीय गीत \"वंदे मातरम्\" किसने लिखा?"
+        ]
+      }
+    },
+    {
+      "key": "0x03012d3066f2d897dccce27fc461afda3299fecfe5989ceec2f55e2ab8e9df76",
+      "type": "reveal",
+      "exam_id": "DEMO-BILINGUAL-2",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 706774,
+      "created_at": "2026-10-17T18:55:14.000Z",
+      "expires_block": 2002771,
+      "expires_in_days": 29.6,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DEMO-BILINGUAL-2",
+        "project": "mohar-v1",
+        "root": "0x73f0620777cf0d19bd9394b5394f86a75debf279521f52aad77e7c2447990be0",
+        "set_code": "A-en",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0xebae50e6592aa36063270d1d85a084a3afdcae30cc9ef73aa34393d6a84485a2",
+          "0x2c251cbe43eb15b3859bdef52cfd74d911039ce495663cada7e0f40af17d3c93"
+        ],
+        "questions": [
+          "Which river is known as the Dakshin Ganga?",
+          "Who wrote the national song \"Vande Mataram\"?"
+        ]
+      }
+    },
+    {
+      "key": "0x2ea77ea0c1ff21734a1be9cc10befa4ea11b7356f64cbb331acd5af67e02141e",
+      "type": "paper_commit",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690057,
+      "created_at": "2026-10-17T09:38:00.000Z",
+      "expires_block": 1986144,
+      "expires_in_days": 29.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "n_q": "5",
+        "opens_at_ms": "1792230054039",
+        "project": "mohar-v1",
+        "root": "0x827891c57f54a322a3306e2fc6bb218be42d7ce1bc60e5bf062ba6532142f625",
+        "set_code": "B",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo State PSC Prelims 2026, Shift 1",
+        "commits": [
+          "0x0d2537cc2cb410c273dcf9d3030eb9b093f7f3985c60898b85ee9f862604c9d2",
+          "0x7465bcced72b07af34efd36bf41bfb76d6be55d2c493cf8ce8265980944a127b",
+          "0xaec78a82f2d9d1fae0fc16aba0f152f557e735d3b49b0c38b4e5a32d86cec540",
+          "0x54b93aab02d75e69ee6aa36a27a1d05a9b3d41dc6c8be1cffcf575f939cae989",
+          "0xc4c293aedd2c8a0c32e6d90544998d696c676df07f6c81c6548c9dcec034bef7"
+        ]
+      }
+    },
+    {
+      "key": "0x170d8d607143ffed4ce0f39dd458e2964fdef87a69f49df854537fc8506e880f",
+      "type": "paper_commit",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690057,
+      "created_at": "2026-10-17T09:38:00.000Z",
+      "expires_block": 1986144,
+      "expires_in_days": 29.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "n_q": "5",
+        "opens_at_ms": "1792230054039",
+        "project": "mohar-v1",
+        "root": "0xdf63f632359f7f2ab15c3aca935d41dcf2be61b926d8816b181b17f53516cd42",
+        "set_code": "A",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo State PSC Prelims 2026, Shift 1",
+        "commits": [
+          "0x2a12778a3a9120d06963e85a6342a3d7d31074d62708464d3af4828c5a14dd88",
+          "0xa209f9555e94606986009450febbafc16bdd692017c5e49c0615075a9e1d755d",
+          "0xcbb903c2f39e4dca5d08217384333d179fd9de5e9c21d59d958d45ef7675294d",
+          "0xd373f88d31768626077d682e81cd2060d2dc6027a1f1a187d777dad088df0657",
+          "0x410cdb2a8b0d1ea0c104855f5073d20ee9ac5beda90052e82e338254ee35591b"
+        ]
+      }
+    },
+    {
+      "key": "0x518da20dea6de595ad70e631b9263b6d154ad18f235e77c0869be83fc7429d6a",
+      "type": "witness",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0xA1BeFA506054F89b1eaF8e15259c90b895ecf40D",
+      "owner": "0xA1BeFA506054F89b1eaF8e15259c90b895ecf40D",
+      "created_block": 690061,
+      "created_at": "2026-10-17T09:38:08.000Z",
+      "expires_block": 2245261,
+      "expires_in_days": 35.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "n_q": "4",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x3006ecb4a975faec143648fb4b1550a6ea58c01523242e355483d37302393a7a",
+          "0xe8fbb68e4c6979df9e16dcf4fcb0babbcd311736b754c426a5869fda773022ef",
+          "0x1758767b2956e435357a9b6bb509ed435407633fcbf84e6f6d30aa0b78635b67",
+          "0x9442303223085382ac5e4d1153b9b0d7b85210a4bc8b91fb8f6fe0d215154f73"
+        ]
+      }
+    },
+    {
+      "key": "0x3b68f29398a17246e9c41691ff8507d2627f77a8d8cef71f5c3d06d989654ffe",
+      "type": "paper_commit",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690065,
+      "created_at": "2026-10-17T09:38:16.000Z",
+      "expires_block": 1986144,
+      "expires_in_days": 29.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "n_q": "1",
+        "opens_at_ms": "1792230054039",
+        "project": "mohar-v1",
+        "root": "0x3badde3ee203c8faeee48cbb5073e33aeab9a3262e5e60afee3e882ccd870d9f",
+        "set_code": "A",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo State PSC Prelims 2026, Shift 1",
+        "commits": [
+          "0x74047c4920c2ca5bb4e9895837cba918948207ac87d4bb84ea580c5b71343655"
+        ]
+      }
+    },
+    {
+      "key": "0xb55fff5278cb2de69509014efa1f69d89bae8a5f3a22b45a41562ec93101a86f",
+      "type": "reveal",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690148,
+      "created_at": "2026-10-17T09:41:02.000Z",
+      "expires_block": 1986144,
+      "expires_in_days": 29.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "project": "mohar-v1",
+        "root": "0x827891c57f54a322a3306e2fc6bb218be42d7ce1bc60e5bf062ba6532142f625",
+        "set_code": "B",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x0641534bb3d8d5a3681493a25c44a5f2b64fbd86283c5029c66af23f4765cb7e",
+          "0xab2196f485971fbf6fe17c7417c59caba0a6f18c08314f82f6a74d7432b199a8",
+          "0x01236219b59ba5785c2c1e57a207d094b5a200dbe9ace9fd72add4f819b673d1",
+          "0xdaed73d7402a9ab22cd4df2c6b3784ffc20c53ad9fe02eeb9a70ce21c8955b1e",
+          "0xb4557782b03c24a45426e33e3b7a94b5cb4736c8affb97ec1fe028beebb7bbce"
+        ],
+        "questions": [
+          "Which Schedule of the Constitution lists the official languages?",
+          "The Nathu La pass connects Sikkim with which region?",
+          "Which gas is most abundant in the Earth's atmosphere?",
+          "Who was the first Chief Election Commissioner of India?",
+          "Simlipal National Park is located in which state?"
+        ]
+      }
+    },
+    {
+      "key": "0x56a43dcabfb38c2d4be3be06a53db483bcb46234e981a84f771c25ac7a12d228",
+      "type": "reveal",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690148,
+      "created_at": "2026-10-17T09:41:02.000Z",
+      "expires_block": 1986144,
+      "expires_in_days": 29.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "project": "mohar-v1",
+        "root": "0xdf63f632359f7f2ab15c3aca935d41dcf2be61b926d8816b181b17f53516cd42",
+        "set_code": "A",
+        "type": "reveal"
+      },
+      "payload": {
+        "v": 1,
+        "salts": [
+          "0x18f64e7bd142271b8bd515cf3734a216eeb94e0b3c1fd0bb665c7b392ef5e2df",
+          "0x1af12f353ac79a41f60c423d15f6525baad1ebbd8775b588e6ee4c63b911df59",
+          "0x978dece8075337c663f2bc24f75b7d06c8543686331c5df9c23f639579e08714",
+          "0x4cc1e80b3d4b2e805ca34b10980763e36e163442abef5567e4fe24277c36c304",
+          "0x8fb6ba2b7d7fffb4ab08a963102e573a5df435cc3da92f53840f8435802c8fba"
+        ],
+        "questions": [
+          "Which river is known as the Dakshin Ganga?",
+          "The Tropic of Cancer does NOT pass through which of these states: Gujarat, Odisha, Tripura, Mizoram?",
+          "Who presides over a joint sitting of both Houses of Parliament?",
+          "Which Article of the Constitution deals with the Finance Commission?",
+          "The Loktak lake is located in which state?"
+        ]
+      }
+    },
+    {
+      "key": "0x0dbab71656f2258d061350996188d49fb80d7e5283821a68345f3021741ce339",
+      "type": "witness",
+      "exam_id": "DSPSC-PRE26-10170937",
+      "creator": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "owner": "0xCf1bbbE459d5E9b60A3F809A93FF111DcfCe7013",
+      "created_block": 690151,
+      "created_at": "2026-10-17T09:41:08.000Z",
+      "expires_block": 2245351,
+      "expires_in_days": 35.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-10170937",
+        "n_q": "1",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x6f1279aae9d13693000c41e1227b1b38ce7821068986b6a61f4a0577d9575bac"
+        ]
+      }
+    },
+    {
+      "key": "0x82bcf78624cfd2ecd2bb4b62f697784e09db82a7d58fb1bd0e1c20836b446f12",
+      "type": "paper_commit",
+      "exam_id": "DSPSC-PRE26-U10170941",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690172,
+      "created_at": "2026-10-17T09:41:50.000Z",
+      "expires_block": 2374968,
+      "expires_in_days": 38.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-U10170941",
+        "n_q": "5",
+        "opens_at_ms": "1793007704201",
+        "project": "mohar-v1",
+        "root": "0xd15e63315af009446038cdc80d106667fd0e1d6fcf0e2317acd1413862324fac",
+        "set_code": "A",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo State PSC Prelims 2026 (upcoming)",
+        "commits": [
+          "0xbd7e0301cb6b6d0c7213e278cf7ee5f1a48c736a3bdbd5165ba72593be78bb2e",
+          "0xd14c85a2424e0d472b7320e721262db8b5dff272261e5aa956463714b4c8e795",
+          "0xc54fcd38c4ad460977d720e56816c897a28ede2ede34c0acbd320bba2adf6faf",
+          "0xb8afa0d7758c56315a3570d93b3bb1b087bb28537de1bd9e21d0171e9a918e2e",
+          "0xbe1f621a8e6f6e3dce38473a065ae06688b21714051218a7758c85564a89cb19"
+        ]
+      }
+    },
+    {
+      "key": "0x2530c9dfc1d1c95d2192163c5fc16ffb46a0e12c1f504f232213e0bf7f2daede",
+      "type": "paper_commit",
+      "exam_id": "DSPSC-PRE26-U10170941",
+      "creator": "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6",
+      "owner": "0x000000000000000000000000000000000000dEaD",
+      "created_block": 690172,
+      "created_at": "2026-10-17T09:41:50.000Z",
+      "expires_block": 2374968,
+      "expires_in_days": 38.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-U10170941",
+        "n_q": "5",
+        "opens_at_ms": "1793007704201",
+        "project": "mohar-v1",
+        "root": "0x6649075a9032a8a6242aaa968f1acf5effc65ac46557f35a541b58c47ff16965",
+        "set_code": "B",
+        "shift": "1",
+        "type": "paper_commit"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo State PSC Prelims 2026 (upcoming)",
+        "commits": [
+          "0x3f8d58f6b80d86b8d5b5b43cafee74b2296e03b1fdf4427887ff3ba67b796dd1",
+          "0xc5ff0eb196df25401913b8d057100ce023c79c045ed339886e4b3a62340066d8",
+          "0x65c5aa53c8a531f19daedea2af5130e9d32f6cb14bafa07ad584416c261b5e74",
+          "0xe79b620c9ea82b176155f3cad1d13e0f93b27eb0ac90f6a70d545739999fbe37",
+          "0x8d05f5b7d8b169e0a4b9bec565a8f3292eb4d67f6c74e0495095c219f9ede069"
+        ]
+      }
+    },
+    {
+      "key": "0x17f08331914c7c9816dd674c836f2c57174dd4fd3c611666aaf99d3a114ef6b6",
+      "type": "witness",
+      "exam_id": "DSPSC-PRE26-U10170941",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "created_block": 690389,
+      "created_at": "2026-10-17T09:49:04.000Z",
+      "expires_block": 1900019,
+      "expires_in_days": 27.3,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "DSPSC-PRE26-U10170941",
+        "n_q": "2",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x8b43b848fd188376ac07afc2b0fb8bcc86a4497ace6561451824e3824bc7d567",
+          "0x0b68baba1de6c1f1f9f8f487cd854b93c232c95da9fe280779119a3babcc4c43"
+        ]
+      }
+    },
+    {
+      "key": "0x6d570fc336c6fd9cdb69453507fc9671e7fbd5a860f52f4a8e5803c09ae00c5a",
+      "type": "open_exam",
+      "exam_id": "open-demo-mock-test-open-exam-e96c10",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "created_block": 697422,
+      "created_at": "2026-10-17T13:43:30.000Z",
+      "expires_block": 3289557,
+      "expires_in_days": 59.4,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "open-demo-mock-test-open-exam-e96c10",
+        "opens_at_ms": "1792244880000",
+        "project": "mohar-v1",
+        "type": "open_exam"
+      },
+      "payload": {
+        "v": 1,
+        "title": "Demo Mock Test, Open Exam"
+      }
+    },
+    {
+      "key": "0x62e6655afa8660e40c30e686b615479939420f46d0cd4bc7a1864883c7f7e4db",
+      "type": "witness",
+      "exam_id": "open-demo-mock-test-open-exam-e96c10",
+      "creator": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "owner": "0x368cAbd27838BA645f883076cC87A839a7457043",
+      "created_block": 697440,
+      "created_at": "2026-10-17T13:44:06.000Z",
+      "expires_block": 2252640,
+      "expires_in_days": 35.4,
+      "readonly": true,
+      "permissionless_extension": true,
+      "attributes": {
+        "exam_id": "open-demo-mock-test-open-exam-e96c10",
+        "n_q": "2",
+        "project": "mohar-v1",
+        "type": "witness"
+      },
+      "payload": {
+        "v": 1,
+        "hashes": [
+          "0x5d1c7d864b4a2a561cc8ede6b2b9790040568b2debe5c0ec669eb73bf9274fab",
+          "0x018b141e530be933577ef2e7db7b83705de9759298a6c18a63297dda6eea4e5b"
+        ]
+      }
+    }
+  ]
+}
