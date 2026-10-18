@@ -1,5 +1,7 @@
 # Mohar for exam bodies
 
+Planning a trial? Start with the [four-week pilot plan](pilot.md): costs, key custody, what can go wrong and how to measure success.
+
 How a commission, board or testing agency uses Mohar for a real exam. Nothing to install on your servers, nothing to host; you need one wallet and a CSV of the paper.
 
 ## What it gives you

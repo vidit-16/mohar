@@ -142,6 +142,10 @@ Or in a browser, with nothing installed: [mohar-in.vercel.app/check.html](https:
 
 An exam body publishes its seal address at `https://<its domain>/.well-known/mohar.json`, and Mohar trusts that file instead of a list we control. Open any exam with `?domain=<domain>`, run `npx mohar-verify <exam id> --domain <domain>`, or fill in the website field in `check.html`: all three read the same file and apply the same rule. The demo body's file is at [mohar-in.vercel.app/.well-known/mohar.json](https://mohar-in.vercel.app/.well-known/mohar.json). Details in [docs/for-exam-bodies.md](docs/for-exam-bodies.md).
 
+### Trying it on real exams
+
+[docs/pilot.md](docs/pilot.md) is a four-week pilot plan for an exam body (measured costs, key and salt custody, failure cases, success measures), plus how journalists, coaching institutes and student groups can use Mohar today through open exams, with no exam body involved. Shared evidence links preview the verdict on Telegram, X and WhatsApp, drawn live from the chain by the same verifier anyone can run.
+
 ## Building on it
 
 Everything is public and documented, so nobody needs permission. Start with **[docs/build-on-mohar.md](docs/build-on-mohar.md)**: the data contract, the hashing rules, `curl` recipes and two zero-dependency examples (a witness counter and a leak-alert feed for coaching institutes). Payloads have a [JSON Schema](arkiv/schemas/payloads.schema.json) that's tested against every record on chain, and [`verify/verify.mjs`](verify/verify.mjs) is a reference reader in about 100 lines. See [CONTRIBUTING.md](CONTRIBUTING.md) to work on the code.
