@@ -128,6 +128,7 @@ Live updates use `watchEntityEvents` on a `webSocket()` transport with no `fromB
 | This website is blocked or taken down | Every exam page has raw `curl` commands, and `npx mohar-verify <exam-id>` or the one-file `check.html` rebuild every verdict from the public RPC with zero dependencies. |
 | Someone tampers with Mohar's issuer list, or the site itself | Exam bodies publish their address at `https://<their domain>/.well-known/mohar.json`; with `?domain=`, `--domain` or the `check.html` website field, only addresses that file lists count, so trust comes from the body's own website, not from us. |
 | Evidence expires before anyone notices | A weekly GitHub Action (`npm run keep-alive`) extends any record within 3 weeks of expiry; anyone else can run the same script. |
+| Someone scripts the test-GLM drip to drain it | The drip only funds wallets with zero balance and zero transactions, 0.02 GLM each, from a separate small wallet; the 5-per-IP-per-hour limit is in memory per serverless instance, so it slows a script down rather than stopping it. The worst case is an empty drip wallet, after which the site falls back to faucet instructions. |
 
 Known limits: matching is exact after normalisation, so a reworded or translated question won't match. Tiramisu is a single-sequencer testnet, so time is only as trustworthy as its sequencing.
 
