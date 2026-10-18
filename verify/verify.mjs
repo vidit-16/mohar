@@ -112,7 +112,9 @@ async function main() {
     return
   }
 
-  const revealMs = reveals[0] ? await timeOf(reveals[0].createdAt) : undefined
+  // a big paper can be revealed over several transactions; the earliest one is when the paper was out
+  const firstReveal = reveals.reduce((a, r) => (!a || BigInt(r.createdAt) < BigInt(a.createdAt) ? r : a), undefined)
+  const revealMs = firstReveal ? await timeOf(firstReveal.createdAt) : undefined
   const deadline = revealMs === undefined ? opensAt : Math.min(opensAt, revealMs)
   console.log(`deadline ${new Date(deadline).toISOString()} (earlier of announced start and reveal)\n`)
 

@@ -90,7 +90,9 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
 
   const sealed = exam?.kind === "sealed"
   const paper = useMemo(() => (sealed ? (exam && reveals.length ? openReveals(exam.sets, reveals) : []) : pasted), [sealed, exam, reveals, pasted])
-  const revealMs = sealed && reveals[0] ? times.get(reveals[0].createdAt) : undefined
+  // a big paper can be revealed over several transactions; the earliest one is when the paper was out
+  const firstReveal = reveals.reduce<Row | undefined>((a, r) => (!a || r.createdAt < a.createdAt ? r : a), undefined)
+  const revealMs = sealed && firstReveal ? times.get(firstReveal.createdAt) : undefined
   const deadlineMs = exam ? (sealed ? deadlineOf(exam.opensAtMs, revealMs) : exam.opensAtMs) : 0
   const hasPaper = paper.length > 0
 
