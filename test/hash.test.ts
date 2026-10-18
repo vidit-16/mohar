@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { commitHash, normalise, questionHash, splitQuestions } from "../src/lib/hash"
+import { createHash } from "node:crypto"
+import { commitHash, normalise, questionHash, rootHash, splitQuestions } from "../src/lib/hash"
 
 describe("normalise", () => {
   it("ignores numbering, case and punctuation", () => {
@@ -44,5 +45,23 @@ describe("Hindi question numbering", () => {
   })
   it("keeps a number that is part of the question", () => {
     expect(normalise("1857 का विद्रोह कहाँ शुरू हुआ?")).toBe("1857 का विद्रोह कहाँ शुरू हुआ")
+  })
+})
+
+describe("numbering edge cases", () => {
+  it.each([
+    ["प्रश्न3. गंगा नदी कहाँ से निकलती है?", "गंगा नदी कहाँ से निकलती है"],
+    ["प्र.3 गंगा नदी", "गंगा नदी"],
+    ["प्र. 3 गंगा नदी", "गंगा नदी"],
+    ["Q no.4 which river", "which river"],
+    ["Q no 4 which river", "which river"],
+    ["Question No. 12) which river", "which river"],
+  ])("%s", (input, want) => expect(normalise(input)).toBe(want))
+})
+
+describe("rootHash", () => {
+  it("is sha256 over the commits joined with nothing in between", () => {
+    const commits = [commitHash("0x01", "a"), commitHash("0x02", "b")]
+    expect(rootHash(commits)).toBe("0x" + createHash("sha256").update(commits.join(""), "utf8").digest("hex"))
   })
 })

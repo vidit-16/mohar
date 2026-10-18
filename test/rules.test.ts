@@ -36,6 +36,7 @@ describe("groupExams", () => {
     expect(exam.sets.map((s) => s.key)).toEqual(["0xa"])
     expect(exam.forged.map((s) => s.key)).toEqual(["0xf"])
     expect(exam).toMatchObject({ kind: "sealed", examId: "E1", title: "Real", shift: 2, opensAtMs: 5000, creator: ISSUER })
+    expect(exam.conflicts).toEqual([])
   })
 
   it("drops exams that only have forged seals", () => {
@@ -96,6 +97,15 @@ describe("newOpenExamId", () => {
     expect(newOpenExamId("x".repeat(200)).length).toBeLessThanOrEqual(5 + 40 + 7)
   })
   it("is unique per call", () => expect(newOpenExamId("a")).not.toBe(newOpenExamId("a")))
+  it("pads every random byte to two hex digits", () => {
+    const real = crypto.getRandomValues.bind(crypto)
+    crypto.getRandomValues = (<T extends ArrayBufferView | null>(a: T) => (a && new Uint8Array(a.buffer).set([0, 1, 10]), a)) as typeof crypto.getRandomValues
+    try {
+      expect(newOpenExamId("a")).toBe("open-a-00010a")
+    } finally {
+      crypto.getRandomValues = real
+    }
+  })
 })
 
 describe("verdict wording", () => {
@@ -107,7 +117,7 @@ describe("verdict wording", () => {
     expect(describeVerdict(t as never, base, false, 1)).toMatchObject({ kind: "wait", tone: "info" })
     expect(describeVerdict(t as never, base, true, 3)).toMatchObject({ kind: "fake", tone: "good", short: "v.fake.s · 0/3" })
     const leak = describeVerdict(t as never, { ...base, matches: [{ set: "A", index: 1, text: "", hash: "0x", sealed: true }] }, true, 4)
-    expect(leak).toMatchObject({ kind: "leak", tone: "danger", short: "v.leak.s · 1/4" })
+    expect(leak).toMatchObject({ kind: "leak", tone: "danger", title: 'v.leak.t{"n":1}', short: "v.leak.s · 1/4" })
   })
 })
 
