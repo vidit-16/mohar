@@ -49,27 +49,10 @@ const json = (e) => {
   }
 }
 
-async function main() {
-  const args = process.argv.slice(2)
-  const paperAt = args.indexOf("--paper")
-  const paperFile = paperAt >= 0 ? args.splice(paperAt, 2)[1] : undefined
-  const domainAt = args.indexOf("--domain")
-  const domainArg = domainAt >= 0 ? args.splice(domainAt, 2)[1] : undefined
-  const [examId, issuerArg] = args
-  if (!examId) {
-    console.error("usage: mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]")
-    process.exitCode = 1
-    return
-  }
-  let trusted = [issuerArg ?? DEFAULT_ISSUER]
-  if (domainArg) {
-    const proof = await domainIssuers(domainArg)
-    trusted = proof.issuers
-    console.log(`${proof.domain} vouches for ${proof.issuers.join(", ")} (${proof.name})`)
-  }
-  const issuer = trusted.join(", ")
+// Every verdict for one exam, as data. The CLI prints it; the site's share cards use it too.
+//   trusted: issuer addresses whose seals count; paperText: the official paper for an open exam
+export async function verdicts(examId, { trusted = [DEFAULT_ISSUER], paperText } = {}) {
   const isTrusted = (a) => trusted.some((t) => same(a, t))
-
   const select = { key: true, creator: true, createdAt: true, attributes: true, payload: true }
   const records = []
   let cursor
@@ -92,39 +75,82 @@ async function main() {
     return blockMs.get(block)
   }
 
-  let opensAt, paper = []
+  let kind, title, opensAt, paper = []
   if (commits.length) {
+    kind = "sealed"
+    title = json(commits[0])?.title ?? examId
     opensAt = Number(BigInt(attr(commits[0], "opens_at_ms")))
     for (const r of reveals) {
       const p = json(r)
       const sealed = json(commits.find((c) => attr(c, "set_code") === attr(r, "set_code")))?.commits ?? []
       p.questions.forEach((q, i) => paper.push({ id: `${attr(r, "set_code")}-Q${i + 1}`, hash: sha(normalise(q)), ok: sealed[i] === sha(`${p.salts[i]}|${normalise(q)}`) }))
     }
-    console.log(`sealed exam ${examId}: ${commits.length} set(s) by ${issuer}, ${forged.length} look-alike(s) from other wallets ignored`)
-    if (paper.length) console.log(`paper revealed: ${paper.filter((q) => q.ok).length}/${paper.length} questions match the seal`)
   } else if (entry) {
+    kind = "open"
+    title = json(entry)?.title ?? examId
     opensAt = Number(BigInt(attr(entry, "opens_at_ms")))
-    console.log(`open exam ${examId}, added by ${entry.creator}`)
-    if (paperFile) paper = lines(readFileSync(paperFile, "utf8")).map((q, i) => ({ id: `Q${i + 1}`, hash: sha(normalise(q)), ok: true }))
+    if (paperText) paper = lines(paperText).map((q, i) => ({ id: `Q${i + 1}`, hash: sha(normalise(q)), ok: true }))
   } else {
-    console.log(`nothing found for ${examId}`)
-    process.exitCode = 2
-    return
+    return { kind: "none", examId }
   }
 
   // a big paper can be revealed over several transactions; the earliest one is when the paper was out
   const firstReveal = reveals.reduce((a, r) => (!a || BigInt(r.createdAt) < BigInt(a.createdAt) ? r : a), undefined)
   const revealMs = firstReveal ? await timeOf(firstReveal.createdAt) : undefined
   const deadline = revealMs === undefined ? opensAt : Math.min(opensAt, revealMs)
-  console.log(`deadline ${new Date(deadline).toISOString()} (earlier of announced start and reveal)\n`)
 
+  const judged = []
   for (const w of witnesses) {
     const at = await timeOf(w.createdAt)
     const hashes = new Set(json(w)?.hashes ?? [])
     const hits = paper.filter((q) => q.ok && hashes.has(q.hash)).map((q) => q.id)
-    const when = at < deadline ? "BEFORE" : "AFTER"
-    const verdict = at >= deadline ? "too late" : !paper.length ? "waiting for paper" : hits.length ? `LEAK ${hits.join(", ")}` : "no match"
-    console.log(`${w.key.slice(0, 12)}… ${w.creator.slice(0, 10)}… ${new Date(at).toISOString()} ${when}: ${verdict}`)
+    const verdict = at >= deadline ? "late" : !paper.length ? "waiting" : hits.length ? "leak" : "no-match"
+    judged.push({ key: w.key, creator: w.creator, at, before: at < deadline, total: hashes.size, hits, verdict })
+  }
+  return {
+    kind, examId, title, opensAt, deadline,
+    sets: commits.length, forged: forged.length, entryCreator: entry?.creator,
+    paper: { total: paper.length, matching: paper.filter((q) => q.ok).length },
+    witnesses: judged,
+  }
+}
+
+async function main() {
+  const args = process.argv.slice(2)
+  const paperAt = args.indexOf("--paper")
+  const paperFile = paperAt >= 0 ? args.splice(paperAt, 2)[1] : undefined
+  const domainAt = args.indexOf("--domain")
+  const domainArg = domainAt >= 0 ? args.splice(domainAt, 2)[1] : undefined
+  const [examId, issuerArg] = args
+  if (!examId) {
+    console.error("usage: mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]")
+    process.exitCode = 1
+    return
+  }
+  let trusted = [issuerArg ?? DEFAULT_ISSUER]
+  if (domainArg) {
+    const proof = await domainIssuers(domainArg)
+    trusted = proof.issuers
+    console.log(`${proof.domain} vouches for ${proof.issuers.join(", ")} (${proof.name})`)
+  }
+  const v = await verdicts(examId, { trusted, paperText: paperFile ? readFileSync(paperFile, "utf8") : undefined })
+  if (v.kind === "none") {
+    console.log(`nothing found for ${examId}`)
+    process.exitCode = 2
+    return
+  }
+  if (v.kind === "sealed") {
+    console.log(`sealed exam ${examId}: ${v.sets} set(s) by ${trusted.join(", ")}, ${v.forged} look-alike(s) from other wallets ignored`)
+    if (v.paper.total) console.log(`paper revealed: ${v.paper.matching}/${v.paper.total} questions match the seal`)
+  } else {
+    console.log(`open exam ${examId}, added by ${v.entryCreator}`)
+  }
+  console.log(`deadline ${new Date(v.deadline).toISOString()} (earlier of announced start and reveal)
+`)
+  const words = { late: "too late", waiting: "waiting for paper", "no-match": "no match" }
+  for (const w of v.witnesses) {
+    const verdict = w.verdict === "leak" ? `LEAK ${w.hits.join(", ")}` : words[w.verdict]
+    console.log(`${w.key.slice(0, 12)}… ${w.creator.slice(0, 10)}… ${new Date(w.at).toISOString()} ${w.before ? "BEFORE" : "AFTER"}: ${verdict}`)
   }
 }
 

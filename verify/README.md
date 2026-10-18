@@ -30,6 +30,14 @@ npx mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper
 
 It also works as a plain copy: download [`verify.mjs`](https://github.com/vidit-16/mohar/blob/main/verify/verify.mjs) and run `node verify.mjs <exam-id>`.
 
+Every verdict is also available as data, which is what the site's share cards use:
+
+```js
+import { verdicts } from "mohar-verify"
+const v = await verdicts("DSPSC-PRE26-10170937")
+v.witnesses.filter((w) => w.verdict === "leak") // [{ key, creator, at, before, total, hits: ["A-Q2", …] }]
+```
+
 The hashing helpers are exported too:
 
 ```js

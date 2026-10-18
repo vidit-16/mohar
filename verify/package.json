@@ -1,6 +1,6 @@
 {
   "name": "mohar-verify",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Rebuild Mohar exam-leak verdicts straight from the public Arkiv RPC. Zero dependencies.",
   "type": "module",
   "bin": {
