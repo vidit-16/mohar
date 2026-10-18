@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { readFileSync } from "node:fs"
+import { normaliseDomain } from "../src/lib/domain"
 import { normalise, questionHash, splitQuestions } from "../src/lib/hash"
 // @ts-expect-error plain JS on purpose, it has to run with zero dependencies
 import * as standalone from "../verify/verify.mjs"
@@ -67,5 +68,30 @@ describe("check.html", () => {
     const browserLines = new Function("normalise", "t", `return ${lines}`) as (n: unknown, t: string) => string[]
     const paper = corpus.join("\n")
     expect(browserLines(browserNormalise, paper)).toEqual(splitQuestions(paper))
+  })
+})
+
+describe("exam-body domain check parity", () => {
+  const A = "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6"
+  const inputs = ["uppsc.up.nic.in", "https://UPPSC.up.nic.in/notices", "mohar-in.vercel.app.", "localhost", "127.0.0.1", "exam body.in", "a..in", "-a.in", "x.1", "javascript:alert(1)"]
+
+  it("verify.mjs accepts and rejects the same domains as the app, and fetches the same URL", async () => {
+    for (const input of inputs) {
+      let url: string | undefined
+      vi.stubGlobal("fetch", async (u: string) => ((url = u), new Response(JSON.stringify({ name: "Demo", issuers: [A] }))))
+      const app = normaliseDomain(input)
+      const cli = await standalone.domainIssuers(input).then((p: { domain: string }) => p.domain, () => null)
+      expect(cli, input).toBe(app)
+      if (app) expect(url).toBe(`https://${app}/.well-known/mohar.json`)
+    }
+    vi.unstubAllGlobals()
+  })
+
+  it("check.html uses the same domain rule as verify.mjs", () => {
+    const rule = (src: string) => src.match(/const domain = input\.trim\(\)[^\n]+\n\s*if \(!(\/[^\n]+\/)\.test\(domain\)\)/)?.slice(0, 2).join("|")
+    const page = readFileSync(new URL("../public/check.html", import.meta.url), "utf8")
+    const cli = readFileSync(new URL("../verify/verify.mjs", import.meta.url), "utf8")
+    expect(rule(page)).toBeTruthy()
+    expect(rule(page)).toBe(rule(cli))
   })
 })

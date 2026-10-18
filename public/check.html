@@ -43,6 +43,11 @@
       <input id="exam" required placeholder="DSPSC-PRE26-10170937" autocomplete="off" spellcheck="false">
     </div>
     <div class="row">
+      <label for="domain">Exam body's website (optional)</label>
+      <input id="domain" placeholder="uppsc.up.nic.in" spellcheck="false" autocomplete="off">
+      <div class="hint">If set, only the addresses the exam body lists at <code>https://&lt;website&gt;/.well-known/mohar.json</code> count, and the address below is ignored.</div>
+    </div>
+    <div class="row">
       <label for="issuer">Exam body's address</label>
       <input id="issuer" value="0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6" spellcheck="false">
       <div class="hint">Only seals created by this address count. Check it against the exam body's own website.</div>
@@ -79,9 +84,22 @@ const json = (e) => {
     return null
   }
 }
+async function domainIssuers(input) {
+  const domain = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[/?#].*$/, "").replace(/\.$/, "")
+  if (!/^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) throw new Error(`not a valid domain: ${input}`)
+  const url = `https://${domain}/.well-known/mohar.json`
+  const res = await fetch(url, { redirect: "error" }).catch(() => {
+    throw new Error(`couldn't load ${url} (offline, redirected, or the file isn't served with Access-Control-Allow-Origin: *)`)
+  })
+  if (!res.ok) throw new Error(`${url} returned HTTP ${res.status}`)
+  const body = await res.json().catch(() => null)
+  const ok = typeof body?.name === "string" && Array.isArray(body.issuers) && body.issuers.length > 0 && body.issuers.every((a) => /^0x[0-9a-fA-F]{40}$/.test(a))
+  if (!ok) throw new Error(`${url} needs {"name": "...", "issuers": ["0x..."]}`)
+  return { domain, name: body.name, issuers: body.issuers }
+}
 const time = (ms) => new Date(ms).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "medium" })
 
-async function check(examId, issuer, paperText, RPC) {
+async function check(examId, issuer, domainInput, paperText, RPC) {
   const rpc = async (method, params) => {
     const res = await fetch(RPC, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) })
     const body = await res.json().catch(() => ({}))
@@ -89,6 +107,14 @@ async function check(examId, issuer, paperText, RPC) {
     if (!res.ok || body.error) throw new Error(`${method}: ${JSON.stringify(body.error ?? body).slice(0, 200)}`)
     return body.result
   }
+  const summary = []
+  let trusted = [issuer]
+  if (domainInput.trim()) {
+    const proof = await domainIssuers(domainInput)
+    trusted = proof.issuers
+    summary.push(`<span class="ok">${esc(proof.domain)}</span> vouches for <span class="mono">${proof.issuers.map(esc).join(", ")}</span> (${esc(proof.name)}).`)
+  }
+  const isTrusted = (a) => trusted.some((t) => same(a, t))
   const select = { key: true, creator: true, createdAt: true, attributes: true, payload: true }
   const records = []
   let cursor
@@ -99,9 +125,9 @@ async function check(examId, issuer, paperText, RPC) {
   } while (cursor)
 
   const typed = (t) => records.filter((e) => attr(e, "type") === t)
-  const commits = typed("paper_commit").filter((e) => same(e.creator, issuer))
-  const forged = typed("paper_commit").filter((e) => !same(e.creator, issuer))
-  const reveals = typed("reveal").filter((e) => same(e.creator, issuer))
+  const commits = typed("paper_commit").filter((e) => isTrusted(e.creator))
+  const forged = typed("paper_commit").filter((e) => !isTrusted(e.creator))
+  const reveals = typed("reveal").filter((e) => isTrusted(e.creator))
   const entry = typed("open_exam").sort((a, b) => Number(BigInt(a.createdAt) - BigInt(b.createdAt)))[0]
   const witnesses = typed("witness").sort((a, b) => Number(BigInt(a.createdAt) - BigInt(b.createdAt)))
 
@@ -111,7 +137,6 @@ async function check(examId, issuer, paperText, RPC) {
     return blockMs.get(block)
   }
 
-  const summary = []
   let opensAt, paper = []
   if (commits.length) {
     opensAt = Number(BigInt(attr(commits[0], "opens_at_ms")))
@@ -122,7 +147,7 @@ async function check(examId, issuer, paperText, RPC) {
         paper.push({ id: `${attr(r, "set_code")}-Q${i + 1}`, hash: await sha(normalise(q)), ok: sealed[i] === (await sha(`${p.salts[i]}|${normalise(q)}`)) })
       }
     }
-    summary.push(`Sealed exam: <b>${commits.length}</b> set(s) by <span class="mono">${esc(issuer)}</span>. ${forged.length} look-alike seal(s) from other wallets ignored.`)
+    summary.push(`Sealed exam: <b>${commits.length}</b> set(s) by <span class="mono">${trusted.map(esc).join(", ")}</span>. ${forged.length} look-alike seal(s) from other wallets ignored.`)
     summary.push(paper.length ? `Paper revealed: <b class="${paper.every((q) => q.ok) ? "ok" : "leak"}">${paper.filter((q) => q.ok).length}/${paper.length}</b> questions match the seal.` : "Paper not revealed yet.")
   } else if (entry) {
     opensAt = Number(BigInt(attr(entry, "opens_at_ms")))
@@ -151,6 +176,8 @@ async function check(examId, issuer, paperText, RPC) {
 }
 
 $("exam").value = new URLSearchParams(location.search).get("exam") ?? ""
+const domainParam = new URLSearchParams(location.search).get("domain")
+if (domainParam) $("domain").value = domainParam
 const issuerParam = new URLSearchParams(location.search).get("issuer")
 if (issuerParam) $("issuer").value = issuerParam
 
@@ -159,7 +186,7 @@ $("f").addEventListener("submit", async (ev) => {
   $("go").disabled = true
   $("out").innerHTML = `<section class="muted">Reading Arkiv…</section>`
   try {
-    $("out").innerHTML = await check($("exam").value.trim(), $("issuer").value.trim(), $("paper").value, $("rpc").value.trim())
+    $("out").innerHTML = await check($("exam").value.trim(), $("issuer").value.trim(), $("domain").value, $("paper").value, $("rpc").value.trim())
   } catch (e) {
     $("out").innerHTML = `<section class="err">Couldn't read Arkiv: ${esc(e.message)}</section>`
   } finally {
