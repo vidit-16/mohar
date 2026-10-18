@@ -15,7 +15,8 @@
   "reporters": [
     "progress-append-only",
     "clear-text",
-    "html"
+    "html",
+    "json"
   ],
   "clearTextReporter": {
     "allowColor": false,
