@@ -15,6 +15,19 @@
         if (l === "hi") document.documentElement.lang = "hi"
       } catch {}
       if (/[?&](exam|tour)=/.test(location.search) || document.documentElement.lang === "hi") document.documentElement.classList.add("no-shell")
+      // a page restored from cache after a deploy points at old bundles that are gone; reload once to get the new ones
+      addEventListener("error", (e) => {
+        const src = e.target && (e.target.src || e.target.href)
+        if (!src || !/\/assets\//.test(src)) return
+        try {
+          if (sessionStorage.getItem("mohar.reloaded")) return
+          sessionStorage.setItem("mohar.reloaded", "1")
+        } catch {
+          return
+        }
+        location.reload()
+      }, true)
+      addEventListener("load", () => setTimeout(() => { try { sessionStorage.removeItem("mohar.reloaded") } catch {} }, 5000))
     </script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Mohar · Prove who had the paper before the exam" />
