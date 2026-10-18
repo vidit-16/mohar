@@ -5,6 +5,7 @@ import { writeFileSync } from "node:fs"
 import { str } from "@arkiv-network/sdk/attr"
 import { eq } from "@arkiv-network/sdk/query"
 import { blockTimeMs, ISSUERS, PROJECT, publicClient } from "../src/lib/mohar"
+import { daysLeft, examCounts } from "./upkeep"
 
 const reader = publicClient()
 const head = await reader.getBlockNumber()
@@ -35,7 +36,7 @@ do {
       created_block: Number(e.createdAt),
       created_at: new Date(await blockTimeMs(reader, e.createdAt!)).toISOString(),
       expires_block: Number(e.expiresAt),
-      expires_in_days: Number((((Number(e.expiresAt! - head) * Number(blockDuration)) / 86_400)).toFixed(1)),
+      expires_in_days: Number(daysLeft(e.expiresAt!, head, Number(blockDuration)).toFixed(1)),
       readonly: !!e.creationFlags?.readonly,
       permissionless_extension: !!e.creationFlags?.permissionlessExtension,
       attributes: attrs,
@@ -47,11 +48,7 @@ do {
 
 records.sort((a, b) => String(a.exam_id).localeCompare(String(b.exam_id)) || (a.created_block as number) - (b.created_block as number))
 
-const exams = [...new Set(records.map((r) => r.exam_id as string))].map((id) => {
-  const of = records.filter((r) => r.exam_id === id)
-  const count = (t: string) => of.filter((r) => r.type === t).length
-  return { exam_id: id, paper_commit: count("paper_commit"), reveal: count("reveal"), open_exam: count("open_exam"), witness: count("witness") }
-})
+const exams = examCounts(records)
 
 const out = {
   network: "Arkiv Tiramisu testnet (chain 7738577)",

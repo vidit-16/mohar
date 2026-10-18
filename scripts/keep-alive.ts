@@ -10,6 +10,7 @@ import { eq } from "@arkiv-network/sdk/query"
 import { formatEther, type Hex, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { keepAlive, PROJECT, publicClient, RPC_URL } from "../src/lib/mohar"
+import { dueForTopUp, type Upkeep } from "./upkeep"
 
 const MIN_DAYS = 21
 const TARGET_DAYS = 35
@@ -21,9 +22,8 @@ if (!key && !dryRun) throw new Error("set KEEPALIVE_KEY to a funded Tiramisu key
 const reader = publicClient()
 const head = await reader.getBlockNumber()
 const { blockDuration } = await reader.getBlockTiming()
-const daysLeft = (expiresAt: bigint) => (Number(expiresAt - head) * Number(blockDuration)) / 86_400
 
-const rows: { key: Hex; expiresAt: bigint; label: string; extendable: boolean }[] = []
+const rows: Upkeep[] = []
 let cursor: string | undefined
 do {
   let q = reader.select({ key: true, expiresAt: true, attributes: true, creationFlags: true }).where(eq("project", str(PROJECT))).limit(200)
@@ -36,21 +36,19 @@ do {
   cursor = page.cursor
 } while (cursor)
 
-const due = rows.filter((r) => daysLeft(r.expiresAt) < MIN_DAYS)
-console.log(`${rows.length} records, ${due.length} expire within ${MIN_DAYS} days (block ${head})`)
+const { extend, skipped } = dueForTopUp(rows, head, Number(blockDuration), MIN_DAYS, TARGET_DAYS)
+console.log(`${rows.length} records, ${extend.length + skipped.length} expire within ${MIN_DAYS} days (block ${head})`)
+for (const r of skipped) console.log(`${r.label.padEnd(48)} ${r.left.toFixed(1).padStart(5)}d left  skipped: ${r.left <= 0 ? "already expired" : "not extendable"}`)
 
 const wallet = key && createWalletClient({ chain: tiramisu, transport: http(RPC_URL, { retryCount: 0 }), account: privateKeyToAccount(key) })
 if (wallet) console.log(`wallet ${wallet.account!.address}, ${formatEther(await reader.getBalance({ address: wallet.account!.address }))} GLM`)
 
 let failed = 0
-for (const r of due) {
-  const left = daysLeft(r.expiresAt)
-  const add = Math.ceil(TARGET_DAYS - left)
-  const line = `${r.label.padEnd(48)} ${left.toFixed(1).padStart(5)}d left, +${add}d`
-  if (!r.extendable) { console.log(`${line}  skipped: not extendable`); continue }
+for (const r of extend) {
+  const line = `${r.label.padEnd(48)} ${r.left.toFixed(1).padStart(5)}d left, +${r.add}d`
   if (dryRun || !wallet) { console.log(`${line}  (dry run)`); continue }
   try {
-    const { txHash } = await keepAlive(wallet, r.key, r.expiresAt, add)
+    const { txHash } = await keepAlive(wallet, r.key as Hex, r.expiresAt, r.add)
     console.log(`${line}  ${txHash}`)
   } catch (e) {
     failed++
