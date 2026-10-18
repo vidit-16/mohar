@@ -3,9 +3,10 @@
 // Zero dependencies on purpose: copy this one file anywhere with Node 18+ and run it,
 // even if the website and this repo are gone.
 //
-//   npx mohar-verify <exam-id> [issuer-address] [--paper paper.txt]
+//   npx mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]
 //   node verify.mjs <exam-id> ...   (same thing, from a copy of this file)
 //
+// --domain trusts whatever addresses the exam body lists at https://<domain>/.well-known/mohar.json.
 // For an open exam (no issuer seal), pass the official paper as a text file, one question per line.
 
 import { createHash } from "node:crypto"
@@ -20,6 +21,17 @@ export const normalise = (t) =>
   t.normalize("NFKC").toLowerCase().replace(/^\s*(q(uestion)?\s*|प्रश्न\s*|प्र\.?\s*)?(no\.?\s*)?\(?[0-9०-९]{1,3}[).:।-]?\s+/u, "").replace(/[^\p{L}\p{N}\p{M}]+/gu, " ").trim()
 export const lines = (t) => t.split(/\r?\n/).map((l) => l.trim()).filter((l) => normalise(l))
 const same = (a, b) => a?.toLowerCase() === b?.toLowerCase()
+
+export async function domainIssuers(input) {
+  const domain = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[/?#].*$/, "").replace(/\.$/, "")
+  if (!/^(?=.{4,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) throw new Error(`not a valid domain: ${input}`)
+  const res = await fetch(`https://${domain}/.well-known/mohar.json`, { redirect: "error" })
+  if (!res.ok) throw new Error(`https://${domain}/.well-known/mohar.json returned HTTP ${res.status}`)
+  const body = await res.json()
+  const ok = typeof body?.name === "string" && Array.isArray(body.issuers) && body.issuers.length > 0 && body.issuers.every((a) => /^0x[0-9a-fA-F]{40}$/.test(a))
+  if (!ok) throw new Error(`${domain}/.well-known/mohar.json needs {"name": "...", "issuers": ["0x..."]}`)
+  return { domain, name: body.name, issuers: body.issuers }
+}
 
 async function rpc(method, params) {
   const res = await fetch(RPC, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) })
@@ -41,11 +53,21 @@ async function main() {
   const args = process.argv.slice(2)
   const paperAt = args.indexOf("--paper")
   const paperFile = paperAt >= 0 ? args.splice(paperAt, 2)[1] : undefined
-  const [examId, issuer = DEFAULT_ISSUER] = args
+  const domainAt = args.indexOf("--domain")
+  const domainArg = domainAt >= 0 ? args.splice(domainAt, 2)[1] : undefined
+  const [examId, issuerArg] = args
   if (!examId) {
-    console.error("usage: mohar-verify <exam-id> [issuer-address] [--paper paper.txt]")
+    console.error("usage: mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]")
     process.exit(1)
   }
+  let trusted = [issuerArg ?? DEFAULT_ISSUER]
+  if (domainArg) {
+    const proof = await domainIssuers(domainArg)
+    trusted = proof.issuers
+    console.log(`${proof.domain} vouches for ${proof.issuers.join(", ")} (${proof.name})`)
+  }
+  const issuer = trusted.join(", ")
+  const isTrusted = (a) => trusted.some((t) => same(a, t))
 
   const select = { key: true, creator: true, createdAt: true, attributes: true, payload: true }
   const records = []
@@ -57,9 +79,9 @@ async function main() {
   } while (cursor)
 
   const typed = (t) => records.filter((e) => attr(e, "type") === t)
-  const commits = typed("paper_commit").filter((e) => same(e.creator, issuer))
-  const forged = typed("paper_commit").filter((e) => !same(e.creator, issuer))
-  const reveals = typed("reveal").filter((e) => same(e.creator, issuer))
+  const commits = typed("paper_commit").filter((e) => isTrusted(e.creator))
+  const forged = typed("paper_commit").filter((e) => !isTrusted(e.creator))
+  const reveals = typed("reveal").filter((e) => isTrusted(e.creator))
   const entry = typed("open_exam").sort((a, b) => Number(BigInt(a.createdAt) - BigInt(b.createdAt)))[0]
   const witnesses = typed("witness")
 
@@ -103,4 +125,9 @@ async function main() {
 }
 
 // realpath: npx runs the file through a symlink in node_modules/.bin
-if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) await main()
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+  await main().catch((e) => {
+    console.error(`error: ${e.message}`)
+    process.exit(1)
+  })
+}

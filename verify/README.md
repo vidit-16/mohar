@@ -20,10 +20,11 @@ deadline 2026-10-17T09:40:54.039Z (earlier of announced start and reveal)
 ## Usage
 
 ```sh
-npx mohar-verify <exam-id> [issuer-address] [--paper paper.txt]
+npx mohar-verify <exam-id> [issuer-address] [--domain exam-body.gov.in] [--paper paper.txt]
 ```
 
 - `issuer-address`: the exam body's published address. Only seals created by it count. Defaults to the demo exam body.
+- `--domain`: trust whatever addresses the exam body lists at `https://<domain>/.well-known/mohar.json` instead of a fixed address. This is the strongest check, because the trust comes from the exam body's own website.
 - `--paper`: for an open exam (no official seal), the official paper as a text file, one question per line.
 - `ARKIV_RPC`: point it at another RPC endpoint.
 
