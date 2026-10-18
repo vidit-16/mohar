@@ -90,13 +90,18 @@ describe("middleware", () => {
     const { default: middleware } = await import("../middleware")
     const real = globalThis.fetch
     const seen: string[] = []
-    globalThis.fetch = (async (u: URL | string) => (seen.push(String(u)), new Response("ok"))) as typeof fetch
+    globalThis.fetch = (async (u: URL | string) => (seen.push(String(u)), new Response("<html>ok</html>", { headers: { "content-type": "text/html", "content-encoding": "br", "content-length": "999" } }))) as typeof fetch
     try {
-      expect(middleware(new Request("https://m.app/"))).toBeUndefined()
-      expect(middleware(new Request("https://m.app/?exam=E"))).toBeUndefined()
-      expect(middleware(new Request("https://m.app/?w=0x1"))).toBeUndefined()
-      await middleware(new Request(`https://m.app/?exam=E&w=${K}`))
+      expect(await middleware(new Request("https://m.app/"))).toBeUndefined()
+      expect(await middleware(new Request("https://m.app/?exam=E"))).toBeUndefined()
+      expect(await middleware(new Request("https://m.app/?w=0x1"))).toBeUndefined()
+      const res = (await middleware(new Request(`https://m.app/?exam=E&w=${K}`)))!
       expect(seen).toEqual([`https://m.app/api/share?exam=E&w=${K}`])
+      // the body is already decoded, so a stale encoding header would break the page in every browser
+      expect(res.headers.get("content-encoding")).toBeNull()
+      expect(res.headers.get("content-length")).toBeNull()
+      expect(res.headers.get("content-type")).toBe("text/html")
+      expect(await res.text()).toBe("<html>ok</html>")
     } finally {
       globalThis.fetch = real
     }
