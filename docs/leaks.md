@@ -6,7 +6,7 @@ Nothing below goes on chain. The on-chain demo uses a made-up exam body and ques
 
 ## The scale
 
-In February 2024 the Indian Express counted **41 documented leaks in five years of recruitment exams across 15 states**, disrupting about **1.4 crore applicants** for a little over 1.04 lakh posts ([Indian Express](https://x.com/IndianExpress/status/1754781339642183793)). A Newslaundry count of media reports found 89 cases over a decade ([Newslaundry, Jul 2024](https://newslaundry.com/2024/07/31/10-years-89-paper-leak-cases-48-retests-from-centre-to-states-few-plugs-for-a-leaky-record)).
+In February 2024 the Indian Express counted **41 documented leaks in five years of recruitment exams across 15 states**, disrupting about **1.4 crore (14 million) applicants** for a little over 1.04 lakh posts ([Indian Express](https://x.com/IndianExpress/status/1754781339642183793)). A Newslaundry count of media reports found 89 cases over a decade ([Newslaundry, Jul 2024](https://newslaundry.com/2024/07/31/10-years-89-paper-leak-cases-48-retests-from-centre-to-states-few-plugs-for-a-leaky-record)).
 
 ## Cases
 
