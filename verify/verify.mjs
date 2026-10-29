@@ -127,11 +127,14 @@ async function main() {
     process.exitCode = 1
     return
   }
+  // names and set codes come from other people's files and the chain: drop terminal control codes before printing,
+  // so nobody can recolour, overwrite or hide a line of the verdict
+  const printable = (t) => String(t).replace(/[\u0000-\u001f\u007f-\u009f]/g, "?")
   let trusted = [issuerArg ?? DEFAULT_ISSUER]
   if (domainArg) {
     const proof = await domainIssuers(domainArg)
     trusted = proof.issuers
-    console.log(`${proof.domain} vouches for ${proof.issuers.join(", ")} (${proof.name})`)
+    console.log(`${proof.domain} vouches for ${proof.issuers.join(", ")} (${printable(proof.name)})`)
   }
   const v = await verdicts(examId, { trusted, paperText: paperFile ? readFileSync(paperFile, "utf8") : undefined })
   if (v.kind === "none") {
@@ -149,7 +152,7 @@ async function main() {
 `)
   const words = { late: "too late", waiting: "waiting for paper", "no-match": "no match" }
   for (const w of v.witnesses) {
-    const verdict = w.verdict === "leak" ? `LEAK ${w.hits.join(", ")}` : words[w.verdict]
+    const verdict = w.verdict === "leak" ? `LEAK ${printable(w.hits.join(", "))}` : words[w.verdict]
     console.log(`${w.key.slice(0, 12)}… ${w.creator.slice(0, 10)}… ${new Date(w.at).toISOString()} ${w.before ? "BEFORE" : "AFTER"}: ${verdict}`)
   }
 }

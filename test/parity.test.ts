@@ -89,8 +89,9 @@ describe("exam-body domain check parity", () => {
 
   it("check.html uses the same domain rule as verify.mjs", () => {
     const rule = (src: string) => src.match(/const domain = input\.trim\(\)[^\n]+\n\s*if \(!(\/[^\n]+\/)\.test\(domain\)\)/)?.slice(0, 2).join("|")
-    const page = readFileSync(new URL("../public/check.html", import.meta.url), "utf8")
-    const cli = readFileSync(new URL("../verify/verify.mjs", import.meta.url), "utf8")
+    // compare logic, not line endings: a Windows checkout turns every LF into CRLF
+    const page = readFileSync(new URL("../public/check.html", import.meta.url), "utf8").replace(/\r\n/g, "\n")
+    const cli = readFileSync(new URL("../verify/verify.mjs", import.meta.url), "utf8").replace(/\r\n/g, "\n")
     expect(rule(page)).toBeTruthy()
     expect(rule(page)).toBe(rule(cli))
   })
