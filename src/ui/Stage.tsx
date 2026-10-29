@@ -203,7 +203,8 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
   useEffect(() => {
     if (remote) return
     const onKey = (e: KeyboardEvent) => {
-      if (setup || (e.target as HTMLElement).closest("input, textarea")) return
+      // clickers and some keyboards send keys to the document itself, which isn't an element
+      if (setup || (e.target instanceof Element && e.target.closest("input, textarea"))) return
       if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) go(slide + 1)
       else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) go(slide - 1)
       else if (e.key === "h" || e.key === "H") setLang(lang === "en" ? "hi" : "en")
@@ -243,7 +244,7 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
 
   const name = SLIDES[slide]
   return (
-    <div className="stage" onClick={(e) => !(e.target as HTMLElement).closest("button, a, input, .stage-setup") && go(slide + 1)}>
+    <div className="stage" onClick={(e) => !(e.target instanceof Element && e.target.closest("button, a, input, .stage-setup")) && go(slide + 1)}>
       <div className="stage-slide" key={name} data-slide={name}>
         {name === "title" && (
           <div className="stage-center">
