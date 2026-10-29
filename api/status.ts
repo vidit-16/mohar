@@ -25,6 +25,6 @@ export async function GET(req: Request) {
   const latest = rows.reduce((m, r) => (BigInt(r.createdAt) > m ? BigInt(r.createdAt) : m), 0n)
   return Response.json(
     { version: `${rows.length}:${latest}` },
-    { headers: { "cache-control": "public, max-age=0, s-maxage=2, stale-while-revalidate=2" } },
+    { headers: { "cache-control": "public, max-age=0, s-maxage=2, stale-while-revalidate=2", "vercel-cdn-cache-control": "max-age=2" } },
   )
 }
