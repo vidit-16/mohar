@@ -22,6 +22,20 @@ export function fmtDuration(ms: number): string {
   return `${m}m`
 }
 
+// Card text is drawn by Satori, whose SVG escaping is broken before 0.33.5 (GHSA-wx4j-mvgx-mqwp), and the fixed
+// @vercel/og 1.0.3 can't load in Node functions. Exam titles come from the chain, where anyone can write, so markup
+// characters are swapped for look-alikes and control characters dropped before anything reaches the renderer.
+export const plain = (s: string) =>
+  s
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/&/g, "and")
+    .replace(/</g, "‹")
+    .replace(/>/g, "›")
+    .replace(/"/g, "”")
+    .replace(/'/g, "’")
+    .slice(0, 200)
+
 export function cardFor(v: Verdicts, witnessKey: string): Card {
   const w = v.witnesses?.find((x) => x.key.toLowerCase() === witnessKey.toLowerCase())
   if (v.kind === "none" || !w || v.deadline === undefined) return FALLBACK

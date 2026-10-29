@@ -1,7 +1,7 @@
 // The image a chat app shows when someone shares a witness link: the verdict, read live from Arkiv.
 //   GET /api/card?exam=<exam id>&w=<witness key>   → 1200×630 PNG
 import { ImageResponse } from "@vercel/og"
-import { type Card, loadCard, type Tone } from "./_share.js"
+import { type Card, loadCard, plain, type Tone } from "./_share.js"
 
 const TONES: Record<Tone, { fg: string; bg: string }> = {
   danger: { fg: "#b42318", bg: "#fde8e6" },
@@ -36,7 +36,8 @@ function render(card: Card) {
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
-  const card = await loadCard(url.searchParams.get("exam") ?? "", url.searchParams.get("w") ?? "")
+  const raw = await loadCard(url.searchParams.get("exam") ?? "", url.searchParams.get("w") ?? "")
+  const card: Card = { ...raw, exam: plain(raw.exam), headline: plain(raw.headline), detail: plain(raw.detail), badge: plain(raw.badge) }
   // a verdict only changes when the paper is revealed, so a few minutes of caching is safe
   return new ImageResponse(render(card) as never, { width: 1200, height: 630, headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=3600" } })
 }
