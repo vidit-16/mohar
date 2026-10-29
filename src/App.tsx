@@ -1,4 +1,5 @@
 import { Globe, Moon, Sun } from "lucide-react"
+import { lazy, Suspense } from "react"
 import { useChain } from "./hooks/useChain"
 import { useIssuer } from "./hooks/useIssuer"
 import { useT } from "./i18n"
@@ -12,6 +13,9 @@ import { Home } from "./ui/Home"
 import { IssuerPage } from "./ui/IssuerPage"
 import { Empty, Spinner, ToastHost } from "./ui/primitives"
 import { Tour } from "./ui/Tour"
+
+// only speakers ever open the stage view, so it (and its QR library) loads on demand
+const Stage = lazy(() => import("./ui/Stage").then((m) => ({ default: m.Stage })))
 
 export default function App() {
   return (
@@ -31,6 +35,22 @@ function Shell() {
   const trust = useIssuer(params)
   const home = trust.status === "ready" ? trust.value.home : "./"
   const examId = params.get("exam")
+  const stage = params.get("stage")
+
+  if (stage && examId) {
+    const issuer = params.get("issuer") ?? ""
+    const qr = params.get("qr") ?? ""
+    return (
+      <Suspense fallback={<Empty icon={<Spinner size={22} />} title="" />}>
+        <Stage
+          examId={examId}
+          remote={stage === "remote"}
+          issuer={/^0x[0-9a-fA-F]{40}$/.test(issuer) ? (issuer as `0x${string}`) : undefined}
+          qr={qr.startsWith("https://") && !/\s/.test(qr) ? qr : undefined}
+        />
+      </Suspense>
+    )
+  }
 
   return (
     <>
