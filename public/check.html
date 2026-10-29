@@ -171,7 +171,7 @@ async function check(examId, issuer, domainInput, paperText, RPC) {
     const hashes = new Set(json(w)?.hashes ?? [])
     const hits = paper.filter((q) => q.ok && hashes.has(q.hash)).map((q) => q.id)
     const before = at < deadline
-    const verdict = !before ? `<span class="muted">too late</span>` : !paper.length ? `<span class="muted">waiting for the paper</span>` : hits.length ? `<span class="leak">LEAK: ${hits.join(", ")}</span>` : `<span class="ok">no match</span>`
+    const verdict = !before ? `<span class="muted">too late</span>` : !paper.length ? `<span class="muted">waiting for the paper</span>` : hits.length ? `<span class="leak">LEAK: ${hits.map(esc).join(", ")}</span>` : `<span class="ok">no match</span>`
     rows.push(`<tr><td class="mono">${esc(w.key.slice(0, 12))}…<br><span class="muted">${esc(w.creator.slice(0, 10))}…</span></td><td>${time(at)}<br><span class="muted">block ${BigInt(w.createdAt)}</span></td><td>${before ? "before" : "after"}</td><td>${verdict}</td></tr>`)
   }
   return `<section>${summary.map((s) => `<p>${s}</p>`).join("")}</section>
