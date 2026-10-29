@@ -11,14 +11,17 @@ function initialLang(): Lang {
   return "en"
 }
 
-// the Devanagari web font is ~120 KB; English visitors only see मोहर in the logo, which system fonts render fine
+// the Devanagari web font is ~120 KB; English visitors only see मोहर in the logo, which system fonts render fine.
+// Self-hosted like the other fonts, so switching to Hindi on a slow or blocked network doesn't depend on Google.
 function loadHindiFont() {
   if (document.getElementById("font-hi")) return
-  const link = document.createElement("link")
-  link.id = "font-hi"
-  link.rel = "stylesheet"
-  link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
-  document.head.appendChild(link)
+  const style = document.createElement("style")
+  style.id = "font-hi"
+  style.textContent =
+    '@font-face{font-family:"Noto Sans Devanagari";font-weight:400 600;font-display:swap;' +
+    'src:url(/fonts/noto-sans-devanagari.woff2) format("woff2");' +
+    "unicode-range:U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF}"
+  document.head.appendChild(style)
 }
 
 export function LangProvider({ children }: { children: ReactNode }) {

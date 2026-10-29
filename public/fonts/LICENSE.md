@@ -4,5 +4,6 @@ Self-hosted latin subsets, served from this site instead of Google Fonts so a sl
 
 - **Fraunces** by Undercase Type, https://github.com/undercasetype/Fraunces
 - **Inter** by Rasmus Andersson, https://github.com/rsms/inter
+- **Noto Sans Devanagari** by Google (Devanagari subset, loaded only in Hindi), https://github.com/notofonts/devanagari
 
-Both are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
+All are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
