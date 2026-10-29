@@ -25,7 +25,7 @@
     "url": "git+https://github.com/vidit-16/mohar.git",
     "directory": "verify"
   },
-  "homepage": "https://mohar-in.vercel.app",
+  "homepage": "https://mohar.live",
   "author": "vidit choudhary",
   "license": "MIT"
 }

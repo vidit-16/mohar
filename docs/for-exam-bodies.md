@@ -21,7 +21,7 @@ The paper itself is never published before the exam, not even encrypted. Only sa
    { "name": "Uttar Pradesh Public Service Commission", "issuers": ["0xYourIssuerAddress"] }
    ```
 
-   Serve it with `Access-Control-Allow-Origin: *` so browsers can read it. That file is what makes your seals trustworthy: Mohar shows a seal as official only if its on-chain creator is an address your own domain lists. Anyone can post a look-alike; it shows up as "fake seal ignored". Link your exams as `https://mohar-in.vercel.app/?domain=<your domain>&exam=<exam id>`; the page then says "Address confirmed by <your domain>". The same check works without our site: `npx mohar-verify <exam id> --domain <your domain>`, or `check.html` with the website field filled in. When you rotate keys, list the new address first and keep the old one until its exams are done.
+   Serve it with `Access-Control-Allow-Origin: *` so browsers can read it. That file is what makes your seals trustworthy: Mohar shows a seal as official only if its on-chain creator is an address your own domain lists. Anyone can post a look-alike; it shows up as "fake seal ignored". Link your exams as `https://mohar.live/?domain=<your domain>&exam=<exam id>`; the page then says "Address confirmed by <your domain>". The same check works without our site: `npx mohar-verify <exam id> --domain <your domain>`, or `check.html` with the website field filled in. When you rotate keys, list the new address first and keep the old one until its exams are done.
 3. **Optionally, get the address added to Mohar's built-in registry** (`ISSUERS` in `src/lib/mohar.ts`), so it's the default on the home page. The domain file is still the stronger proof, because it doesn't depend on us.
 4. Fund the wallet with a little gas. Sealing a whole paper is usually one transaction: a 180-question paper in five languages sealed in one, costing well under 0.01 test GLM.
 
@@ -31,7 +31,7 @@ The paper itself is never published before the exam, not even encrypted. Only sa
 
 Two ways to do it, same result on chain:
 
-- **In the browser:** open [mohar-in.vercel.app/?issue=1](https://mohar-in.vercel.app/?issue=1), connect MetaMask (a hardware wallet behind MetaMask works) or use the browser's own wallet, paste or upload the CSV, and click *Seal paper*. The salts file downloads straight away. The paper text never leaves your machine before the reveal.
+- **In the browser:** open [mohar.live/?issue=1](https://mohar.live/?issue=1), connect MetaMask (a hardware wallet behind MetaMask works) or use the browser's own wallet, paste or upload the CSV, and click *Seal paper*. The salts file downloads straight away. The paper text never leaves your machine before the reveal.
 - **From the command line**, for air-gapped or scripted setups:
 
 Export the paper as `set,question`, one row per question, in printed order. Bilingual papers: give each language its own set code (`A-en`, `A-hi`) so a leak in either language matches.

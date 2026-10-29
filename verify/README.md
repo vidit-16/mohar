@@ -1,6 +1,6 @@
 # mohar-verify
 
-Rebuilds every [Mohar](https://mohar-in.vercel.app) verdict for an exam straight from the public Arkiv RPC: which seals are official, whether the revealed paper matches them, and which witnesses held real questions before the exam started.
+Rebuilds every [Mohar](https://mohar.live) verdict for an exam straight from the public Arkiv RPC: which seals are official, whether the revealed paper matches them, and which witnesses held real questions before the exam started.
 
 No dependencies, no website, no API key. One file, Node 18+.
 

@@ -29,7 +29,7 @@ function render(card: Card) {
     ]),
     h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end", fontSize: 26, color: "#6b645a" }, [
       h("div", { display: "flex", maxWidth: 760 }, card.exam),
-      h("div", { display: "flex" }, "Checked on Arkiv · mohar-in.vercel.app"),
+      h("div", { display: "flex" }, "Checked on Arkiv · mohar.live"),
     ]),
   ])
 }

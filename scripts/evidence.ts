@@ -57,7 +57,7 @@ const out = {
   generated_at: new Date().toISOString(),
   at_block: Number(head),
   trusted_issuers: ISSUERS,
-  how_to_check: "npx mohar-verify <exam_id>, or https://mohar-in.vercel.app/check.html?exam=<exam_id>",
+  how_to_check: "npx mohar-verify <exam_id>, or https://mohar.live/check.html?exam=<exam_id>",
   exams,
   records,
 }

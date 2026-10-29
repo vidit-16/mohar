@@ -14,6 +14,6 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"], channel: "chrome" } },
     { name: "phone", use: { ...devices["Pixel 7"], channel: "chrome" } },
   ],
-  // E2E_BASE_URL=https://mohar-in.vercel.app runs the same suite against production
+  // E2E_BASE_URL=https://mohar.live runs the same suite against production
   webServer: process.env.E2E_BASE_URL ? undefined : { command: "npx vite preview --port 4174 --strictPort", url: "http://localhost:4174", reuseExistingServer: true },
 })

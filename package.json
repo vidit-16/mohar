@@ -20,7 +20,7 @@
     "test:e2e": "npm run build && playwright test",
     "seal": "tsx scripts/seal.ts",
     "reveal": "tsx scripts/reveal.ts",
-    "test:e2e:prod": "E2E_BASE_URL=https://mohar-in.vercel.app playwright test",
+    "test:e2e:prod": "E2E_BASE_URL=https://mohar.live playwright test",
     "shots": "node scripts/screenshots.mjs",
     "keep-alive": "tsx scripts/keep-alive.ts",
     "evidence": "tsx scripts/evidence.ts",

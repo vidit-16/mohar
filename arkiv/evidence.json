@@ -7,7 +7,7 @@
   "trusted_issuers": {
     "0x6A473f5cE4AfB5acC58a56C4988b1fCb7A5E36A6": "Demo State Public Service Commission"
   },
-  "how_to_check": "npx mohar-verify <exam_id>, or https://mohar-in.vercel.app/check.html?exam=<exam_id>",
+  "how_to_check": "npx mohar-verify <exam_id>, or https://mohar.live/check.html?exam=<exam_id>",
   "exams": [
     {
       "exam_id": "CONSOLE-TEST-PAPER-SHIFT-1",

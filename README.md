@@ -6,7 +6,7 @@ Prove who had the exam paper before the exam. Built on [Arkiv](https://arkiv.net
 
 *Mohar* (मोहर) is the Hindi/Urdu word for a seal: the stamp an office presses on a document to say "this is official, as of now". That's what the app does to a question paper, except the stamp is on a public chain, so nobody can forge it, backdate it or take it back.
 
-**Live:** https://mohar-in.vercel.app (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
+**Live:** https://mohar.live (reading needs no wallet). Hit **"See a leak get caught"** for a 2-minute guided run.
 
 **Backup:** https://vidit-16.github.io/mohar/ is the same app as a static copy on GitHub Pages, reading Arkiv directly. If the main site is ever down or blocked, the evidence is still one link away.
 
@@ -92,7 +92,7 @@ Optional: put an Arkiv access key in `.env` as `VITE_ARKIV_KEY` (site) and `ARKI
 
 ### For exam bodies
 
-Seal a real paper from a CSV (bilingual papers supported) and reveal it at the exam, either in the browser at **[/?issue=1](https://mohar-in.vercel.app/?issue=1)** (MetaMask or the browser's own wallet) or from the command line:
+Seal a real paper from a CSV (bilingual papers supported) and reveal it at the exam, either in the browser at **[/?issue=1](https://mohar.live/?issue=1)** (MetaMask or the browser's own wallet) or from the command line:
 
 ```sh
 npm run seal -- paper.csv --exam-id UPPSC-PRE-2026-S1 --title "UPPSC Prelims 2026" --opens 2026-11-02T09:30+05:30
@@ -141,11 +141,11 @@ npx mohar-verify DSPSC-PRE26-10170937
 npx mohar-verify <open-exam-id> --paper official-paper.txt
 ```
 
-Or in a browser, with nothing installed: [mohar-in.vercel.app/check.html](https://mohar-in.vercel.app/check.html?exam=DSPSC-PRE26-10170937). It's one self-contained file, so you can save it and it keeps working without either site.
+Or in a browser, with nothing installed: [mohar.live/check.html](https://mohar.live/check.html?exam=DSPSC-PRE26-10170937). It's one self-contained file, so you can save it and it keeps working without either site.
 
 ### Exam bodies prove their own address
 
-An exam body publishes its seal address at `https://<its domain>/.well-known/mohar.json`, and Mohar trusts that file instead of a list we control. Open any exam with `?domain=<domain>`, run `npx mohar-verify <exam id> --domain <domain>`, or fill in the website field in `check.html`: all three read the same file and apply the same rule. The demo body's file is at [mohar-in.vercel.app/.well-known/mohar.json](https://mohar-in.vercel.app/.well-known/mohar.json). Details in [docs/for-exam-bodies.md](docs/for-exam-bodies.md).
+An exam body publishes its seal address at `https://<its domain>/.well-known/mohar.json`, and Mohar trusts that file instead of a list we control. Open any exam with `?domain=<domain>`, run `npx mohar-verify <exam id> --domain <domain>`, or fill in the website field in `check.html`: all three read the same file and apply the same rule. The demo body's file is at [mohar.live/.well-known/mohar.json](https://mohar.live/.well-known/mohar.json). Details in [docs/for-exam-bodies.md](docs/for-exam-bodies.md).
 
 ### Trying it on real exams
 

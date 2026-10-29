@@ -189,7 +189,7 @@ export function Tour({ search }: { search: string }) {
         <div className="tour-end">
           <Emblem size={180} animate />
           <p className="tour-end-line">{s[lang]}</p>
-          <p className="tour-end-url">mohar-in.vercel.app</p>
+          <p className="tour-end-url">mohar.live</p>
           <div className="row-gap" hidden={rec}>
             <button className="btn btn-secondary" onClick={() => go(0)}>
               <Play size={15} /> {t("tour.play")}
