@@ -129,6 +129,7 @@ async function main() {
   }
   // names and set codes come from other people's files and the chain: drop terminal control codes before printing,
   // so nobody can recolour, overwrite or hide a line of the verdict
+  // eslint-disable-next-line no-control-regex
   const printable = (t) => String(t).replace(/[\u0000-\u001f\u007f-\u009f]/g, "?")
   let trusted = [issuerArg ?? DEFAULT_ISSUER]
   if (domainArg) {
