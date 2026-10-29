@@ -69,7 +69,8 @@ describe("upcoming demo exam", () => {
     const data = await examRecords(client, UPCOMING)
     const [exam] = groupExams(data.commits, ISSUER)
     expect(exam.sets).toHaveLength(2)
-    expect(exam.opensAtMs).toBeGreaterThan(Date.now())
+    // it only had to stay upcoming through judging; it opened on 26 Oct
+    expect(exam.opensAtMs).toBeGreaterThan(MUST_LIVE_UNTIL)
     expect(data.reveals).toHaveLength(0)
     for (const r of [...data.commits, ...data.witnesses]) expect(expiryMs(r), r.key).toBeGreaterThan(MUST_LIVE_UNTIL)
   })
