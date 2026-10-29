@@ -31,12 +31,19 @@ export const RPC_URL = KEY ? `${tiramisu.rpcUrls.default.http[0]}/${KEY}` : unde
 // The deployed site reads through its own /api/rpc proxy (key stays server-side) and falls back to
 // the public RPC if that's down, so the site never depends on our proxy to show the evidence.
 // The GitHub Pages mirror is built with VITE_STATIC=1: no functions there, so it reads the RPC directly.
-const viaProxy = Boolean((import.meta as { env?: { PROD?: boolean } }).env?.PROD) && !viteEnv.VITE_STATIC && typeof window !== "undefined"
+export const viaProxy = Boolean((import.meta as { env?: { PROD?: boolean } }).env?.PROD) && !viteEnv.VITE_STATIC && typeof window !== "undefined"
 
 export function publicClient(rpc = RPC_URL): PublicArkivClient {
   // retryCount 0: on a keyless 429 viem would otherwise sit on a ~40 min Retry-After without telling anyone
   const direct = http(rpc, { retryCount: 0 })
   return createPublicClient({ chain: tiramisu, transport: viaProxy ? fallback([http("/api/rpc", { retryCount: 0 }), direct], { retryCount: 0 }) : direct })
+}
+
+// A version string for one exam from the site's 2s-cached /api/status; it changes whenever a record is added.
+export async function examVersion(examId: string): Promise<string | undefined> {
+  const res = await fetch(`/api/status?exam=${encodeURIComponent(examId)}`)
+  if (!res.ok) return undefined
+  return ((await res.json()) as { version?: string }).version
 }
 
 export function liveClient(): PublicArkivClient {

@@ -8,6 +8,7 @@ import {
   groupExams,
   judge,
   examRecords,
+  examVersion,
   liveClient,
   openExamFrom,
   openReveals,
@@ -15,6 +16,7 @@ import {
   type Row,
   sameAddr,
   type Verdict,
+  viaProxy,
 } from "../lib/mohar"
 import { errText, EXPLORER } from "../ui/format"
 import { reader } from "./useChain"
@@ -160,6 +162,32 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
       unwatchBlocks?.()
     }
   }, [load, attempt])
+
+  // Around the bell the 15s live throttle is too slow for a room watching a reveal, and the keyless socket is
+  // shared by everyone on the venue's IP. So near the start time, poll the 2s-cached /api/status and reload the
+  // exam as soon as its version changes: hundreds of phones, about one Arkiv query every two seconds.
+  const opensAtMs = exam?.opensAtMs
+  const revealed = reveals.length > 0
+  useEffect(() => {
+    if (opensAtMs === undefined || revealed || !viaProxy) return
+    const nearBell = () => Date.now() > opensAtMs - 2 * 3_600_000 && Date.now() < opensAtMs + 6 * 3_600_000
+    let last: string | undefined
+    let timer: ReturnType<typeof setTimeout>
+    let stopped = false
+    const tick = async () => {
+      if (document.visibilityState === "visible" && nearBell()) {
+        const v = await examVersion(examId).catch(() => undefined)
+        if (v && last && v !== last) load()
+        if (v) last = v
+      }
+      if (!stopped) timer = setTimeout(tick, 3000)
+    }
+    timer = setTimeout(tick, 0)
+    return () => {
+      stopped = true
+      clearTimeout(timer)
+    }
+  }, [opensAtMs, revealed, examId, load])
 
   const seen = useRef<Set<string> | null>(null)
   useEffect(() => {

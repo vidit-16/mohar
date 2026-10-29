@@ -10,16 +10,28 @@ import { tiramisu } from "@arkiv-network/sdk/chains"
 import { type Challenge, solves } from "../src/lib/pow.js"
 
 const AMOUNT = parseEther("0.02")
-const PER_IP_PER_HOUR = 5
+// Defaults suit a normal day. For an event, where a whole room shares one IP, raise DRIP_PER_IP_PER_HOUR in the
+// Vercel env; DRIP_MAX_PER_HOUR caps what one instance pays out per hour whatever the per-IP limit is.
+const envInt = (name: string, fallback: number, max: number) => {
+  const n = Number(process.env[name])
+  return Number.isInteger(n) && n > 0 ? Math.min(n, max) : fallback
+}
+const PER_IP_PER_HOUR = envInt("DRIP_PER_IP_PER_HOUR", 5, 1000)
+const MAX_PER_HOUR = envInt("DRIP_MAX_PER_HOUR", 120, 2000)
+export const LIMITS = { perIpPerHour: PER_IP_PER_HOUR, maxPerHour: MAX_PER_HOUR }
+const paid: number[] = []
 const POW_BITS = 17
 const CHALLENGE_TTL_MS = 5 * 60_000
 const hits = new Map<string, number[]>()
 
 function limited(ip: string) {
   const now = Date.now()
+  while (paid.length && now - paid[0] >= 3_600_000) paid.shift()
+  if (paid.length >= MAX_PER_HOUR) return true
   const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000)
   if (recent.length >= PER_IP_PER_HOUR) return true
   hits.set(ip, [...recent, now])
+  paid.push(now)
   return false
 }
 
