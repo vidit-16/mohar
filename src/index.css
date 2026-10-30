@@ -102,7 +102,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
 html[lang="hi"] body { font-family: var(--deva); }
 h1, h2, h3 { margin: 0; letter-spacing: -0.01em; line-height: 1.2; text-wrap: balance; }
 h2 { font-size: 1.05rem; font-weight: 650; display: flex; align-items: center; gap: 8px; }
@@ -227,6 +227,8 @@ textarea { resize: vertical; margin-top: 6px; }
 .section { padding-block: 72px 16px; }
 .band { background: var(--surface-2); border-block: 1px solid var(--border); padding-block: 64px; margin-top: 72px; }
 .band + .section { padding-top: 64px; }
+/* on a phone the desktop rhythm leaves screen-high blank bands between sections */
+@media (max-width: 640px) { .section { padding-block: 44px 8px; } .band { margin-top: 36px; padding-block: 40px; } .band + .section { padding-top: 40px; } .cta-card { margin-top: 36px; padding: 24px; } }
 .section > h2, .section-head h2, .cta-card h2 { font: 600 1.75rem var(--display); margin-bottom: 8px; }
 html[lang="hi"] .section > h2, html[lang="hi"] .section-head h2, html[lang="hi"] .cta-card h2, html[lang="hi"] .exam-head h1 { font-family: var(--deva); }
 .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }

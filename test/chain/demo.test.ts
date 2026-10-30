@@ -65,13 +65,15 @@ describe("held demo exam", () => {
 })
 
 describe("upcoming demo exam", () => {
-  it("is sealed, not revealed, and alive past 23 Oct", async () => {
+  it("stayed sealed and unrevealed through judging, then was revealed after its start", async () => {
     const data = await examRecords(client, UPCOMING)
     const [exam] = groupExams(data.commits, ISSUER)
     expect(exam.sets).toHaveLength(2)
-    // it only had to stay upcoming through judging; it opened on 26 Oct
+    // it only had to stay upcoming through judging; it opened on 26 Oct and was revealed on 30 Oct
     expect(exam.opensAtMs).toBeGreaterThan(MUST_LIVE_UNTIL)
-    expect(data.reveals).toHaveLength(0)
+    const reveals = data.reveals.filter((r) => r.creator.toLowerCase() === ISSUER.toLowerCase())
+    expect(reveals).toHaveLength(2)
+    for (const r of reveals) expect(r.createdAt).toBeGreaterThan(0n)
     for (const r of [...data.commits, ...data.witnesses]) expect(expiryMs(r), r.key).toBeGreaterThan(MUST_LIVE_UNTIL)
   })
 })
