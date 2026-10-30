@@ -8,6 +8,7 @@ import { useT } from "../i18n"
 import { BURN, pastedPaper, QUERIES, sameAddr, type WitnessPayload } from "../lib/mohar"
 import { EvidenceDrawer, KeepAlive } from "./EvidenceDrawer"
 import { fmtDateTime, fmtDuration, fmtRelative, fmtTime, RPC, shownTitle } from "./format"
+import { LacSeal } from "./brand"
 import { CopyButton, Empty, Mono, Skeleton, Stat, Tag } from "./primitives"
 import { Timeline } from "./Timeline"
 import { describe } from "./verdict"
@@ -186,13 +187,11 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
       <section className={`meaning ${firstLeak ? "meaning-leak" : ""}`} data-tour="meaning">
         {firstLeak ? <ShieldAlert size={20} /> : <Info size={20} />}
         <div className="grow">
-          <div className="meaning-k">{firstLeak ? t("exam.leakAlert") : t("exam.meaning")}</div>
+          <div className="meaning-k">{firstLeak ? t("hero.app.caught") : t("exam.meaning")}</div>
           <p>{meaning}</p>
         </div>
         {firstLeak && (
-          <span className="meaning-stamp" aria-hidden="true">
-            LEAK
-          </span>
+          <LacSeal size={120} className="meaning-seal" label={t("hero.app.sealLabel")} />
         )}
         {firstLeak && (
           <button className="btn btn-sm btn-danger" onClick={() => setPicked(firstLeak.w.key)}>
