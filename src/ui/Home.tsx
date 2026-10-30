@@ -10,7 +10,7 @@ import { AddExamSheet } from "./AddExamSheet"
 import { Emblem } from "./brand"
 import { errText, fmtDateTime, fmtDuration, fmtRelative, REPO } from "./format"
 import { Badge, Empty, Skeleton } from "./primitives"
-import { DEMO_EXAM, tourHref } from "./tourSteps"
+import { DEMO_EXAM, DEMO_TITLE, tourHref } from "./tourSteps"
 
 type Tab = "sealed" | "open"
 
@@ -240,17 +240,13 @@ function CaughtLeak() {
     <a className="hero-card" href={top ? `${examHref(DEMO_EXAM)}&w=${top.witness.key}` : examHref(DEMO_EXAM)}>
       <div className="hero-card-head">
         <Emblem size={56} />
-        <span className="hero-card-exam">{x.exam?.title ?? DEMO_EXAM}</span>
+        <span className="hero-card-exam">{x.exam?.title ?? DEMO_TITLE}</span>
       </div>
-      {top ? (
-        <>
-          <div className="hero-card-stamp">LEAK</div>
-          <p className="hero-card-big">{t("hero.card.caught").replace("{n}", String(top.matches.length))}</p>
-          <p className="hero-card-when">{t("hero.card.when").replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs))}</p>
-        </>
-      ) : (
-        <p className="hero-card-when">{t("hero.card.loading")}</p>
-      )}
+      <div className={`hero-card-stamp ${top ? "landed" : ""}`} aria-hidden={!top}>
+        LEAK
+      </div>
+      <p className="hero-card-big">{top ? t("hero.card.caught").replace("{n}", String(top.matches.length)) : t("hero.card.loading")}</p>
+      <p className="hero-card-when">{top ? t("hero.card.when").replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs)) : "\u00a0"}</p>
       <span className="hero-card-cta">
         {t("hero.card.cta")} <ArrowRight size={16} />
       </span>
