@@ -13,12 +13,17 @@ export function scallopPath(cx: number, cy: number, r: number, bumps: number) {
   return `${d} Z`
 }
 
-// Hand-drawn ridges so the print reads as a fingerprint at any size.
-export const FINGERPRINT = [
-  "M-22 6c0-14 10-25 22-25s22 11 22 25",
-  "M-15 18c-2-4-3-8-3-12 0-10 8-18 18-18s18 8 18 18c0 6-1 11-3 16",
-  "M-8 24c-2-5-4-11-4-18 0-6.6 5.4-12 12-12s12 5.4 12 12c0 9-2 17-6 23",
-  "M0 28c-3-7-5-14-5-22 0-2.8 2.2-5 5-5s5 2.2 5 5c0 10-1.5 18-4 25",
-  "M-27 -4c3-7 8-13 15-17",
-  "M12 -21c8 3 14 9 17 17",
+// The seal's centre is a clock at 9:58, two minutes before a 10 o'clock bell: Mohar is a clock nobody controls.
+// Strokes in a 64-unit box centred on 0,0, so it scales from the favicon to the stage.
+const polar = (deg: number, r: number) => {
+  const a = (deg * Math.PI) / 180
+  return `${(Math.sin(a) * r).toFixed(2)} ${(-Math.cos(a) * r).toFixed(2)}`
+}
+export const CLOCK = [
+  "M-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0",
+  ...Array.from({ length: 12 }, (_, i) => `M${polar(i * 30, i % 3 === 0 ? 13.5 : 16.5)} L${polar(i * 30, 18.5)}`),
+  `M0 0 L${polar((9 + 58 / 60) * 30, 10)}`,
+  `M0 0 L${polar(58 * 6, 15)}`,
 ]
+// At favicon and nav sizes twelve ticks turn to noise, so the small mark keeps only the face and the two hands.
+export const CLOCK_SMALL = [CLOCK[0], ...CLOCK.slice(-2)]
