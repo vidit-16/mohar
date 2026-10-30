@@ -234,7 +234,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             </h2>
           </div>
           <p className="muted small">{t("exam.checkHint")}</p>
-          <textarea rows={5} value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder={"1. …\n2. …"} />
+          <textarea rows={5} value={pasteText} aria-label={t("exam.check")} onChange={(e) => setPasteText(e.target.value)} placeholder={"1. …\n2. …"} />
           <div className="row-gap" style={{ marginTop: 10 }}>
             <button className="btn btn-primary btn-sm" disabled={!pasteText.trim()} onClick={() => setPasteApplied(pasteText)}>
               {t("exam.checkBtn")}

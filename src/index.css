@@ -104,11 +104,13 @@
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
 html[lang="hi"] body { font-family: var(--deva); }
-h1, h2, h3 { margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+h1, h2, h3 { margin: 0; letter-spacing: -0.01em; line-height: 1.2; text-wrap: balance; }
 h2 { font-size: 1.05rem; font-weight: 650; display: flex; align-items: center; gap: 8px; }
 h3 { font-size: 1rem; font-weight: 650; }
 p { margin: 0; }
 a { color: inherit; }
+/* no 300 ms double-tap wait on phones, and no grey flash over every tap */
+a, button, label, summary, [role="tab"] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 code, .mono-strong, pre { font-family: var(--mono); font-size: 0.86em; }
 :focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: 6px; }
 ::selection { background: var(--seal-soft); }
@@ -442,7 +444,7 @@ a.exam-row:hover { background: var(--surface-2); border-radius: 10px; }
 
 /* sheet */
 .sheet-root { position: fixed; inset: 0; z-index: 50; background: rgb(15 14 12 / 0.45); backdrop-filter: blur(3px); display: flex; justify-content: flex-end; animation: fade 0.15s ease-out; }
-.sheet { width: min(520px, 100%); height: 100%; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; outline: 0; animation: slide 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.sheet { overscroll-behavior: contain; width: min(520px, 100%); height: 100%; background: var(--surface); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; outline: 0; animation: slide 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .sheet-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
 .sheet-head h2 { font: 600 1.35rem var(--display); }
 html[lang="hi"] .sheet-head h2 { font-family: var(--deva); }
@@ -702,3 +704,4 @@ html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
 .meaning-stamp { flex: none; font: 700 1.5rem/1 var(--display); color: var(--danger); border: 3px solid currentColor; border-radius: 6px; padding: 4px 10px 2px; transform: rotate(-8deg); animation: meaning-stamp 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.25) 1.3s both; }
 @keyframes meaning-stamp { from { opacity: 0; transform: rotate(-8deg) scale(2.6); } 60% { opacity: 1; transform: rotate(-8deg) scale(0.92); } to { transform: rotate(-8deg) scale(1); } }
 @media (max-width: 640px) { .meaning { position: relative; } .meaning-stamp { position: absolute; top: 12px; right: 14px; font-size: 1.05rem; } }
+.paper > * { content-visibility: auto; contain-intrinsic-size: auto 64px; }

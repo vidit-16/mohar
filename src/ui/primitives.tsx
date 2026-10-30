@@ -49,7 +49,7 @@ export function Mono({ value, kind, head, tail }: { value: string; kind?: "addre
   const href = kind === "address" ? `${EXPLORER}/address/${value}` : kind === "entity" ? `${EXPLORER}/entity/${value}` : kind === "tx" ? `${EXPLORER}/tx/${value}` : undefined
   return (
     <span className="mono-chip">
-      <code title={value}>{short(value, head, tail)}</code>
+      <code title={value} translate="no">{short(value, head, tail)}</code>
       <CopyButton value={value} />
       {href && (
         <a className="icon-btn" href={href} target="_blank" rel="noreferrer" aria-label="Open in explorer" title="Open in explorer">

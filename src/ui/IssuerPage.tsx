@@ -179,7 +179,7 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
             </label>
             <label className="field">
               <span className="field-label">{t("iss.examId")}</span>
-              <input className="input mono-input" value={examId} placeholder={slug(title) || "UPPSC-PRE-2026-S1"} onChange={(e) => setExamId(e.target.value.trim())} />
+              <input className="input mono-input" value={examId} spellCheck={false} autoComplete="off" placeholder={slug(title) || "UPPSC-PRE-2026-S1"} onChange={(e) => setExamId(e.target.value.trim())} />
               <span className="field-hint">{t("iss.examIdHint")}</span>
             </label>
             <label className="field">

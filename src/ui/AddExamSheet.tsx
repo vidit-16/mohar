@@ -47,7 +47,7 @@ export function AddExamSheet({ open, onClose, onAdded }: { open: boolean; onClos
       >
         <label className="field">
           <span className="field-label">{t("add.name")}</span>
-          <input className="input" value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} placeholder={t("add.namePh")} autoFocus />
+          <input className="input" value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} placeholder={t("add.namePh")} autoFocus={window.matchMedia?.("(pointer: fine)").matches} />
         </label>
         <label className="field">
           <span className="field-label">{t("add.start")}</span>
@@ -56,7 +56,7 @@ export function AddExamSheet({ open, onClose, onAdded }: { open: boolean; onClos
         </label>
         <label className="field">
           <span className="field-label">{t("add.notice")}</span>
-          <input className="input" type="url" value={notice} onChange={(e) => setNotice(e.target.value)} placeholder="https://" />
+          <input className="input" type="url" autoComplete="off" spellCheck={false} value={notice} onChange={(e) => setNotice(e.target.value)} placeholder="https://" />
         </label>
 
         {!funded && drip === "dripping" && (

@@ -76,7 +76,7 @@ export function Wordmark({ size = 32 }: { size?: number }) {
   return (
     <span className="wordmark">
       <Mark size={size} />
-      <span className="wm-text">
+      <span className="wm-text" translate="no">
         Mohar <span className="wm-hi">मोहर</span>
       </span>
     </span>
