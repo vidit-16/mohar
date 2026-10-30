@@ -182,6 +182,11 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
           <p>{meaning}</p>
         </div>
         {firstLeak && (
+          <span className="meaning-stamp" aria-hidden="true">
+            LEAK
+          </span>
+        )}
+        {firstLeak && (
           <button className="btn btn-sm btn-danger" onClick={() => setPicked(firstLeak.w.key)}>
             {t("exam.viewEvidence")}
           </button>
