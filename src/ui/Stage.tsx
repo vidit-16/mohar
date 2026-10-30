@@ -1,25 +1,25 @@
 import { createWalletClient } from "@arkiv-network/sdk"
 import { tiramisu } from "@arkiv-network/sdk/chains"
 import QRCode from "qrcode"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { type Address, type Hex, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { ISSUERS, revealExam } from "../lib/mohar"
 import type { SealSecrets } from "../lib/rules"
-import { Emblem } from "./brand"
-import { fmtDateTime, fmtDuration } from "./format"
+import { fmtDuration } from "./format"
 
-// Presentation mode for a live talk: the slides and the live exam in one fullscreen page, driven by a clicker.
+// Presentation mode for the ETHIndia talk: the same 13 slides as the uploaded deck, drawn to the ETHIndia × Devcon
+// template (its grid, colours, Geist and Silkscreen, lockups, stickers and footer), with the demo slide live.
 //   ?stage=1&exam=ID        the talk. Next: → PageDown Space Enter (or a click). Back: ← PageUp. H Hindi, F fullscreen, S setup.
 //   ?stage=remote&exam=ID   one big Reveal button, for revealing from a phone while the room watches their own phones.
 //   &issuer=0x…             rehearse against an exam sealed by another wallet (defaults to the demo exam body)
-//   &qr=https://…           what the closing QR opens; a short link scans better from the back of a hall
-// The reveal slide sends the real reveal transaction. If nothing is on screen within a few seconds, the recorded
-// backup plays instead, so a slow network never leaves the presenter standing in silence.
+//   &qr=https://…           what the closing QR opens (defaults to mohar.live/devcon)
+// On the demo slide the first "next" sends the real reveal transaction; the image frame flips to the verdict read
+// back from the chain. If nothing is on screen within a few seconds, the recorded backup plays instead.
 
-export const DEMO_ISSUER = Object.keys(ISSUERS)[0] as Address
+const DEMO_ISSUER = Object.keys(ISSUERS)[0] as Address
 const KEY_STORE = "mohar.stage.key"
 const SALTS_STORE = "mohar.stage.salts"
 type Saved = SealSecrets & { opensAtMs: number }
@@ -52,86 +52,198 @@ type Reveal = "idle" | "sending" | "sent" | "failed"
 
 const copy = {
   en: {
-    title: "Prove who had the paper before the exam.",
-    hook: "NEET-UG 2026 was cancelled.",
-    hookSub: "The 3 May exam was re-held on 21 June. The leak came from inside the exam body.",
+    coverTitle: "Mohar: who had the paper first?",
+    coverSub: "A clock for paper leaks that nobody controls.",
+    role: "Builder, Mohar",
+    s1: "The problem.",
+    numLine: "exam leaks in 5 years, across 15 states",
+    numSrc: "1.4 crore applicants hit · Indian Express, 2024",
+    fightLabel: "01 / KEY POINT",
     fight: "Every leak is a fight about time.",
-    leaks: "recruitment exam leaks in 5 years",
-    states: "states",
-    applicants: "applicants affected (14 million)",
-    idea: "A clock nobody controls.",
-    beats: [
-      "Before the exam, the exam body seals a fingerprint of every question. Nobody can edit or delete it.",
-      "Anyone who gets a “leaked paper” seals its fingerprints from their phone. The text and their name never leave it.",
-      "At the bell the paper is revealed, and everyone sees who had real questions first.",
+    fightBody: "A “leaked paper” goes round Telegram the night before the exam. Afterwards, nobody can prove when it existed. Screenshots get called fake, and the only other clock is the exam body’s own server, run by the party being accused.",
+    s2: "What I built.",
+    bigIdeaLabel: "THE BIG IDEA",
+    bigIdea: "A clock for paper leaks that nobody controls.",
+    howLabel: "HOW IT WORKS",
+    how: "Seal, witness, verdict.",
+    steps: [
+      ["Seal", "Before the exam, the exam body seals a fingerprint of every question. Nobody can edit or delete it."],
+      ["Witness", "Got a “leaked paper”? Seal its fingerprints from your phone. The text and your name never leave it."],
+      ["Verdict", "At the bell the paper is revealed, and everyone sees who held real questions first."],
     ],
-    onArkiv: "Every record lives on Arkiv: public, time-stamped by the network, readable without this website.",
-    leaked: "Someone leaked the paper for this talk.",
-    sealedAgo: "Sealed {ago} ago",
-    noWitness: "No leak sealed yet",
-    waiting: "Sealed, waiting for the paper",
-    by: "Sealed by",
-    witnesses: "witnesses",
-    witness: "witness",
-    opens: "Announced start",
-    revealPrompt: "Reveal the paper",
+    arkivLabel: "02 / WHY ARKIV",
+    arkiv: "The record lives on Arkiv, not on my server.",
+    arkivBody: "Every seal, witness and reveal is a public record, timed by the network. Seals are read-only and their ownership is burned, so not even the exam body can delete one. Anyone can rebuild every verdict without my site.",
+    s3: "Live demo.",
+    demoLabel: "03 / LIVE DEMO",
+    demo: "I leaked this talk’s paper. Watch it get caught.",
+    demoBody: "Days ago I sealed a 5-question paper for this talk, then leaked 3 of its questions and sealed them from my phone. At the bell the paper is revealed, and the verdict comes straight from the public record.",
+    sealedBy: "Sealed by",
+    witnessN: (n: number) => (n === 1 ? "1 witness" : `${n} witnesses`),
+    firstSealed: "first sealed {ago} ago",
+    waiting: "Waiting for the paper",
     revealing: "Revealing the paper on Arkiv…",
     caught: "Held {n} real questions",
-    caughtSub: "{t} before the exam. On a public record nobody can edit.",
+    caughtSub: "{t} before the exam",
     fake: "{n} fake",
     late: "{n} too late",
-    learned: "What I learned",
-    lessons: [
-      "Evidence is only as good as the clock behind it.",
-      "Building on Arkiv: 9 friction reports filed upstream, each with a script that reproduces it.",
-      "Anyone can rebuild every verdict without my site: npx mohar-verify.",
-    ],
-    scan: "Check it yourself",
-    scanSub: "Every verdict you just saw is on a public record.",
+    noLeak: "No leak sealed yet",
+    learnedLabel: "03 / WHAT I LEARNED",
+    learned: "Evidence needs a clock nobody owns.",
+    learnedBody: "What worked: trust comes from who signed a record on chain, not from a label or from me. What broke: a hidden ~128 KB transaction limit, and an “extend” call that sets a lifetime instead of adding to it. I filed 9 friction reports to Arkiv, each with a script that reproduces it.",
+    nextLabel: "04 / WHAT’S NEXT",
+    next: "Next: real exams, real exam bodies.",
+    nextBody: "A pilot with a state PSC or a coaching network: exam bodies publish their wallet on their own .gov.in site and seal before the bell. Photo witnessing: snap a leaked paper and fingerprint it on the phone. Hindi and English throughout.",
+    thanks: "Thank you!",
+    revealPrompt: "Reveal the paper",
   },
   hi: {
-    title: "परीक्षा से पहले पेपर किसके पास था, साबित करें।",
-    hook: "NEET-UG 2026 रद्द हुआ।",
-    hookSub: "3 मई की परीक्षा 21 जून को दोबारा हुई। लीक परीक्षा संस्था के अंदर से हुआ।",
+    coverTitle: "मोहर: पेपर पहले किसके पास था?",
+    coverSub: "पेपर लीक के लिए एक घड़ी, जिस पर किसी का क़ब्ज़ा नहीं।",
+    role: "Builder, Mohar",
+    s1: "समस्या।",
+    numLine: "परीक्षा लीक, 5 साल में, 15 राज्यों में",
+    numSrc: "1.4 करोड़ अभ्यर्थी प्रभावित · Indian Express, 2024",
+    fightLabel: "01 / मुख्य बात",
     fight: "हर लीक की लड़ाई समय की है।",
-    leaks: "भर्ती परीक्षा लीक, 5 साल में",
-    states: "राज्य",
-    applicants: "अभ्यर्थी प्रभावित",
-    idea: "एक घड़ी जिस पर किसी का क़ब्ज़ा नहीं।",
-    beats: [
-      "परीक्षा से पहले, परीक्षा संस्था हर प्रश्न की फ़िंगरप्रिंट मोहर लगाती है। कोई उसे बदल या मिटा नहीं सकता।",
-      "जिसके पास “लीक पेपर” आए, वह फ़ोन से उसकी फ़िंगरप्रिंट मोहर लगाए। प्रश्न और नाम फ़ोन से बाहर नहीं जाते।",
-      "परीक्षा शुरू होते ही पेपर खुलता है, और सब देखते हैं कि असली प्रश्न पहले किसके पास थे।",
+    fightBody: "परीक्षा से पहली रात Telegram पर “लीक पेपर” घूमता है। बाद में कोई साबित नहीं कर पाता कि वह कब मौजूद था। स्क्रीनशॉट नकली कहे जाते हैं, और अकेली घड़ी परीक्षा संस्था का अपना सर्वर है, जिस पर ही आरोप है।",
+    s2: "मैंने क्या बनाया।",
+    bigIdeaLabel: "बड़ा विचार",
+    bigIdea: "पेपर लीक के लिए एक घड़ी, जिस पर किसी का क़ब्ज़ा नहीं।",
+    howLabel: "कैसे काम करता है",
+    how: "मोहर, गवाही, निर्णय।",
+    steps: [
+      ["मोहर", "परीक्षा से पहले संस्था हर प्रश्न की फ़िंगरप्रिंट मोहर लगाती है। कोई उसे बदल या मिटा नहीं सकता।"],
+      ["गवाही", "“लीक पेपर” मिला? फ़ोन से उसकी फ़िंगरप्रिंट मोहर लगाएँ। प्रश्न और आपका नाम फ़ोन से बाहर नहीं जाते।"],
+      ["निर्णय", "परीक्षा शुरू होते ही पेपर खुलता है, और सब देखते हैं कि असली प्रश्न पहले किसके पास थे।"],
     ],
-    onArkiv: "हर रिकॉर्ड Arkiv पर है: सार्वजनिक, नेटवर्क का समय, इस वेबसाइट के बिना भी पढ़ा जा सके।",
-    leaked: "इस टॉक का पेपर किसी ने लीक किया।",
-    sealedAgo: "{ago} पहले मोहर लगी",
-    noWitness: "अभी कोई लीक नहीं",
-    waiting: "मोहर लगी है, पेपर का इंतज़ार",
-    by: "मोहर",
-    witnesses: "गवाहियाँ",
-    witness: "गवाही",
-    opens: "घोषित समय",
-    revealPrompt: "पेपर खोलें",
+    arkivLabel: "02 / ARKIV क्यों",
+    arkiv: "रिकॉर्ड Arkiv पर है, मेरे सर्वर पर नहीं।",
+    arkivBody: "हर मोहर, गवाही और खुला पेपर एक सार्वजनिक रिकॉर्ड है, समय नेटवर्क का। मोहरें केवल-पढ़ने योग्य हैं और उनका स्वामित्व जला दिया जाता है, इसलिए संस्था भी उन्हें मिटा नहीं सकती। कोई भी हर निर्णय मेरी साइट के बिना जाँच सकता है।",
+    s3: "लाइव डेमो।",
+    demoLabel: "03 / लाइव डेमो",
+    demo: "मैंने इस टॉक का पेपर लीक किया। देखिए, कैसे पकड़ा गया।",
+    demoBody: "कुछ दिन पहले मैंने इस टॉक के लिए 5 प्रश्नों के पेपर पर मोहर लगाई, फिर उसके 3 प्रश्न लीक करके फ़ोन से उनकी मोहर लगाई। अब पेपर खुलेगा, और निर्णय सीधे सार्वजनिक रिकॉर्ड से आएगा।",
+    sealedBy: "मोहर",
+    witnessN: (n: number) => `${n} गवाही`,
+    firstSealed: "पहली मोहर {ago} पहले",
+    waiting: "पेपर का इंतज़ार",
     revealing: "Arkiv पर पेपर खुल रहा है…",
     caught: "{n} असली प्रश्न पहले से थे",
-    caughtSub: "परीक्षा से {t} पहले। ऐसे सार्वजनिक रिकॉर्ड पर जिसे कोई बदल नहीं सकता।",
+    caughtSub: "परीक्षा से {t} पहले",
     fake: "{n} नकली",
     late: "{n} देर से",
-    learned: "मैंने क्या सीखा",
-    lessons: ["सबूत उतना ही अच्छा है जितनी उसके पीछे की घड़ी।", "Arkiv पर बनाते हुए: 9 समस्याएँ रिपोर्ट कीं, हर एक के साथ दोहराने की स्क्रिप्ट।", "कोई भी हर फ़ैसला मेरी साइट के बिना जाँच सकता है: npx mohar-verify।"],
-    scan: "खुद जाँचें",
-    scanSub: "जो फ़ैसले आपने अभी देखे, सब सार्वजनिक रिकॉर्ड पर हैं।",
+    noLeak: "अभी कोई लीक नहीं",
+    learnedLabel: "03 / मैंने क्या सीखा",
+    learned: "सबूत को ऐसी घड़ी चाहिए जो किसी की न हो।",
+    learnedBody: "क्या चला: भरोसा इस बात से आता है कि रिकॉर्ड पर किसने हस्ताक्षर किए, किसी लेबल या मुझसे नहीं। क्या टूटा: लगभग 128 KB की छिपी ट्रांज़ैक्शन सीमा, और एक “extend” जो उम्र जोड़ता नहीं, तय करता है। मैंने Arkiv को 9 रिपोर्ट भेजीं, हर एक के साथ दोहराने की स्क्रिप्ट।",
+    nextLabel: "04 / आगे क्या",
+    next: "आगे: असली परीक्षाएँ, असली परीक्षा संस्थाएँ।",
+    nextBody: "किसी राज्य PSC या कोचिंग नेटवर्क के साथ पायलट: संस्थाएँ अपना वॉलेट अपनी .gov.in साइट पर प्रकाशित करें और परीक्षा से पहले मोहर लगाएँ। फ़ोटो से गवाही: लीक पेपर की फ़ोटो लें और फ़ोन पर ही फ़िंगरप्रिंट बनाएँ।",
+    thanks: "धन्यवाद!",
+    revealPrompt: "पेपर खोलें",
   },
-} as const
+}
+type Copy = (typeof copy)["en"]
 
-const SLIDES = ["title", "hook", "fight", "idea", "leak", "exam", "reveal", "learned", "scan"] as const
-const REVEAL_AT = SLIDES.indexOf("reveal")
+const SLIDES = ["cover", "problem", "number", "fight", "built", "idea", "how", "arkiv", "demoSection", "demo", "learned", "next", "thanks"] as const
+const DEMO_AT = SLIDES.indexOf("demo")
+
+// template geometry: a 13.333 × 7.5 inch slide drawn on a 1920 × 1080 canvas, so 1 inch = 144 px and 1 pt = 2 px
+const IN = 144
+const at = (x: number, y: number, w?: number, h?: number): CSSProperties => ({ left: x * IN, top: y * IN, width: w === undefined ? undefined : w * IN, height: h === undefined ? undefined : h * IN })
+const Box = ({ x, y, w, h, className, children, style }: { x: number; y: number; w?: number; h?: number; className?: string; children?: ReactNode; style?: CSSProperties }) => (
+  <div className={`tpl-box ${className ?? ""}`} style={{ ...at(x, y, w, h), ...style }}>
+    {children}
+  </div>
+)
+const Img = ({ src, x, y, w, h, alt = "" }: { src: string; x: number; y: number; w: number; h: number; alt?: string }) => <img className="tpl-box" src={`/stage/${src}.png`} alt={alt} style={at(x, y, w, h)} draggable={false} />
+
+// the ETHIndia × Devcon lockup, top left on covers and dividers
+const Lockup = ({ light }: { light?: boolean }) => (
+  <>
+    <Img src={light ? "ethindia-white" : "ethindia"} x={1.11} y={0.68} w={1.47} h={0.31} alt="ETHIndia" />
+    <Box x={2.75} y={0.66} className={`tpl-x ${light ? "tpl-white" : ""}`}>
+      ×
+    </Box>
+    <Img src={light ? "devcon-white" : "devcon"} x={3.04} y={0.56} w={1.27} h={0.56} alt="Devcon India" />
+  </>
+)
+const Pill = ({ inverse }: { inverse?: boolean }) => (
+  <Box x={8.89} y={0.56} w={3.33} h={0.56} className={`tpl-pill ${inverse ? "tpl-pill-inverse" : ""}`}>
+    ETHIndia Stage · Devcon India
+  </Box>
+)
+// the footer every content slide carries: small lockup on one side, "ETHINDIA STAGE @ DEVCON" on the other
+const Footer = ({ logoX = 1.11, textX = 9.07, light }: { logoX?: number; textX?: number; light?: boolean }) => (
+  <>
+    <Img src={light ? "ethindia-white" : "ethindia"} x={logoX} y={6.84} w={1.01} h={0.21} />
+    <Box x={logoX + 1.12} y={6.82} className={`tpl-x-sm ${light ? "tpl-white" : ""}`}>
+      ×
+    </Box>
+    <Img src={light ? "devcon-white" : "devcon"} x={logoX + 1.31} y={6.78} w={0.76} h={0.33} />
+    <Box x={textX} y={6.84} w={3.15} className={`tpl-pixel tpl-foot ${light ? "tpl-white" : ""}`}>
+      ETHINDIA STAGE @ DEVCON
+    </Box>
+  </>
+)
+
+function Section({ n, title, tone }: { n: string; title: string; tone: "green" | "sky" | "cream" }) {
+  const light = tone === "green"
+  return (
+    <div className={`tpl-slide tpl-bg-${tone}`}>
+      <Lockup light={light} />
+      <Box x={1.11} y={2.62} w={11.44} className={`tpl-pixel tpl-label ${light ? "tpl-white" : "tpl-green"}`}>
+        SECTION {n}
+      </Box>
+      <Box x={1.11} y={3.05} w={7.44} className={`tpl-title-xl ${light ? "tpl-white" : ""}`}>
+        <h1>{title}</h1>
+      </Box>
+      <Box x={6.5} y={4.44} w={5.72} className={`tpl-pixel tpl-section-n ${tone === "green" ? "tpl-white" : tone === "sky" ? "" : "tpl-green"}`}>
+        {n}
+      </Box>
+    </div>
+  )
+}
+
+// a statement on a coloured panel, detail beside it on the grid
+function KeyPoint({ label, title, body, tone, panelRight }: { label: string; title: string; body: string; tone: "green" | "cream" | "black"; panelRight?: boolean }) {
+  const px = panelRight ? 7.78 : 0
+  const tx = panelRight ? 8.33 : 1.11
+  const light = tone !== "cream"
+  return (
+    <div className="tpl-slide tpl-bg-white">
+      <div className={`tpl-box tpl-panel tpl-panel-${tone}`} style={at(px, 0, 5.56, 7.5)} />
+      <Box x={tx} y={2.8} w={4.01} className={`tpl-pixel tpl-label-sm ${light ? "tpl-white" : "tpl-green"}`}>
+        {label}
+      </Box>
+      <Box x={tx} y={3.17} w={4.01} className={`tpl-statement ${light ? "tpl-white" : ""}`}>
+        <h1>{title}</h1>
+      </Box>
+      <Box x={panelRight ? 1.11 : 6.67} y={2.52} w={5.72} className="tpl-body">
+        <p>{body}</p>
+      </Box>
+      <Footer logoX={panelRight ? 1.11 : 6.67} textX={panelRight ? 3.52 : 9.07} />
+    </div>
+  )
+}
+
+// fits the 1920 × 1080 template canvas into any screen, letterboxed, like a projector would
+function useCanvasScale() {
+  const [scale, setScale] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
+  useEffect(() => {
+    const fit = () => setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
+    window.addEventListener("resize", fit)
+    return () => window.removeEventListener("resize", fit)
+  }, [])
+  return scale
+}
 
 export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: string; remote: boolean; issuer?: Address; qr?: string }) {
   const { lang, setLang } = useT()
-  const c = copy[lang]
+  const c: Copy = copy[lang]
   const x = useExam(examId, issuer, [])
+  const scale = useCanvasScale()
   const [slide, setSlide] = useState(0)
   const [setup, setSetup] = useState(false)
   const [key, setKey] = useState(() => read(KEY_STORE))
@@ -192,12 +304,14 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
 
   const go = useCallback(
     (to: number) => {
-      const next = Math.max(0, Math.min(SLIDES.length - 1, to))
-      // arriving on the reveal slide is the click that reveals
-      if (next === REVEAL_AT && slide === REVEAL_AT - 1) void doReveal()
-      setSlide(next)
+      // on the demo slide, the first "next" is the reveal itself; the slide stays while the verdict lands
+      if (slide === DEMO_AT && to > slide && !shown && !backupVisible && reveal !== "failed") {
+        if (reveal === "idle") void doReveal()
+        return
+      }
+      setSlide(Math.max(0, Math.min(SLIDES.length - 1, to)))
     },
-    [slide, doReveal],
+    [slide, shown, backupVisible, reveal, doReveal],
   )
 
   useEffect(() => {
@@ -221,14 +335,15 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
   const exam = x.exam
   const witnesses = x.witnesses
   const firstWitnessMs = witnesses.map((w) => x.times.get(w.createdAt)).filter((t): t is number => t !== undefined).sort((a, b) => a - b)[0]
+  const setupPanel = setup && <Setup {...{ examId, issuer, key_: key, setKey, setSavedRaw, saved, account, exam, setVideo, fallbackS, setFallbackS, close: () => setSetup(false), remote }} />
 
   if (remote)
     return (
-      <div className="stage stage-remote">
-        <Emblem size={96} />
+      <div className="stage stage-remote tpl-fonts">
+        <img src="/stage/ethindia.png" alt="ETHIndia" className="stage-remote-logo" />
         <h1>{exam?.title ?? examId}</h1>
         {shown ? (
-          <Verdict c={c} summary={summary} />
+          <LiveExam c={c} summary={summary} />
         ) : (
           <button className="stage-big" onClick={() => void doReveal()} disabled={reveal === "sending" || reveal === "sent"}>
             {reveal === "sending" || reveal === "sent" ? c.revealing : c.revealPrompt}
@@ -238,170 +353,220 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
         <button className="stage-setup-link" onClick={() => setSetup(true)}>
           Setup
         </button>
-        {setup && <Setup {...{ examId, issuer, key_: key, setKey, setSavedRaw, saved, account, exam, setVideo, fallbackS, setFallbackS, close: () => setSetup(false), remote }} />}
+        {setupPanel}
       </div>
     )
 
   const name = SLIDES[slide]
+  const live = (
+    <LiveExam
+      c={c}
+      summary={summary}
+      shown={shown}
+      state={reveal}
+      error={revealError}
+      exam={exam ? { title: exam.title, by: ISSUERS[issuer] ?? `${issuer.slice(0, 10)}…` } : undefined}
+      witnesses={witnesses.length}
+      firstAgo={firstWitnessMs ? fmtDuration(nowMs - firstWitnessMs) : undefined}
+    />
+  )
   return (
-    <div className="stage" onClick={(e) => !(e.target instanceof Element && e.target.closest("button, a, input, .stage-setup")) && go(slide + 1)}>
-      <div className="stage-slide" key={name} data-slide={name}>
-        {name === "title" && (
-          <div className="stage-center">
-            <Emblem size={220} />
-            <h1 className="stage-xl">Mohar</h1>
-            <p className="stage-lead">{c.title}</p>
-            <p className="stage-small">Vidit Choudhary · mohar.live</p>
-          </div>
-        )}
-        {name === "hook" && (
-          <div className="stage-col">
-            <h1 className="stage-xl">{c.hook}</h1>
-            <p className="stage-lead">{c.hookSub}</p>
-          </div>
-        )}
-        {name === "fight" && (
-          <div className="stage-col">
-            <h1 className="stage-xl">{c.fight}</h1>
-            <div className="stage-stats">
-              <div>
-                <b>41</b>
-                <span>{c.leaks}</span>
-              </div>
-              <div>
-                <b>15</b>
-                <span>{c.states}</span>
-              </div>
-              <div>
-                <b>1.4 cr</b>
-                <span>{c.applicants}</span>
-              </div>
+    <div className="stage tpl-fonts" onClick={(e) => !(e.target instanceof Element && e.target.closest("button, a, input, .stage-setup")) && go(slide + 1)}>
+      <div className="tpl-canvas" style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
+        <div className="stage-slide" key={name} data-slide={name}>
+          {name === "cover" && (
+            <div className="tpl-slide tpl-bg-white">
+              <Lockup />
+              <Pill />
+              <Box x={1.11} y={1.67} w={7.44} className="tpl-pixel tpl-label tpl-green">
+                ETHINDIA × DEVCON
+              </Box>
+              <Box x={1.11} y={2.1} w={7.44} className="tpl-title-xl">
+                <h1>{c.coverTitle}</h1>
+              </Box>
+              <Box x={1.11} y={4.1} w={7.44} className="tpl-sub">
+                <p>{c.coverSub}</p>
+              </Box>
+              <Box x={1.11} y={5.56} w={6.44} className="tpl-name">
+                Vidit Choudhary
+              </Box>
+              <Box x={1.11} y={6.06} w={6.44} className="tpl-role">
+                {c.role}
+              </Box>
+              <Img src="ikat" x={11.11} y={1.67} w={1.67} h={2.26} />
+              <Img src="elephant" x={8.33} y={2.78} w={2.78} h={2.39} />
+              <Img src="block" x={7.78} y={5.56} w={1.67} h={1.67} />
+              <Img src="paisley" x={10} y={5} w={3.06} h={2.24} />
+              <Img src="diamond" x={11.67} y={4.17} w={0.49} h={0.78} />
             </div>
-          </div>
-        )}
-        {name === "idea" && (
-          <div className="stage-split">
-            <div>
-              <h1 className="stage-xl">{c.idea}</h1>
-              <p className="stage-small">{c.onArkiv}</p>
+          )}
+          {name === "problem" && <Section n="01" title={c.s1} tone="green" />}
+          {name === "number" && (
+            <div className="tpl-slide tpl-bg-white">
+              <Box x={0.94} y={2.36} w={11.44} className="tpl-pixel tpl-big-number">
+                41
+              </Box>
+              <Box x={2.38} y={4.05} w={8.58} className="tpl-quote">
+                <p>{c.numLine}</p>
+              </Box>
+              <Box x={3.81} y={4.61} w={5.72} className="tpl-source">
+                <p>{c.numSrc}</p>
+              </Box>
+              <Footer />
             </div>
-            <ol className="stage-beats">
-              {c.beats.map((b) => (
-                <li key={b}>{b}</li>
+          )}
+          {name === "fight" && <KeyPoint label={c.fightLabel} title={c.fight} body={c.fightBody} tone="green" />}
+          {name === "built" && <Section n="02" title={c.s2} tone="sky" />}
+          {name === "idea" && (
+            <div className="tpl-slide tpl-bg-white">
+              <Box x={3.81} y={2.6} w={5.72} className="tpl-pixel tpl-label tpl-green tpl-center">
+                {c.bigIdeaLabel}
+              </Box>
+              <Box x={1.52} y={3.09} w={10.3} className="tpl-big-idea">
+                <h1>{c.bigIdea}</h1>
+              </Box>
+              <Img src="diamond" x={11.67} y={0.56} w={0.56} h={0.9} />
+              <Footer />
+            </div>
+          )}
+          {name === "how" && (
+            <div className="tpl-slide tpl-bg-white">
+              <Box x={1.11} y={1.11} w={11.44} className="tpl-pixel tpl-label-sm tpl-green">
+                {c.howLabel}
+              </Box>
+              <Box x={1.11} y={1.53} w={11.44} className="tpl-title-md">
+                <h1>{c.how}</h1>
+              </Box>
+              {c.steps.map(([t, d], i) => (
+                <div key={t}>
+                  <div className="tpl-box tpl-rule" style={at(1.11 + i * 3.89, 3.29, 3.33)} />
+                  <Box x={1.11 + i * 3.89} y={3.53} w={3.43} className="tpl-pixel tpl-step-n tpl-green">
+                    0{i + 1}
+                  </Box>
+                  <Box x={1.11 + i * 3.89} y={3.88} w={3.43} className="tpl-step-t">
+                    <h2>{t}</h2>
+                  </Box>
+                  <Box x={1.11 + i * 3.89} y={4.36} w={3.43} className="tpl-step-d">
+                    <p>{d}</p>
+                  </Box>
+                </div>
               ))}
-            </ol>
-          </div>
-        )}
-        {name === "leak" && (
-          <div className="stage-split">
-            <div>
-              <h1 className="stage-xl">{c.leaked}</h1>
-              {firstWitnessMs ? (
-                <p className="stage-lead">
-                  {c.sealedAgo.replace("{ago}", fmtDuration(nowMs - firstWitnessMs))}
-                  <br />
-                  <span className="stage-small">{fmtDateTime(firstWitnessMs)}</span>
-                </p>
-              ) : (
-                <p className="stage-lead">{c.noWitness}</p>
-              )}
+              <Footer />
             </div>
-            <img className="stage-shot" src="/stage/leak.png" alt="" onError={(e) => (e.currentTarget.style.display = "none")} />
-          </div>
-        )}
-        {name === "exam" && (
-          <div className="stage-col">
-            <p className="stage-small">{exam ? `${c.by} ${ISSUERS[issuer] ?? `${issuer.slice(0, 10)}…`} ✓` : examId}</p>
-            <h1 className="stage-xl">{exam?.title ?? examId}</h1>
-            <div className="stage-stats">
-              <div>
-                <b>{witnesses.length}</b>
-                <span>{witnesses.length === 1 ? c.witness : c.witnesses}</span>
+          )}
+          {name === "arkiv" && (
+            <div className="tpl-slide tpl-bg-white">
+              <div className="tpl-box tpl-frame" style={at(1.12, 1.12, 4.99, 4.99)}>
+                <img src="/stage/exam.png" alt="The demo exam on mohar.live: leak evidence, seals and timeline" />
               </div>
-              <div>
-                <b>{revealed ? "✓" : "—"}</b>
-                <span>{revealed ? "" : c.waiting}</span>
-              </div>
-              <div>
-                <b className="stage-time">{exam ? fmtDateTime(exam.opensAtMs) : "…"}</b>
-                <span>{c.opens}</span>
-              </div>
+              <Box x={6.67} y={2.3} w={5.72} className="tpl-pixel tpl-label-sm tpl-green">
+                {c.arkivLabel}
+              </Box>
+              <Box x={6.67} y={2.72} w={5.72} className="tpl-title-sm">
+                <h1>{c.arkiv}</h1>
+              </Box>
+              <Box x={6.67} y={3.84} w={5.72} className="tpl-body-sm">
+                <p>{c.arkivBody}</p>
+              </Box>
+              <Footer />
             </div>
-          </div>
-        )}
-        {name === "reveal" && (
-          <div className="stage-center">
-            {shown ? (
-              <Verdict c={c} summary={summary} />
-            ) : (
-              <>
-                <Emblem size={180} animate />
-                <p className="stage-lead">{reveal === "failed" ? revealError : c.revealing}</p>
-              </>
-            )}
-          </div>
-        )}
-        {name === "learned" && (
-          <div className="stage-col">
-            <h1 className="stage-xl">{c.learned}</h1>
-            <ul className="stage-beats">
-              {c.lessons.map((l) => (
-                <li key={l}>{l}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {name === "scan" && <Scan c={c} url={qr ?? `${location.origin}/?exam=${encodeURIComponent(examId)}`} />}
-      </div>
-      <div className="stage-progress" aria-hidden>
-        <span style={{ width: `${((slide + 1) / SLIDES.length) * 100}%` }} />
+          )}
+          {name === "demoSection" && <Section n="03" title={c.s3} tone="cream" />}
+          {name === "demo" && (
+            <div className="tpl-slide tpl-bg-white">
+              <Box x={1.11} y={2.3} w={5.72} className="tpl-pixel tpl-label-sm tpl-green">
+                {c.demoLabel}
+              </Box>
+              <Box x={1.11} y={2.72} w={5.72} className="tpl-title-sm">
+                <h1>{c.demo}</h1>
+              </Box>
+              <Box x={1.11} y={3.84} w={5.72} className="tpl-body-sm">
+                <p>{c.demoBody}</p>
+              </Box>
+              <div className="tpl-box tpl-frame tpl-live" style={at(7.23, 1.12, 4.99, 4.99)}>
+                {live}
+              </div>
+              <Footer />
+            </div>
+          )}
+          {name === "learned" && <KeyPoint label={c.learnedLabel} title={c.learned} body={c.learnedBody} tone="cream" />}
+          {name === "next" && <KeyPoint label={c.nextLabel} title={c.next} body={c.nextBody} tone="black" panelRight />}
+          {name === "thanks" && <Thanks c={c} url={qr ?? "https://mohar.live/devcon"} />}
+        </div>
       </div>
       {backupVisible && video && (
         <div className="stage-backup">
           <video src={video} autoPlay controls={false} onEnded={() => setShowBackup(false)} />
         </div>
       )}
-      {setup && <Setup {...{ examId, issuer, key_: key, setKey, setSavedRaw, saved, account, exam, setVideo, fallbackS, setFallbackS, close: () => setSetup(false), remote }} />}
+      {setupPanel}
     </div>
   )
 }
 
-function Verdict({ c, summary }: { c: (typeof copy)["en" | "hi"]; summary: { top?: { matches: unknown[]; witnessedAtMs: number; deadlineMs: number }; fake: number; late: number } }) {
-  const top = summary.top
+type Summary = { top?: { matches: unknown[]; witnessedAtMs: number; deadlineMs: number }; fake: number; late: number }
+
+// the demo slide's image frame, live: the sealed exam while it waits, then the verdict read back from the chain
+function LiveExam({ c, summary, shown = true, state, error, exam, witnesses, firstAgo }: { c: Copy; summary: Summary; shown?: boolean; state?: Reveal; error?: string; exam?: { title: string; by: string }; witnesses?: number; firstAgo?: string }) {
+  if (shown) {
+    const top = summary.top
+    return (
+      <div className="tpl-verdict">
+        <div className="stage-stamp">LEAK</div>
+        {top ? (
+          <>
+            <h1 className="tpl-verdict-big">{c.caught.replace("{n}", String(top.matches.length))}</h1>
+            <p className="tpl-verdict-when">{c.caughtSub.replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs))}</p>
+          </>
+        ) : (
+          <h1 className="tpl-verdict-big">{c.noLeak}</h1>
+        )}
+        <p className="tpl-verdict-counts">
+          {[summary.fake > 0 && c.fake.replace("{n}", String(summary.fake)), summary.late > 0 && c.late.replace("{n}", String(summary.late))].filter(Boolean).join(" · ")}
+        </p>
+      </div>
+    )
+  }
   return (
-    <div className="stage-verdict">
-      <div className="stage-stamp">LEAK</div>
-      {top ? (
-        <>
-          <h1 className="stage-xl">{c.caught.replace("{n}", String(top.matches.length))}</h1>
-          <p className="stage-lead">{c.caughtSub.replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs))}</p>
-        </>
-      ) : (
-        <h1 className="stage-xl">{c.noWitness}</h1>
-      )}
-      <p className="stage-small">
-        {summary.fake > 0 && c.fake.replace("{n}", String(summary.fake))}
-        {summary.fake > 0 && summary.late > 0 && " · "}
-        {summary.late > 0 && c.late.replace("{n}", String(summary.late))}
+    <div className="tpl-waiting">
+      <p className="tpl-pixel tpl-label-sm tpl-green">{exam ? `${c.sealedBy} ${exam.by} ✓` : "…"}</p>
+      <h2>{exam?.title ?? "…"}</h2>
+      <p>
+        {c.witnessN(witnesses ?? 0)}
+        {firstAgo ? ` · ${c.firstSealed.replace("{ago}", firstAgo)}` : ""}
       </p>
+      <p className="tpl-waiting-state">{state === "sending" || state === "sent" ? c.revealing : state === "failed" ? error : c.waiting}</p>
     </div>
   )
 }
 
-function Scan({ c, url }: { c: (typeof copy)["en" | "hi"]; url: string }) {
+function Thanks({ c, url }: { c: Copy; url: string }) {
   const [qr, setQr] = useState("")
   useEffect(() => {
-    QRCode.toDataURL(url, { margin: 1, width: 640, errorCorrectionLevel: "M", color: { dark: "#0f0e0c", light: "#ffffff" } }).then(setQr, () => setQr(""))
+    QRCode.toDataURL(url, { margin: 1, width: 720, errorCorrectionLevel: "M", color: { dark: "#000000", light: "#ffffff" } }).then(setQr, () => setQr(""))
   }, [url])
   return (
-    <div className="stage-split">
-      <div className="stage-col">
-        <h1 className="stage-xl">{c.scan}</h1>
-        <p className="stage-lead">{c.scanSub}</p>
-        <p className="stage-url">mohar.live</p>
-        <p className="stage-small">Vidit Choudhary · github.com/vidit-16/mohar</p>
-      </div>
-      {qr && <img className="stage-qr" src={qr} width={640} height={640} alt={`QR code for ${url}`} />}
+    <div className="tpl-slide tpl-bg-green">
+      <Lockup light />
+      <Pill inverse />
+      <Box x={1.11} y={1.67} w={7.44} className="tpl-thanks tpl-white">
+        <h1>{c.thanks}</h1>
+      </Box>
+      <Box x={1.11} y={4.84} w={6.44} className="tpl-name tpl-white">
+        Vidit Choudhary
+      </Box>
+      <Box x={1.11} y={5.34} w={6.44} className="tpl-role tpl-white">
+        {c.role}
+      </Box>
+      <Box x={1.11} y={5.72} w={6.44} className="tpl-role tpl-white">
+        mohar.live
+      </Box>
+      <Box x={1.11} y={6.1} w={6.44} className="tpl-pixel tpl-label tpl-white">
+        github.com/vidit-16/mohar
+      </Box>
+      {qr && <img className="tpl-box tpl-qr" src={qr} alt={`QR code for ${url}`} style={at(7.55, 1.9, 3.1, 3.1)} />}
+      <Img src="leaf" x={11.11} y={1.67} w={1.67} h={1.99} />
+      <Img src="paisley" x={10} y={5} w={3.06} h={2.24} />
     </div>
   )
 }
