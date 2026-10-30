@@ -285,7 +285,7 @@ a.exam-row:hover { background: var(--surface-2); border-radius: 10px; }
 .exam-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--surface-2); color: var(--text-2); flex: none; }
 .exam-icon.up { background: var(--info-soft); color: var(--info); }
 .exam-title { font-weight: 600; }
-@media (max-width: 640px) { .exam-row { flex-wrap: wrap; } .exam-row .grow { flex-basis: calc(100% - 54px); } .exam-row .badge { margin-left: 54px; } }
+@media (max-width: 640px) { .exam-row { flex-wrap: wrap; } .exam-row .grow { flex-basis: calc(100% - 54px); } .exam-row .badge, .exam-row .tag { margin-left: 54px; margin-top: -8px; } }
 
 .trust-grid { list-style: none; margin: 18px 0 14px; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .trust-grid li { display: grid; gap: 10px; align-content: start; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-weight: 600; font-size: 0.92rem; }
@@ -711,3 +711,40 @@ html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
 @media (max-width: 640px) { .meaning { position: relative; } .meaning-stamp { position: absolute; top: 12px; right: 14px; font-size: 1.05rem; } }
 .paper > * { content-visibility: auto; contain-intrinsic-size: auto 64px; }
 .witness-scan { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; }
+
+/* states as coloured text, not pills */
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; font-weight: 600; white-space: nowrap; color: var(--text-2); }
+.tag-good { color: var(--good); }
+.tag-warn { color: var(--warn); }
+.tag-danger { color: var(--danger); }
+.tag-info { color: var(--info); }
+.tag-seal { color: var(--accent); }
+@media (max-width: 480px) { .pq .tag { margin-left: 56px; } }
+
+/* try it: a question's fingerprint, changing with every key */
+.try { margin-top: 28px; display: grid; gap: 8px; padding: 24px; }
+.try h3 { margin: 0 0 4px; font: 600 1.3rem var(--display); }
+.try-label { font-weight: 600; font-size: 0.9rem; }
+.try-read span { color: var(--text-2); }
+.try-fp-k { margin-top: 6px; font-weight: 600; font-size: 0.9rem; }
+.try-fp { display: block; font: 500 1rem/1.6 var(--mono); color: var(--accent); overflow-wrap: anywhere; }
+.try-fp span { display: inline-block; animation: fp-flip 0.12s ease-out both; }
+.try-fp i { color: var(--text-3); font-style: normal; }
+@keyframes fp-flip { from { opacity: 0.15; transform: translateY(-3px); } }
+
+/* the bell: time to the start, then waiting for the paper */
+.bell { display: flex; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; margin: 14px 0 0; }
+.bell-k { font-weight: 600; color: var(--text-2); }
+.bell-seg { display: inline-flex; align-items: baseline; gap: 5px; }
+.bell-seg b { display: inline-block; font: 600 2rem/1 var(--display); font-variant-numeric: tabular-nums; color: var(--text); }
+.bell-seg small { color: var(--text-3); font-size: 0.8rem; }
+.bell-tick { animation: bell-tick 0.25s ease-out both; }
+@keyframes bell-tick { from { opacity: 0; transform: translateY(-6px); } }
+.bell-started { align-items: center; gap: 8px; color: var(--warn); font-weight: 600; animation: fade 0.4s ease-out both; }
+.bell-started i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-beat 1.6s ease-in-out infinite; }
+
+/* witnesses landing while you watch */
+.stat-bump { display: inline-block; animation: stat-bump 0.3s ease-out both; }
+@keyframes stat-bump { 40% { transform: scale(1.15); color: var(--accent); } }
+.wrow-new { animation: wrow-in 0.35s ease-out both; }
+@keyframes wrow-in { from { opacity: 0; transform: translateY(-10px); } }

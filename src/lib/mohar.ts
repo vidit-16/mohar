@@ -11,7 +11,7 @@ import { tiramisu } from "@arkiv-network/sdk/chains"
 import { and, eq, gte } from "@arkiv-network/sdk/query"
 import { type Address, fallback, type Hex, http, webSocket } from "viem"
 import { commitHash, questionHash, randomSalt, rootHash, splitQuestions } from "./hash"
-import { type CommitPayload, type ExamSpec, newOpenExamId, type OpenExamPayload, packBatches, type RevealPayload, type Row, type SealSecrets, type WitnessPayload } from "./rules"
+import { type CommitPayload, deadlineOf, type ExamSpec, groupExams, judge, newOpenExamId, openReveals, type OpenExamPayload, packBatches, type RevealPayload, type Row, type SealSecrets, sameAddr, type WitnessPayload } from "./rules"
 
 export * from "./rules"
 
@@ -237,6 +237,22 @@ export async function examRecords(client: PublicArkivClient, examId: string, cur
     witnesses: of("witness"),
     next: res.hasNextPage() ? res.cursor : undefined,
   }
+}
+
+// What happened at a sealed exam, for its row in the list: still waiting for the paper, clean, or how many witnesses
+// held real questions before it started. One query for the exam's records plus cached block times.
+export type Outcome = { kind: "waiting" } | { kind: "clean" } | { kind: "leak"; n: number }
+export async function examOutcome(client: PublicArkivClient, examId: string, issuer: Address): Promise<Outcome> {
+  const r = await examRecords(client, examId)
+  const exam = groupExams(r.commits, issuer)[0]
+  const reveals = r.reveals.filter((x) => sameAddr(x.creator, issuer))
+  if (!exam || reveals.length === 0) return { kind: "waiting" }
+  const paper = openReveals(exam.sets, reveals)
+  const first = reveals.reduce((a, x) => (x.createdAt < a.createdAt ? x : a))
+  const deadline = deadlineOf(exam.opensAtMs, await blockTimeMs(client, first.createdAt))
+  const verdicts = await Promise.all(r.witnesses.map(async (w) => judge(w, await blockTimeMs(client, w.createdAt), deadline, paper)))
+  const n = verdicts.filter((v) => v.before && v.matches.length > 0).length
+  return n ? { kind: "leak", n } : { kind: "clean" }
 }
 
 export async function witnessesFor(client: PublicArkivClient, examId: string, cursor?: string) {

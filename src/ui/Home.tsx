@@ -1,15 +1,16 @@
 import { ArrowRight, BadgeCheck, ChevronRight, Clock, Globe, Play, Plus, Search, Stamp, Unlock, Users } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { Address } from "viem"
 import { reader, useChain, useNow } from "../hooks/useChain"
 import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { examHref, navigate } from "../router"
-import { blockTimeMs, DAY_MS, type Exam, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, witnessStats } from "../lib/mohar"
+import { normalise, questionHash } from "../lib/hash"
+import { blockTimeMs, DAY_MS, type Exam, examOutcome, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, type Outcome, witnessStats } from "../lib/mohar"
 import { AddExamSheet } from "./AddExamSheet"
 import { Emblem } from "./brand"
-import { errText, fmtDateTime, fmtDuration, fmtRelative, REPO } from "./format"
-import { Badge, Empty, Skeleton } from "./primitives"
+import { errText, fmtDuration, fmtWhen, REPO, shownTitle } from "./format"
+import { Empty, Skeleton, Tag } from "./primitives"
 import { DEMO_EXAM, DEMO_TITLE, tourHref } from "./tourSteps"
 
 type Tab = "sealed" | "open"
@@ -47,6 +48,41 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
     return (list ?? []).filter((x) => !needle || x.examId.toLowerCase().includes(needle) || x.title.toLowerCase().includes(needle))
   }, [list, q])
   const exactId = q.trim() && !shown.some((x) => x.examId === q.trim()) ? q.trim() : undefined
+
+  // what happened at each sealed exam, loaded once the list scrolls into view; a busy or rate-limited network gets
+  // a few retries, then the row falls back to when the exam was held
+  const [outcomes, setOutcomes] = useState<Map<string, Outcome | "unknown">>(new Map())
+  const listRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = listRef.current
+    const held = (sealed ?? []).filter((x) => x.opensAtMs <= Date.now())
+    if (!el || held.length === 0) return
+    let live = true
+    const timers: ReturnType<typeof setTimeout>[] = []
+    const get = (examId: string, tries = 0): void => {
+      examOutcome(reader, examId, issuer)
+        .then((o) => live && setOutcomes((m) => new Map(m).set(examId, o)))
+        .catch(() => {
+          if (!live) return
+          if (tries < 3) timers.push(setTimeout(() => get(examId, tries + 1), 2000 * 2 ** tries))
+          else setOutcomes((m) => new Map(m).set(examId, "unknown"))
+        })
+    }
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return
+        io.disconnect()
+        for (const x of held) get(x.examId)
+      },
+      { rootMargin: "300px" },
+    )
+    io.observe(el)
+    return () => {
+      live = false
+      io.disconnect()
+      timers.forEach(clearTimeout)
+    }
+  }, [sealed, issuer])
 
   return (
     <>
@@ -107,6 +143,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
             </article>
           ))}
         </div>
+        <TryFingerprint />
       </section>
 
       <section id="exams" className="section">
@@ -142,7 +179,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
           )}
         </p>
 
-        <div className="card list-card">
+        <div className="card list-card" ref={listRef}>
           {err && (
             <Empty icon={<Globe size={22} />} title={t("exams.offline")}>
               {err}{" "}
@@ -182,10 +219,10 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
               <a key={x.examId} className="exam-row" href={examHref(x.examId)}>
                 <div className={`exam-icon ${upcoming ? "up" : ""}`}>{upcoming ? <Clock size={18} /> : <Unlock size={18} />}</div>
                 <div className="grow">
-                  <div className="exam-title">{x.title}</div>
-                  <div className="muted small">{fmtDateTime(x.opensAtMs)}</div>
+                  <div className="exam-title">{shownTitle(x.title, !upcoming)}</div>
+                  <div className="muted small">{fmtWhen(x.opensAtMs)}</div>
                 </div>
-                <Badge tone={upcoming ? "info" : "neutral"}>{upcoming ? `${t("exams.accepting")} · ${fmtRelative(x.opensAtMs, now)}` : `${t("exams.held")} ${fmtRelative(x.opensAtMs, now)}`}</Badge>
+                <ExamState upcoming={upcoming} open={tab === "open"} outcome={outcomes.get(x.examId)} opensAtMs={x.opensAtMs} now={now} />
                 <ChevronRight size={18} className="muted hide-sm" />
               </a>
             )
@@ -226,6 +263,40 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
       <AddExamSheet open={adding} onClose={() => setAdding(false)} onAdded={(id) => navigate(examHref(id))} />
     </>
+  )
+}
+
+function ExamState({ upcoming, open, outcome, opensAtMs, now }: { upcoming: boolean; open: boolean; outcome?: Outcome | "unknown"; opensAtMs: number; now: number }) {
+  const { t } = useT()
+  if (upcoming) return <Tag tone="info">{t("exams.opensIn", { t: fmtDuration(opensAtMs - now) })}</Tag>
+  if (open || outcome === "unknown") return <Tag>{t("exams.heldAgo", { t: fmtDuration(now - opensAtMs) })}</Tag>
+  if (!outcome) return <Tag>…</Tag>
+  if (outcome.kind === "leak") return <Tag tone="danger">{outcome.n === 1 ? t("exams.outcome.leak1") : t("exams.outcome.leaks", { n: outcome.n })}</Tag>
+  if (outcome.kind === "clean") return <Tag tone="good">{t("exams.outcome.clean")}</Tag>
+  return <Tag tone="warn">{t("exams.outcome.waiting")}</Tag>
+}
+
+// The one thing that leaves a witness's phone: type a question and watch its fingerprint change with every key.
+// Nothing here touches the network.
+function TryFingerprint() {
+  const { t } = useT()
+  const [text, setText] = useState(() => t("try.example"))
+  const read = normalise(text)
+  const fp = read ? questionHash(text) : undefined
+  return (
+    <div className="card try">
+      <h3>{t("try.title")}</h3>
+      <label className="try-label" htmlFor="try-q">
+        {t("try.label")}
+      </label>
+      <input id="try-q" className="input" value={text} onChange={(e) => setText(e.target.value)} spellCheck={false} autoComplete="off" />
+      <p className="muted small try-read">
+        {t("try.reads")}: <span>{read || "—"}</span>
+      </p>
+      <div className="try-fp-k">{t("try.fp")}</div>
+      <code className="try-fp">{fp ? [...fp].map((c, i) => <span key={`${i}${c}`}>{c}</span>) : <i>{t("try.empty")}</i>}</code>
+      <p className="muted small">{t("try.note")}</p>
+    </div>
   )
 }
 

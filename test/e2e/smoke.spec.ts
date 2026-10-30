@@ -117,6 +117,27 @@ test("a photo of the paper is read on the device into the witness box", async ({
   await expect(page.getByText("2 questions found")).toBeVisible()
 })
 
+test("try it turns a question into its fingerprint as you type, ignoring numbering and case", async ({ page }) => {
+  await page.goto("/#how")
+  const box = page.getByLabel("Type any question")
+  const fp = page.locator(".try-fp")
+  await box.fill("Q4) Which river is known as the DAKSHIN GANGA?")
+  await expect(fp).toHaveText(/^0x[0-9a-f]{64}$/)
+  const first = await fp.textContent()
+  await box.fill("4. which river is known as the dakshin ganga")
+  await expect(fp).toHaveText(first!)
+  await box.fill("A different question")
+  await expect(fp).not.toHaveText(first!)
+})
+
+test("the exam list says what happened at each exam", async ({ page }) => {
+  await page.goto("/#exams")
+  const row = page.locator(".exam-row", { hasText: "Demo State PSC Prelims 2026, Shift 1" })
+  // outcomes load when the list scrolls into view, as a visitor would bring it
+  await row.scrollIntoViewIfNeeded()
+  await expect(row.locator(".tag")).toHaveText("1 leak caught", { timeout: 30_000 })
+})
+
 test("open exam checks witnesses against a pasted official paper", async ({ page }) => {
   await page.goto(OPEN)
   await page.locator("[data-tour=check] textarea").fill("Q1) Which planet is known as the RED planet\nQ2. Who is known as the Missile Man of India?")
