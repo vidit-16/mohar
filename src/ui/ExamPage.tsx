@@ -107,18 +107,24 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
     )
 
   const timeStr = fmtDateTime(exam.opensAtMs)
+  // until every witness has a verdict, saying "nobody leaked it" could be wrong, so say we are still checking
+  const judging = x.hasPaper && rows.some((r) => !r.v)
   const meaning = sealed
     ? !opened
       ? t("mean.upcoming", { time: timeStr })
       : !x.hasPaper
         ? t("mean.awaiting")
-        : firstLeak?.v
+        : judging && !firstLeak
+          ? t("mean.judging")
+          : firstLeak?.v
           ? t("mean.leak", { n: firstLeak.v.matches.length, t: fmtDuration(firstLeak.v.deadlineMs - firstLeak.v.witnessedAtMs) })
           : t("mean.clean")
     : !opened
       ? t("mean.openUpcoming", { time: timeStr })
       : x.hasPaper
-        ? t("mean.openChecked", { n: counts.leak })
+        ? judging
+          ? t("mean.judging")
+          : t("mean.openChecked", { n: counts.leak })
         : t("mean.openAfter")
 
   const status = !sealed ? (

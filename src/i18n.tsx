@@ -142,6 +142,7 @@ const en = {
   "exam.missingHint": "Nothing matches this ID. If someone sent you this as an \"official\" exam, be careful.",
 
   "mean.leak": "Someone held {n} real {qs} from this paper {t} before the exam. That's on a public record nobody can edit.",
+  "mean.judging": "Checking every witness against the revealed paper…",
   "mean.clean": "Nobody proved they had this paper early. Every revealed question matches what was locked before the exam.",
   "mean.upcoming": "The paper is locked. If a \"leaked\" paper reaches you before {time}, seal it here. It stays private.",
   "mean.awaiting": "The exam has started. Waiting for the exam body to reveal the paper.",
@@ -417,6 +418,7 @@ const hi: Record<Key, string> = {
   "exam.missingHint": "इस ID से कुछ नहीं मिला। अगर किसी ने इसे \"आधिकारिक\" बताकर भेजा है, सावधान रहें।",
 
   "mean.leak": "किसी के पास इस पेपर के {n} असली प्रश्न परीक्षा से {t} पहले थे। यह ऐसे सार्वजनिक रिकॉर्ड पर है जिसे कोई बदल नहीं सकता।",
+  "mean.judging": "हर गवाही को जारी पेपर से मिलाया जा रहा है…",
   "mean.clean": "किसी ने यह साबित नहीं किया कि पेपर पहले मिला था। जारी हर प्रश्न परीक्षा से पहले लॉक किए गए पेपर से मेल खाता है।",
   "mean.upcoming": "पेपर लॉक है। अगर {time} से पहले \"लीक\" पेपर मिले, यहाँ सील करें। यह निजी रहता है।",
   "mean.awaiting": "परीक्षा शुरू हो गई है। संस्था के पेपर जारी करने का इंतज़ार है।",
