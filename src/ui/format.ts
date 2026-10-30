@@ -10,6 +10,11 @@ export const short = (a: string, head = 6, tail = 4) => `${a.slice(0, head)}…$
 const IST = "Asia/Kolkata"
 export const fmtDateTime = (ms: number) =>
   new Date(ms).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: IST }) + " IST"
+// for lists, where the second an exam starts is noise
+export const fmtWhen = (ms: number) =>
+  new Date(ms).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: IST }) + " IST"
+// the first demo exam was sealed with "(upcoming)" in its on-chain title, which reads wrong once it has started
+export const shownTitle = (title: string, started: boolean) => (started ? title.replace(/\s*\(upcoming\)$/i, "") : title)
 export const fmtTime = (ms: number) =>
   new Date(ms).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: IST })
 export const fmtDate = (ms: number) =>

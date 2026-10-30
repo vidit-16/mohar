@@ -22,6 +22,16 @@ export function Badge({ tone = "neutral", icon, children }: { tone?: Tone; icon?
   )
 }
 
+// a state written as coloured text; the pill Badge is for the few labels that have to stand out
+export function Tag({ tone = "neutral", icon, children }: { tone?: Tone; icon?: ReactNode; children: ReactNode }) {
+  return (
+    <span className={`tag tag-${tone}`}>
+      {icon}
+      {children}
+    </span>
+  )
+}
+
 export function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
   const [done, setDone] = useState(false)
   return (
