@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "node scripts/ocr-assets.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/ocr-assets.mjs",
+    "prebuild": "node scripts/ocr-assets.mjs && tsx --tsconfig tsconfig.app.json scripts/shell.ts",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",

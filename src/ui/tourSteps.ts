@@ -1,6 +1,8 @@
 import type { TourAction } from "./ExamPage"
 
 export const DEMO_EXAM = "DSPSC-PRE26-10170937"
+// shown until the chain answers, so the home card doesn't flash the raw exam ID
+export const DEMO_TITLE = "Demo State PSC Prelims 2026, Shift 1"
 export const LIVE_EXAM = "DSPSC-PRE26-U10170941"
 
 export type TourStep = {
