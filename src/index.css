@@ -648,30 +648,6 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .stage-big:disabled { opacity: 0.6; }
 .stage-setup-link { background: transparent; color: #555; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .tpl-canvas .stage-slide, .stage-stamp { animation: none; } }
-=======
-.stage-setup-link { background: transparent; color: #b8b1a3; text-decoration: underline; }
-@media (max-width: 760px) { .stage-split { grid-template-columns: 1fr; } .stage-qr { width: 60vw; justify-self: start; } .stage-stats { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .stage-slide, .stage-stamp { animation: none; } }
-.stage-url { font: 600 clamp(32px, 3.6vw, 68px) / 1 var(--display); color: #e2583c; margin: 0; }
-
-/* hero: the real caught leak, as a piece of the product */
-.hero-card { display: grid; gap: 14px; padding: 28px; border-radius: 20px; background: var(--surface); color: var(--text); text-decoration: none; transform: rotate(1.2deg); transition: transform 0.2s ease, background-color 0.2s ease; }
-.hero-card:hover { transform: rotate(0deg); }
-.hero-card:focus-visible { outline: 2px solid var(--info); outline-offset: 4px; }
-.hero-card-head { display: flex; align-items: center; gap: 14px; }
-.hero-card-exam { font-weight: 600; font-size: 1rem; color: var(--text-2); }
-.hero-card-stamp { justify-self: start; font: 700 clamp(2.6rem, 5vw, 3.6rem)/1 var(--display); color: var(--danger); border: 0.07em solid currentColor; border-radius: 0.12em; padding: 0.04em 0.3em; transform: rotate(-5deg); margin: 6px 0 4px; }
-.hero-card-big { margin: 0; font: 600 clamp(1.7rem, 3vw, 2.3rem)/1.1 var(--display); letter-spacing: -0.02em; }
-.hero-card-when { margin: 0; color: var(--text-2); font-size: 1.05rem; }
-.hero-card-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--accent); }
-.step h3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.step-hi { font: 600 0.95rem var(--deva); color: var(--text-3); }
-.trust-list { margin: 18px 0 14px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 40px; }
-.trust-list li { font: 600 clamp(1.05rem, 1.6vw, 1.25rem)/1.35 var(--font); padding-left: 18px; position: relative; }
-.trust-list li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-@media (max-width: 760px) { .trust-list { grid-template-columns: 1fr; } .hero-card { transform: none; } }
-@media (prefers-reduced-motion: reduce) { .hero-card { transition: none; } }
->>>>>>> redesign
 
 /* hero: the real caught leak, as a piece of the product */
 .hero-card { display: grid; gap: 14px; padding: 28px; border-radius: 20px; background: var(--surface); color: var(--text); text-decoration: none; transform: rotate(1.2deg); transition: transform 0.2s ease, background-color 0.2s ease; }
