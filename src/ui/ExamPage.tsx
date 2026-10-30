@@ -7,8 +7,8 @@ import type { IssuerSource } from "../hooks/useIssuer"
 import { useT } from "../i18n"
 import { BURN, pastedPaper, QUERIES, sameAddr, type WitnessPayload } from "../lib/mohar"
 import { EvidenceDrawer, KeepAlive } from "./EvidenceDrawer"
-import { fmtDateTime, fmtDuration, fmtRelative, fmtTime, RPC } from "./format"
-import { Badge, CopyButton, Empty, Mono, Skeleton, Stat } from "./primitives"
+import { fmtDateTime, fmtDuration, fmtRelative, fmtTime, RPC, shownTitle } from "./format"
+import { CopyButton, Empty, Mono, Skeleton, Stat, Tag } from "./primitives"
 import { Timeline } from "./Timeline"
 import { describe } from "./verdict"
 import { WitnessSheet } from "./WitnessSheet"
@@ -61,6 +61,15 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
   const [showAllPaper, setShowAllPaper] = useState(false)
   const allPaper = x.paper.map((q) => ({ q, hits: leaks.filter((r) => r.v!.matches.some((m) => m.set === q.set && m.index === q.index)).length }))
   const paperRows = showAllPaper || allPaper.length <= 60 ? allPaper : allPaper.filter(({ q, hits }, i) => i < 30 || hits > 0 || !q.sealed)
+
+  // a paper that arrives while the page is open is revealed question by question, slower than on a fresh load
+  const [sawSealedPaper, setSawSealedPaper] = useState(false)
+  if (sealed && x.exam && !x.hasPaper && !sawSealedPaper) setSawSealedPaper(true)
+  const liveReveal = sawSealedPaper && x.hasPaper
+  // witnesses that land while the page is open pulse the count; the first load doesn't
+  const [baseCount, setBaseCount] = useState<number>()
+  if (x.status === "ready" && baseCount === undefined) setBaseCount(x.witnesses.length)
+  const arrived = new Set(x.feed.filter((f) => f.kind === "witness").map((f) => f.id))
 
   useEffect(() => {
     const onTour = (e: Event) => {
@@ -128,21 +137,19 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         : t("mean.openAfter")
 
   const status = !sealed ? (
-    <Badge tone="info" icon={<Users size={12} />}>
+    <Tag tone="info" icon={<Users size={13} />}>
       {t("exam.status.open")}
-    </Badge>
+    </Tag>
   ) : !opened ? (
-    <Badge tone="info" icon={<Fingerprint size={12} />}>
+    <Tag tone="info" icon={<Fingerprint size={13} />}>
       {t("exam.status.accepting")}
-    </Badge>
+    </Tag>
   ) : x.hasPaper ? (
-    <Badge tone="neutral" icon={<CircleCheck size={12} />}>
-      {t("exam.status.revealed")}
-    </Badge>
+    <Tag icon={<CircleCheck size={13} />}>{t("exam.status.revealed")}</Tag>
   ) : (
-    <Badge tone="warn" icon={<Bell size={12} />}>
+    <Tag tone="warn" icon={<Bell size={13} />}>
       {t("exam.status.awaiting")}
-    </Badge>
+    </Tag>
   )
 
   return (
@@ -158,16 +165,11 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               <code>{exam.examId}</code> <CopyButton value={exam.examId} label="Copy exam ID" />
             </span>
           </div>
-          <h1>{exam.title}</h1>
+          <h1>{shownTitle(exam.title, opened)}</h1>
           <p className="muted">
             {opened ? t("exam.opened") : t("exam.opens")} <b className="ink">{timeStr}</b>
-            {!opened && (
-              <span className="countdown">
-                {" "}
-                · {fmtDuration(exam.opensAtMs - now)} {t("exam.toBell")}
-              </span>
-            )}
           </p>
+          {!opened ? <Countdown opensAtMs={exam.opensAtMs} now={now} /> : sealed && !x.hasPaper && <p className="bell bell-started"><i aria-hidden="true" /> {t("exam.bell.started", { t: fmtDuration(now - exam.opensAtMs) })}</p>}
         </div>
         <div className="head-actions">
           <label className="switch">
@@ -205,7 +207,13 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         ) : (
           <Stat label={t("exam.stat.entry")} value={<span className="stat-addr">{exam.creator.slice(0, 6)}…{exam.creator.slice(-4)}</span>} hint={t("exam.status.open")} />
         )}
-        <Stat label={t("exam.stat.witnesses")} value={x.witnesses.length + (x.cursor ? "+" : "")} hint={`${counts.before} ${t("exam.stat.before")} · ${counts.late} ${t("exam.stat.after")}`} />
+        <Stat
+          label={t("exam.stat.witnesses")}
+          value={
+            <span key={x.witnesses.length} className={baseCount !== undefined && x.witnesses.length > baseCount ? "stat-bump" : undefined}>
+              {x.witnesses.length + (x.cursor ? "+" : "")}
+            </span>
+          } hint={`${counts.before} ${t("exam.stat.before")} · ${counts.late} ${t("exam.stat.after")}`} />
         {sealed ? (
           <Stat label={t("exam.stat.integrity")} value={x.hasPaper ? `${integrity}/${x.paper.length}` : "—"} hint={x.hasPaper ? (integrity === x.paper.length ? "✓" : "✗") : t("exam.status.awaiting")} />
         ) : (
@@ -281,7 +289,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             <ul className="wlist">
               {filtered.map(({ w, v, d, n }) => (
                 <li key={w.key}>
-                  <button className={`wrow ${d.kind === "leak" ? "wrow-leak" : ""}`} onClick={() => setPicked(w.key)} data-tour={`w-${d.kind}`}>
+                  <button className={`wrow ${d.kind === "leak" ? "wrow-leak" : ""} ${arrived.has(w.key) ? "wrow-new" : ""}`} onClick={() => setPicked(w.key)} data-tour={`w-${d.kind}`}>
                     <span className={`wdot tone-${d.tone}`}>
                       <Fingerprint size={14} />
                     </span>
@@ -292,7 +300,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                         <span className="tech-only"> · {w.creator.slice(0, 6)}…{w.creator.slice(-4)} · #{String(w.createdAt)}</span>
                       </span>
                     </span>
-                    <Badge tone={d.tone}>{d.short}</Badge>
+                    <Tag tone={d.tone}>{d.short}</Tag>
                     <ChevronRight size={16} className="muted hide-sm" />
                   </button>
                 </li>
@@ -311,9 +319,9 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             <section className="card" data-tour="seal">
               <div className="card-head">
                 <h2>{t("exam.seal")}</h2>
-                <Badge tone="good" icon={<BadgeCheck size={12} />}>
+                <Tag tone="good" icon={<BadgeCheck size={14} />}>
                   {t("exam.verified")}
-                </Badge>
+                </Tag>
               </div>
               <p className="muted small">{t("exam.sealNote")}</p>
               <p className={`small trust-line trust-${source}`}>
@@ -330,7 +338,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                       <b>Set {String(s.attrs.set_code)}</b>
                       <span className="muted small">{String(s.attrs.n_q)} Q</span>
                       <span className="grow" />
-                      <Badge tone={sameAddr(s.owner, BURN) ? "good" : "warn"}>{t("exam.undeletable")}</Badge>
+                      <Tag tone={sameAddr(s.owner, BURN) ? "good" : "warn"}>{t("exam.undeletable")}</Tag>
                     </div>
                     <div className="muted small">
                       {x.times.get(s.createdAt) ? fmtRelative(x.times.get(s.createdAt)!, now) : "…"}
@@ -396,7 +404,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                           <Mono value={c.creator} kind="address" /> · {t("exam.conflictAdded")} {at ? fmtDateTime(at) : "…"}
                           <br />
                           {t("exam.conflictClaims")} <b>{fmtDateTime(claimed)}</b>
-                          {claimed !== exam.opensAtMs && <Badge tone="warn">{fmtDuration(Math.abs(claimed - exam.opensAtMs))} {claimed > exam.opensAtMs ? t("exam.conflictLater") : t("exam.conflictEarlier")}</Badge>}
+                          {claimed !== exam.opensAtMs && <Tag tone="warn">{fmtDuration(Math.abs(claimed - exam.opensAtMs))} {claimed > exam.opensAtMs ? t("exam.conflictLater") : t("exam.conflictEarlier")}</Tag>}
                         </li>
                       )
                     })}
@@ -450,15 +458,15 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
           <div className="paper">
             {paperRows.map(({ q, hits }, i) => {
               return (
-                <div key={`${q.set}${q.index}`} className={`pq ${hits ? "hit" : ""}`} style={{ animationDelay: `${Math.min(i, 20) * 0.04}s` }}>
+                <div key={`${q.set}${q.index}`} className={`pq ${hits ? "hit" : ""}`} style={{ animationDelay: `${Math.min(i, 20) * (liveReveal ? 0.08 : 0.04)}s` }}>
                   <span className="pq-n">
                     {q.set}-Q{q.index}
                   </span>
                   <span className="grow">{q.text}</span>
                   {hits > 0 && (
-                    <Badge tone="danger">
+                    <Tag tone="danger">
                       {t("exam.heldEarly")} {hits}
-                    </Badge>
+                    </Tag>
                   )}
                   {q.sealed ? <CircleCheck size={16} className="good" aria-label="matches seal" /> : <CircleX size={16} className="bad" aria-label="doesn't match seal" />}
                 </div>
@@ -531,6 +539,33 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         onChanged={x.reload}
       />
     </div>
+  )
+}
+
+// The time to the bell, ticking every second; only the seconds move.
+function Countdown({ opensAtMs, now }: { opensAtMs: number; now: number }) {
+  const { t } = useT()
+  const s = Math.max(0, Math.floor((opensAtMs - now) / 1000))
+  const parts = [
+    ["d", Math.floor(s / 86400)],
+    ["h", Math.floor((s % 86400) / 3600)],
+    ["m", Math.floor((s % 3600) / 60)],
+    ["s", s % 60],
+  ] as const
+  return (
+    <p className="bell" role="timer" aria-label={`${t("exam.bell.opens")} ${fmtDuration(opensAtMs - now)}`}>
+      <span className="bell-k">{t("exam.bell.opens")}</span>
+      {parts
+        .filter(([u]) => u !== "d" || parts[0][1] > 0)
+        .map(([u, v]) => (
+          <span className="bell-seg" key={u} aria-hidden="true">
+            <b key={u === "s" ? v : u} className={u === "s" ? "bell-tick" : undefined}>
+              {String(v).padStart(2, "0")}
+            </b>
+            <small>{t(`exam.bell.${u}`)}</small>
+          </span>
+        ))}
+    </p>
   )
 }
 
