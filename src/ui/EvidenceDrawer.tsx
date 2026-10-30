@@ -9,6 +9,7 @@ import { Badge, Mono, Sheet, Spinner } from "./primitives"
 import { canSpeak, speakAll } from "./speech"
 import { useToast } from "./toast"
 import { describe } from "./verdict"
+import { LacSeal } from "./brand"
 
 type Props = {
   row?: Row
@@ -49,6 +50,7 @@ export function EvidenceDrawer({ row, verdict, hasPaper, examTitle, msLeft, onCl
           <Badge tone={d.tone}>{d.short}</Badge>
           <h3>{d.title}</h3>
           <p>{d.explain}</p>
+          {d.kind === "leak" && <LacSeal size={92} className="verdict-seal" label={t("hero.app.sealLabel")} />}
         </div>
 
         {verdict && (

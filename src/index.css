@@ -147,7 +147,7 @@ html, body { overflow-x: clip; }
 /* brand */
 .wordmark { display: inline-flex; align-items: center; gap: 10px; }
 .wm-text { font: 650 1.22rem var(--display); letter-spacing: -0.03em; display: inline-flex; align-items: baseline; gap: 6px; }
-.wm-hi { font: 600 0.95rem var(--deva); color: var(--accent); }
+.wm-hi { font: 600 0.95rem "Mohar Deva", var(--deva); color: var(--accent); }
 .footer .wm-text { font-size: 1.05rem; }
 .stamp-in { animation: stamp 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.15) both; transform-origin: 50% 50%; }
 @keyframes stamp {
@@ -807,3 +807,9 @@ html[lang="hi"] .big-line { font-family: var(--deva); line-height: 1.2; letter-s
 .stat-label { font-size: 0.9rem; color: var(--text-2); font-weight: 500; }
 .stat-value { font: 600 2.2rem/1.05 var(--display); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(3) { box-shadow: 0 -1px 0 var(--border); } .stat:nth-child(4) { box-shadow: -1px 0 0 var(--border), 0 -1px 0 var(--border); } }
+.verdict-hero { position: relative; }
+.verdict-hero.tone-danger { padding-right: 104px; }
+.verdict-seal { position: absolute; top: -10px; right: 6px; transform: rotate(-12deg); filter: drop-shadow(0 2px 1.5px rgb(70 20 10 / 0.35)) drop-shadow(0 8px 12px rgb(70 20 10 / 0.16)); animation: lac-press 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25) 0.3s both; }
+@media print { .verdict-seal { animation: none; } }
+.footer { margin-top: clamp(96px, 12vw, 180px); border-top: 0; overflow: clip; }
+.footer-name { font: 600 clamp(7rem, 24vw, 22rem)/0.85 "Mohar Deva", var(--deva); color: var(--seal); letter-spacing: -0.02em; margin-bottom: clamp(18px, 3vw, 36px); user-select: none; }

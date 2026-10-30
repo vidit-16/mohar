@@ -519,13 +519,13 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
       </details>
 
       {witnessOpen && (
-        <WitnessSheet key={prefill ?? "manual"} open onClose={() => (setWitnessOpen(false), setPrefill(undefined))} examId={exam.examId} examTitle={exam.title} deadlineMs={x.deadlineMs} onSealed={x.reload} prefill={prefill} />
+        <WitnessSheet key={prefill ?? "manual"} open onClose={() => (setWitnessOpen(false), setPrefill(undefined))} examId={exam.examId} examTitle={shownTitle(exam.title, opened)} deadlineMs={x.deadlineMs} onSealed={x.reload} prefill={prefill} />
       )}
       <EvidenceDrawer
         row={pickedRow?.w}
         verdict={pickedRow?.v}
         hasPaper={x.hasPaper}
-        examTitle={exam.title}
+        examTitle={shownTitle(exam.title, opened)}
         msLeft={pickedRow ? msUntilBlock(pickedRow.w.expiresAt) : NaN}
         onClose={() => {
           setPicked(undefined)

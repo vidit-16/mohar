@@ -122,6 +122,9 @@ function Footer() {
   const { t } = useT()
   return (
     <footer className="footer">
+      <div className="container footer-name" aria-hidden="true" translate="no">
+        मोहर
+      </div>
       <div className="container footer-inner">
         <Wordmark size={22} />
         <span className="grow" />

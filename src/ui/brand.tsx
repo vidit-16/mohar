@@ -45,7 +45,7 @@ export function Emblem({ size = 200, className, animate }: { size?: number; clas
             MOHAR
           </textPath>
         </text>
-        <text fontSize="20" fontWeight="600" fill="var(--seal-ink)" fontFamily="'Noto Sans Devanagari', 'Nirmala UI', sans-serif" textAnchor="middle">
+        <text fontSize="20" fontWeight="600" fill="var(--seal-ink)" fontFamily="'Mohar Deva', 'Noto Sans Devanagari', 'Nirmala UI', sans-serif" textAnchor="middle">
           <textPath href={`#bot${id}`} startOffset="50%">
             मोहर
           </textPath>
@@ -129,7 +129,7 @@ export function LacSeal({ size = 160, className, label = "Mohar seal: leak caugh
             <line x1="0" y1="-4" x2="-5" y2="-35" strokeWidth="9" />
           </g>
           <circle cy="-4" r="5" fill="#2a2a2a" />
-          <text y="62" textAnchor="middle" fontFamily="'Noto Sans Devanagari', 'Nirmala UI', sans-serif" fontWeight="700" fontSize="24" fill="#2a2a2a">
+          <text y="62" textAnchor="middle" fontFamily="'Mohar Deva', 'Noto Sans Devanagari', 'Nirmala UI', sans-serif" fontWeight="700" fontSize="24" fill="#2a2a2a">
             मोहर
           </text>
         </mask>
