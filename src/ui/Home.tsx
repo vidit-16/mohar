@@ -1,13 +1,14 @@
-import { ArrowRight, BadgeCheck, ChevronRight, Clock, Globe, Lock, Play, Plus, Search, Stamp, Terminal, Unlock, Users } from "lucide-react"
+import { ArrowRight, BadgeCheck, ChevronRight, Clock, Globe, Play, Plus, Search, Stamp, Unlock, Users } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import type { Address } from "viem"
 import { reader, useNow } from "../hooks/useChain"
+import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { examHref, navigate } from "../router"
-import { DAY_MS, type Exam, examsFrom, groupExams, openExamFrom, openExamsSince } from "../lib/mohar"
+import { DAY_MS, type Exam, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince } from "../lib/mohar"
 import { AddExamSheet } from "./AddExamSheet"
-import { Emblem, Mark } from "./brand"
-import { errText, fmtDateTime, fmtRelative, REPO } from "./format"
+import { Emblem } from "./brand"
+import { errText, fmtDateTime, fmtDuration, fmtRelative, REPO } from "./format"
 import { Badge, Empty, Skeleton } from "./primitives"
 import { DEMO_EXAM, tourHref } from "./tourSteps"
 
@@ -51,13 +52,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
     <>
       <section className="hero bleed">
         <div className="hero-copy">
-          <div className="eyebrow">
-            <Mark size={18} />
-            {t("hero.badge")}
-          </div>
-          <h1>
-            {t("hero.title1")} <em>{t("hero.title2")}</em> {t("hero.title3")}
-          </h1>
+          <h1>{t("hero.title")}</h1>
           <p className="lead">{t("hero.lead")}</p>
           <div className="hero-cta">
             <a className="btn btn-primary btn-lg" href={tourHref(0)} data-tour="tour-btn">
@@ -68,9 +63,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
             </a>
           </div>
         </div>
-        <div className="hero-art">
-          <Emblem size={320} animate className="hero-emblem" />
-        </div>
+        <CaughtLeak />
       </section>
 
       <section className="proof bleed" data-tour="proof">
@@ -99,19 +92,15 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         <div className="steps3">
           {(
             [
-              [Stamp, "seal", "how.1.t", "how.1.d", "मोहर"],
-              [Users, "info", "how.2.t", "how.2.d", "गवाही"],
-              [Unlock, "danger", "how.3.t", "how.3.d", "निर्णय"],
+              ["how.1.t", "how.1.d", "मोहर"],
+              ["how.2.t", "how.2.d", "गवाही"],
+              ["how.3.t", "how.3.d", "निर्णय"],
             ] as const
-          ).map(([Icon, tone, title, body, hi], i) => (
+          ).map(([title, body, hi]) => (
             <article className="step" key={title}>
-              <div className={`step-icon ${tone}`}>
-                <Icon size={20} />
-              </div>
-              <div className="step-k">
-                {i + 1} · {hi}
-              </div>
-              <h3>{t(title)}</h3>
+              <h3>
+                {t(title)} <span className="step-hi">{hi}</span>
+              </h3>
               <p>{t(body)}</p>
             </article>
           ))}
@@ -204,23 +193,11 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
       <section className="section trust band bleed" data-tour="trust">
         <h2>{t("trust.title")}</h2>
-        <ul className="trust-grid">
-          <li>
-            <BadgeCheck size={20} />
-            {t("trust.1")}
-          </li>
-          <li>
-            <Clock size={20} />
-            {t("trust.2")}
-          </li>
-          <li>
-            <Lock size={20} />
-            {t("trust.3")}
-          </li>
-          <li>
-            <Terminal size={20} />
-            {t("trust.4")}
-          </li>
+        <ul className="trust-list">
+          <li>{t("trust.1")}</li>
+          <li>{t("trust.2")}</li>
+          <li>{t("trust.3")}</li>
+          <li>{t("trust.4")}</li>
         </ul>
         <p className="muted small">{t("trust.arkiv")}</p>
       </section>
@@ -247,5 +224,34 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
       <AddExamSheet open={adding} onClose={() => setAdding(false)} onAdded={(id) => navigate(examHref(id))} />
     </>
+  )
+}
+
+const DEMO_ISSUER = Object.keys(ISSUERS)[0] as Address
+
+// The hero shows the product doing its job: the demo exam's caught leak, read live from the chain.
+function CaughtLeak() {
+  const { t } = useT()
+  const x = useExam(DEMO_EXAM, DEMO_ISSUER, [])
+  const top = [...x.verdicts.values()].filter((v) => v.before && v.matches.length > 0).sort((a, b) => b.matches.length - a.matches.length)[0]
+  return (
+    <a className="hero-card" href={top ? `${examHref(DEMO_EXAM)}&w=${top.witness.key}` : examHref(DEMO_EXAM)}>
+      <div className="hero-card-head">
+        <Emblem size={56} />
+        <span className="hero-card-exam">{x.exam?.title ?? DEMO_EXAM}</span>
+      </div>
+      {top ? (
+        <>
+          <div className="hero-card-stamp">LEAK</div>
+          <p className="hero-card-big">{t("hero.card.caught").replace("{n}", String(top.matches.length))}</p>
+          <p className="hero-card-when">{t("hero.card.when").replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs))}</p>
+        </>
+      ) : (
+        <p className="hero-card-when">{t("hero.card.loading")}</p>
+      )}
+      <span className="hero-card-cta">
+        {t("hero.card.cta")} <ArrowRight size={16} />
+      </span>
+    </a>
   )
 }
