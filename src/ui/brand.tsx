@@ -40,7 +40,7 @@ export function Emblem({ size = 200, className, animate }: { size?: number; clas
         <circle cx="100" cy="100" r="84" fill="none" stroke="var(--seal-lo)" strokeWidth="1.5" opacity="0.6" />
         <circle cx="100" cy="100" r="58" fill="var(--seal-lo)" opacity="0.35" />
         <circle cx="100" cy="100" r="58" fill="none" stroke="var(--seal-ink)" strokeOpacity="0.35" strokeWidth="1.2" />
-        <text fontSize="14.5" fontWeight="700" letterSpacing="5" fill="var(--seal-ink)" fontFamily="Inter, sans-serif" textAnchor="middle">
+        <text fontSize="14.5" fontWeight="700" letterSpacing="5" fill="var(--seal-ink)" fontFamily="Geist, sans-serif" textAnchor="middle">
           <textPath href={`#top${id}`} startOffset={TOP_MID}>
             MOHAR
           </textPath>
