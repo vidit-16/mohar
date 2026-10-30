@@ -6,12 +6,14 @@ import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { examHref, navigate } from "../router"
 import { normalise, questionHash } from "../lib/hash"
-import { blockTimeMs, DAY_MS, type Exam, examOutcome, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, type Outcome, witnessStats } from "../lib/mohar"
+import { DAY_MS, type Exam, examOutcome, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, type Outcome, witnessStats } from "../lib/mohar"
 import { AddExamSheet } from "./AddExamSheet"
-import { Emblem } from "./brand"
-import { errText, fmtDuration, fmtWhen, REPO, shownTitle } from "./format"
+import { LacSeal, SealOutline } from "./brand"
+import { LeakCard } from "./LeakCard"
+import { loadingCard } from "./leakCardLoading"
+import { errText, fmtClock, fmtDuration, fmtWhen, REPO, shownTitle } from "./format"
 import { Empty, Skeleton, Tag } from "./primitives"
-import { DEMO_EXAM, DEMO_TITLE, tourHref } from "./tourSteps"
+import { DEMO_EXAM, tourHref } from "./tourSteps"
 
 type Tab = "sealed" | "open"
 
@@ -86,38 +88,43 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
   return (
     <>
-      <section className="hero bleed">
-        <div className="hero-copy">
-          <h1>{t("hero.title")}</h1>
-          <p className="lead">{t("hero.lead")}</p>
-          <div className="hero-cta">
-            <a className="btn btn-primary btn-lg" href={tourHref(0)} data-tour="tour-btn">
-              <Play size={17} /> {t("hero.tour")}
-            </a>
-            <a className="btn btn-ghost btn-lg" href="#exams">
-              {t("hero.browse")} <ArrowRight size={17} />
-            </a>
-          </div>
+      <section className="hero">
+        <SealOutline className="hero-outline" />
+        <HeroLive />
+        <h1>{t("hero.title")}</h1>
+        <p className="lead">{t("hero.lead")}</p>
+        <div className="hero-cta">
+          <a className="btn btn-primary btn-lg" href={tourHref(0)} data-tour="tour-btn">
+            <Play size={17} /> {t("hero.tour")}
+          </a>
+          <a className="btn btn-secondary btn-lg" href="#exams">
+            {t("hero.browse")} <ArrowRight size={17} />
+          </a>
         </div>
         <CaughtLeak />
       </section>
 
-      <LivePulse />
+      <section id="how" className="section how">
+        <h2 className="big">{t("how.big")}</h2>
+        <ol className="moments">
+          {([1, 2, 3] as const).map((i) => (
+            <li key={i} className={i === 3 ? "is-bell" : ""}>
+              <div className="m-time">{t(`how.m${i}.time`)}</div>
+              <div className="m-when">{t(`how.m${i}.when`)}</div>
+              <h3>{t(`how.m${i}.t`)}</h3>
+              <p>{t(`how.m${i}.d`)}</p>
+            </li>
+          ))}
+        </ol>
+        <TryFingerprint />
+      </section>
 
-      <section className="proof bleed" data-tour="proof">
-        <div>
-          <b>41</b>
-          <span>{t("proof.leaks")}</span>
-        </div>
-        <div>
-          <b>15</b>
-          <span>{t("proof.states")}</span>
-        </div>
-        <div>
-          <b>1.4 cr</b>
-          <span>{t("proof.applicants")}</span>
-        </div>
-        <p className="proof-src">
+      <section className="section numbers" data-tour="proof">
+        <p className="big-line">
+          <span>{t("stat.a")}</span>
+          {t("stat.b")}
+        </p>
+        <p className="numbers-src">
           {t("proof.src")} ·{" "}
           <a href={`${REPO}/blob/main/docs/leaks.md`} target="_blank" rel="noopener">
             {t("proof.cases")}
@@ -125,30 +132,9 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         </p>
       </section>
 
-      <section id="how" className="section">
-        <h2>{t("how.title")}</h2>
-        <div className="steps3">
-          {(
-            [
-              ["how.1.t", "how.1.d", "मोहर"],
-              ["how.2.t", "how.2.d", "गवाही"],
-              ["how.3.t", "how.3.d", "निर्णय"],
-            ] as const
-          ).map(([title, body, hi]) => (
-            <article className="step" key={title}>
-              <h3>
-                {t(title)} <span className="step-hi">{hi}</span>
-              </h3>
-              <p>{t(body)}</p>
-            </article>
-          ))}
-        </div>
-        <TryFingerprint />
-      </section>
-
       <section id="exams" className="section">
         <div className="section-head">
-          <h2>{t("exams.title")}</h2>
+          <h2 className="big">{t("exams.title")}</h2>
           <label className="search">
             <Search size={16} />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("exams.search")} aria-label={t("exams.search")} />
@@ -230,8 +216,8 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         </div>
       </section>
 
-      <section className="section trust band bleed" data-tour="trust">
-        <h2>{t("trust.title")}</h2>
+      <section className="section trust" data-tour="trust">
+        <h2 className="big">{t("trust.title")}</h2>
         <ul className="trust-list">
           <li>{t("trust.1")}</li>
           <li>{t("trust.2")}</li>
@@ -271,7 +257,15 @@ function ExamState({ upcoming, open, outcome, opensAtMs, now }: { upcoming: bool
   if (upcoming) return <Tag tone="info">{t("exams.opensIn", { t: fmtDuration(opensAtMs - now) })}</Tag>
   if (open || outcome === "unknown") return <Tag>{t("exams.heldAgo", { t: fmtDuration(now - opensAtMs) })}</Tag>
   if (!outcome) return <Tag>…</Tag>
-  if (outcome.kind === "leak") return <Tag tone="danger">{outcome.n === 1 ? t("exams.outcome.leak1") : t("exams.outcome.leaks", { n: outcome.n })}</Tag>
+  if (outcome.kind === "leak")
+    return (
+      <span className="leak-out">
+        <span aria-hidden="true">
+          <LacSeal size={30} className="lac-mini" label="" />
+        </span>
+        <Tag tone="danger">{outcome.n === 1 ? t("exams.outcome.leak1") : t("exams.outcome.leaks", { n: outcome.n })}</Tag>
+      </span>
+    )
   if (outcome.kind === "clean") return <Tag tone="good">{t("exams.outcome.clean")}</Tag>
   return <Tag tone="warn">{t("exams.outcome.waiting")}</Tag>
 }
@@ -284,7 +278,7 @@ function TryFingerprint() {
   const read = normalise(text)
   const fp = read ? questionHash(text) : undefined
   return (
-    <div className="card try">
+    <div className="try">
       <h3>{t("try.title")}</h3>
       <label className="try-label" htmlFor="try-q">
         {t("try.label")}
@@ -302,67 +296,81 @@ function TryFingerprint() {
 
 const DEMO_ISSUER = Object.keys(ISSUERS)[0] as Address
 
-// The hero shows the product doing its job: the demo exam's caught leak, read live from the chain.
+// The hero's picture is the product doing its job: the demo exam's caught leak, read live from the chain and drawn
+// the way the exam page shows it.
 function CaughtLeak() {
   const { t } = useT()
   const x = useExam(DEMO_EXAM, DEMO_ISSUER, [])
   const top = [...x.verdicts.values()].filter((v) => v.before && v.matches.length > 0).sort((a, b) => b.matches.length - a.matches.length)[0]
+  const early = [...x.verdicts.values()].filter((v) => v.before && v.matches.length > 0).length
+  const paper = x.paper.slice(0, 5)
+  const sealMs = x.exam?.sets.length ? Math.min(...x.exam.sets.map((s) => x.times.get(s.createdAt) ?? Infinity)) : undefined
+  const ready = !!(top && x.exam && paper.length && sealMs !== undefined && Number.isFinite(sealMs))
+  if (!ready) return <LeakCard {...loadingCard(t, examHref(DEMO_EXAM))} />
+  // seal, leak and bell can be seconds apart; give each its own room on the line, in order
+  const sealPct = 6
+  const bellPct = 84
+  const leakPct = Math.min(bellPct - 14, Math.max(sealPct + 18, sealPct + ((top.witnessedAtMs - sealMs!) / (top.deadlineMs - sealMs!)) * (bellPct - sealPct)))
   return (
-    <a className="hero-card" href={top ? `${examHref(DEMO_EXAM)}&w=${top.witness.key}` : examHref(DEMO_EXAM)}>
-      <div className="hero-card-head">
-        <Emblem size={56} />
-        <span className="hero-card-exam">{x.exam?.title ?? DEMO_TITLE}</span>
-      </div>
-      <div className={`hero-card-stamp ${top ? "landed" : ""}`} aria-hidden={!top}>
-        LEAK
-      </div>
-      <p className="hero-card-big">{top ? t("hero.card.caught").replace("{n}", String(top.matches.length)) : t("hero.card.loading")}</p>
-      <p className="hero-card-when">{top ? t("hero.card.when").replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs)) : "\u00a0"}</p>
-      <span className="hero-card-cta">
-        {t("hero.card.cta")} <ArrowRight size={16} />
-      </span>
-    </a>
+    <LeakCard
+      href={`${examHref(DEMO_EXAM)}&w=${top.witness.key}`}
+      title={x.exam!.title}
+      started={t("hero.app.started", { t: fmtWhen(x.exam!.opensAtMs) })}
+      verdict={t("hero.app.caught")}
+      sub={t("hero.app.sub", { n: top.matches.length, t: fmtDuration(top.deadlineMs - top.witnessedAtMs) })}
+      caught
+      questions={paper.map((q) => ({ code: `${q.set}-Q${q.index}`, text: q.text, hit: top.matches.some((m) => m.set === q.set && m.index === q.index) }))}
+      hitLabel={t("hero.app.heldEarly")}
+      stats={[
+        { label: t("exam.stat.witnesses"), value: String(x.witnesses.length) },
+        { label: t("hero.app.early"), value: String(early), tone: "red" },
+        { label: t("exam.stat.integrity"), value: `${x.paper.filter((q) => q.sealed).length}/${x.paper.length}`, tone: "ok" },
+        { label: t("exam.stat.forged"), value: String(x.exam!.forged.length) },
+      ]}
+      line={{
+        sealPct,
+        leakPct,
+        bellPct,
+        labels: [t("hero.app.sealed", { t: fmtClock(sealMs!) }), t("hero.app.leak", { t: fmtClock(top.witnessedAtMs) }), t("hero.app.bell", { t: fmtClock(top.deadlineMs) })],
+      }}
+      sealLabel={t("hero.app.sealLabel")}
+    />
   )
 }
 
-// A strip that shows the record is alive: the chain's block ticking, and how many leaks have really been witnessed.
+// One line that shows the record is alive: the chain's block ticking, and how many witnesses have really been sealed.
 // Every number comes from the chain; between polls the block advances at the chain's own block time.
-function LivePulse() {
+function HeroLive() {
   const { t } = useT()
   const { clock, online } = useChain()
   const now = useNow(1000)
-  const [stats, setStats] = useState<{ count: number; capped: boolean; latestMs?: number }>()
+  const [count, setCount] = useState<string>()
   useEffect(() => {
     let live = true
     witnessStats(reader)
-      .then(async (s) => {
-        const latestMs = s.latest !== undefined ? await blockTimeMs(reader, s.latest).catch(() => undefined) : undefined
-        if (live) setStats({ count: s.count, capped: s.capped, latestMs })
-      })
+      .then((s) => live && setCount(`${s.count}${s.capped ? "+" : ""}`))
       .catch(() => undefined)
     return () => {
       live = false
     }
   }, [])
-  if (!clock || online === false) return null
-  const block = clock.block + BigInt(Math.max(0, Math.floor((now - clock.at) / (clock.secs * 1000))))
+  const block = clock ? clock.block + BigInt(Math.max(0, Math.floor((now - clock.at) / (clock.secs * 1000)))) : undefined
   return (
-    <section className="pulse bleed" aria-label={t("pulse.label")}>
-      <span className="pulse-dot" aria-hidden="true" />
-      <span className="pulse-live">{t("pulse.live")}</span>
-      <span className="pulse-block">
-        {t("pulse.block")} <b>#{block.toString()}</b>
-      </span>
-      {stats && (
-        <span className="pulse-stat">
-          <b>
-            {stats.count}
-            {stats.capped ? "+" : ""}
-          </b>{" "}
-          {t("pulse.witnessed")}
-          {stats.latestMs !== undefined && <span className="muted"> · {t("pulse.latest").replace("{ago}", fmtDuration(Math.max(0, now - stats.latestMs)))}</span>}
+    <p className="hero-live" aria-label={t("pulse.label")}>
+      <i className={online === false ? "down" : ""} aria-hidden="true" />
+      {t("pulse.live")}
+      {block !== undefined && (
+        <>
+          {" · "}
+          {t("pulse.block")} <b>#{block.toString()}</b>
+        </>
+      )}
+      {count && (
+        <span className="hero-live-count">
+          <span className="sep">{" · "}</span>
+          <b>{count}</b> {t("pulse.witnessed")}
         </span>
       )}
-    </section>
+    </p>
   )
 }
