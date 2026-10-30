@@ -60,6 +60,32 @@ export function Mono({ value, kind, head, tail }: { value: string; kind?: "addre
   )
 }
 
+// a real button that opens a file picker, so it can be reached and pressed from the keyboard
+export function FileButton({ className, accept, capture, disabled, onFile, children }: { className: string; accept: string; capture?: "environment"; disabled?: boolean; onFile: (f: File) => void; children: ReactNode }) {
+  const input = useRef<HTMLInputElement>(null)
+  return (
+    <>
+      <button type="button" className={className} disabled={disabled} onClick={() => input.current?.click()}>
+        {children}
+      </button>
+      <input
+        ref={input}
+        type="file"
+        accept={accept}
+        capture={capture}
+        hidden
+        tabIndex={-1}
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          // so picking the same file again still fires
+          e.target.value = ""
+          if (f) onFile(f)
+        }}
+      />
+    </>
+  )
+}
+
 export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
   return (
     <div className="stat">

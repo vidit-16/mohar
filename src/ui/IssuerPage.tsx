@@ -9,7 +9,7 @@ import { parsePaperCsv } from "../lib/csv"
 import { connectInjected, hasInjectedWallet } from "../lib/injected"
 import { DAY_MS, ISSUERS, revealExam, type SealSecrets, sealExam } from "../lib/mohar"
 import { errText, fmtDateTime, fmtDuration } from "./format"
-import { Badge, Mono, Spinner } from "./primitives"
+import { Badge, FileButton, Mono, Spinner } from "./primitives"
 import { useToast } from "./toast"
 
 type Saved = SealSecrets & { opensAtMs: number; issuer: string; title: string }
@@ -255,10 +255,9 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
       {tab === "reveal" && (
         <section className="card stack">
           <p className="muted">{t("iss.revealLead")}</p>
-          <label className="btn btn-secondary file-btn">
+          <FileButton className="btn btn-secondary file-btn" accept="application/json,.json" onFile={loadSalts}>
             <FileUp size={16} /> {t("iss.loadSalts")}
-            <input type="file" accept="application/json,.json" hidden onChange={(e) => e.target.files?.[0] && loadSalts(e.target.files[0])} />
-          </label>
+          </FileButton>
           {loaded && (
             <>
               <dl className="kv">
