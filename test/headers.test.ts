@@ -21,9 +21,10 @@ describe("security headers", () => {
       for (const h of hashes) expect(csp, `${file} ${h}`).toContain(h)
     })
 
-  it("never allows unsafe-inline or eval for scripts", () => {
+  it("never allows unsafe-inline or eval for scripts; only WebAssembly may compile, for the on-device OCR", () => {
     const scriptSrc = csp.split(";").find((d) => d.trim().startsWith("script-src"))!
-    expect(scriptSrc).not.toMatch(/unsafe-inline|unsafe-eval/)
+    expect(scriptSrc).not.toMatch(/unsafe-inline|'unsafe-eval'/)
+    expect(scriptSrc.replace("'wasm-unsafe-eval'", "")).not.toMatch(/unsafe/)
   })
 
   it("can't be framed", () => expect(csp).toContain("frame-ancestors 'none'"))

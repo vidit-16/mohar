@@ -32,3 +32,6 @@ reports/
 .stryker-tmp/
 test-results/
 playwright-report/
+
+# copied from node_modules by scripts/ocr-assets.mjs
+public/ocr/

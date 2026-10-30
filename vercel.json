@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'sha256-Jgv4w5Ap/VtuSYgnHqYrOU7oNk+lrRbIKuNog0g53qU=' 'sha256-1vUFsDIuZfPNDklZcmRfh0fn2EMYVlIHtn0yPz3tyaA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https: wss://rpc.tiramisu.db-chain.testnet.arkiv.network; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-Jgv4w5Ap/VtuSYgnHqYrOU7oNk+lrRbIKuNog0g53qU=' 'sha256-1vUFsDIuZfPNDklZcmRfh0fn2EMYVlIHtn0yPz3tyaA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https: wss://rpc.tiramisu.db-chain.testnet.arkiv.network; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         },
         {
           "key": "X-Content-Type-Options",

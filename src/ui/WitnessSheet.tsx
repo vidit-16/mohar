@@ -1,4 +1,4 @@
-import { ChevronDown, EyeOff, Fingerprint, Lock, RefreshCw, Share2 } from "lucide-react"
+import { Camera, ChevronDown, EyeOff, Fingerprint, Lock, RefreshCw, Share2 } from "lucide-react"
 import { useState } from "react"
 import { formatEther, type Hex } from "viem"
 import { useBurnerBalance } from "../hooks/useBurnerBalance"
@@ -7,9 +7,10 @@ import { useT } from "../i18n"
 import { burner, type BurnerKind, retireWitnessWallet } from "../lib/burner"
 import { normalise, questionHash, splitQuestions } from "../lib/hash"
 import { witnessPaper } from "../lib/mohar"
+import { readPhoto } from "../lib/ocr"
 import { Emblem } from "./brand"
 import { errText, FAUCET, fmtDateTime } from "./format"
-import { CopyButton, Mono, Sheet, Spinner } from "./primitives"
+import { CopyButton, FileButton, Mono, Sheet, Spinner } from "./primitives"
 import { useToast } from "./toast"
 
 type Props = { open: boolean; onClose: () => void; examId: string; examTitle: string; deadlineMs: number; onSealed: () => void; prefill?: string }
@@ -62,6 +63,19 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
   const funded = wei !== undefined && wei > 0n
   // a keyboard popping up over the sheet on a phone is worse than one more tap
   const [desktop] = useState(() => typeof window !== "undefined" && window.matchMedia?.("(pointer: fine)").matches)
+  // a photo of the leaked paper, read into the box on this phone; the person checks it before sealing
+  const [ocr, setOcr] = useState<{ pct: number } | { error: true }>()
+  const scan = async (file: File) => {
+    setOcr({ pct: 0 })
+    try {
+      const read = await readPhoto(file, (pct) => setOcr({ pct }))
+      if (!read.trim()) throw new Error("empty")
+      setText((cur) => (cur.trim() ? `${cur.trim()}\n${read}` : read))
+      setOcr(undefined)
+    } catch {
+      setOcr({ error: true })
+    }
+  }
 
   const seal = async () => {
     setBusy(true)
@@ -141,6 +155,13 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
             <span className="field-hint">{t("w.hint")}</span>
             <textarea rows={7} value={text} autoFocus={desktop && !prefill} onChange={(e) => setText(e.target.value)} placeholder={"Q3. Which river is known as the Dakshin Ganga?\nQ7. …"} />
           </label>
+
+          <div className="witness-scan">
+            <FileButton className="btn btn-secondary btn-sm" accept="image/*" capture="environment" disabled={!!ocr && "pct" in ocr} onFile={(f) => void scan(f)}>
+              <Camera size={16} /> {ocr && "pct" in ocr ? t("w.scanning", { n: ocr.pct }) : t("w.scan")}
+            </FileButton>
+            <span className="muted small">{ocr && "error" in ocr ? t("w.scanFailed") : t("w.scanNote")}</span>
+          </div>
 
           <div className="witness-meta">
             <span className="muted small" aria-live="polite">

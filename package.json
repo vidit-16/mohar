@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/ocr-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/ocr-assets.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
@@ -29,11 +31,14 @@
   },
   "dependencies": {
     "@arkiv-network/sdk": "0.8.1",
+    "@tesseract.js-data/eng": "1.0.0",
+    "@tesseract.js-data/hin": "1.0.0",
     "@vercel/og": "0.8.5",
     "lucide-react": "^1.59.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tesseract.js": "7.0.0",
     "viem": "^2.57.7"
   },
   "devDependencies": {

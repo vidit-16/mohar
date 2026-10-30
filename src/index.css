@@ -707,3 +707,4 @@ html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
 @keyframes meaning-stamp { from { opacity: 0; transform: rotate(-8deg) scale(2.6); } 60% { opacity: 1; transform: rotate(-8deg) scale(0.92); } to { transform: rotate(-8deg) scale(1); } }
 @media (max-width: 640px) { .meaning { position: relative; } .meaning-stamp { position: absolute; top: 12px; right: 14px; font-size: 1.05rem; } }
 .paper > * { content-visibility: auto; contain-intrinsic-size: auto 64px; }
+.witness-scan { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; }

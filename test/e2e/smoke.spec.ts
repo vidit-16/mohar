@@ -11,8 +11,9 @@ test.beforeEach(async ({ page }) => {
   const list: string[] = []
   errors.set(page, list)
   page.on("pageerror", (e) => list.push(e.message))
-  // a rate-limited socket handshake is the network pushing back on parallel test workers, not an app error
-  page.on("console", (m) => m.type() === "error" && !/WebSocket connection to .* 429/.test(m.text()) && list.push(m.text()))
+  // a rate-limited socket handshake is the network pushing back on parallel test workers, and the OCR engine
+  // prints tuning notices for its Hindi model; neither is an app error
+  page.on("console", (m) => m.type() === "error" && !/WebSocket connection to .* 429|^Warning: Parameter not found/.test(m.text()) && list.push(m.text()))
   // start every test from defaults once, without undoing choices a test makes before a reload
   await page.addInitScript(() => {
     if (sessionStorage.getItem("e2e.fresh")) return
@@ -93,6 +94,29 @@ test("witness sheet hashes on the device before anything is sent", async ({ page
   await expect(page.locator(".wallet-card")).toBeVisible()
 })
 
+test("a photo of the paper is read on the device into the witness box", async ({ page }) => {
+  await page.goto(UPCOMING)
+  await page.getByRole("button", { name: "Witness a leak" }).click()
+  const png = await page.evaluate(async () => {
+    const c = document.createElement("canvas")
+    c.width = 1400
+    c.height = 300
+    const g = c.getContext("2d")!
+    g.fillStyle = "#fff"
+    g.fillRect(0, 0, c.width, c.height)
+    g.fillStyle = "#111"
+    g.font = "36px Arial"
+    g.fillText("Q1. Which river is known as the Dakshin Ganga?", 50, 100)
+    g.fillText("प्रश्न 2. भारत की राजधानी क्या है?", 50, 210)
+    return c.toDataURL("image/png").split(",")[1]
+  })
+  await page.locator('input[type="file"][accept="image/*"]').setInputFiles({ name: "leak.png", mimeType: "image/png", buffer: Buffer.from(png, "base64") })
+  const box = page.getByRole("dialog").locator("textarea")
+  await expect(box).toHaveValue(/Dakshin Ganga/, { timeout: 60_000 })
+  await expect(box).toHaveValue(/राजधानी/)
+  await expect(page.getByText("2 questions found")).toBeVisible()
+})
+
 test("open exam checks witnesses against a pasted official paper", async ({ page }) => {
   await page.goto(OPEN)
   await page.locator("[data-tour=check] textarea").fill("Q1) Which planet is known as the RED planet\nQ2. Who is known as the Missile Man of India?")
@@ -145,7 +169,7 @@ test("issuer console validates the paper and won't reveal early", async ({ page 
 
   await page.getByRole("tab", { name: /Reveal/ }).click()
   const salts = JSON.stringify({ examId: "E2E-PAPER", title: "E2E Paper", opensAtMs: Date.parse("2030-01-01T10:00:00+05:30"), issuer: "0x0000000000000000000000000000000000000001", sets: [{ code: "A", salts: ["0x" + "11".repeat(32)], questions: ["One?"] }] })
-  await page.locator('.file-btn input[type="file"]').setInputFiles({ name: "salts.json", mimeType: "application/json", buffer: Buffer.from(salts) })
+  await page.locator('input[type="file"][accept*="json"]').setInputFiles({ name: "salts.json", mimeType: "application/json", buffer: Buffer.from(salts) })
   await expect(page.getByText(/Revealing early would let anyone/)).toBeVisible()
   await expect(page.getByRole("button", { name: "Reveal paper" })).toBeDisabled()
 })
