@@ -62,7 +62,7 @@ export function Emblem({ size = 200, className, animate }: { size?: number; clas
 
 export function Mark({ size = 32, className }: { size?: number; className?: string }) {
   return (
-    <svg viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden>
+    <svg viewBox="-1 -1 66 66" width={size} height={size} className={className} aria-hidden>
       <path d={scallopPath(32, 32, 29, 16)} fill="var(--seal)" />
       <circle cx="32" cy="32" r="20" fill="none" stroke="var(--seal-ink)" strokeOpacity="0.35" strokeWidth="1" />
       <g transform="translate(32 32)">

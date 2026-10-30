@@ -11,7 +11,7 @@ const SEAL = "#a8291c", LO = "#6e170e", INK = "#fbe9df"
 const print = (size: number, w: number, paths = CLOCK) =>
   `<g transform="scale(${size / 64})" fill="none" stroke="${INK}" stroke-width="${w / (size / 64)}" stroke-linecap="round">${paths.map((d) => `<path d="${d}"/>`).join("")}</g>`
 
-const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="${scallopPath(32, 32, 30, 14)}" fill="${SEAL}"/><g transform="translate(32 32)">${print(42, 4.6, CLOCK_SMALL)}</g></svg>`
+const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 70 70"><path d="${scallopPath(32, 32, 30, 14)}" fill="${SEAL}"/><g transform="translate(32 32)">${print(42, 4.6, CLOCK_SMALL)}</g></svg>`
 writeFileSync("public/favicon.svg", favicon)
 
 const emblem = (x: number, y: number, s: number) => `<g transform="translate(${x} ${y}) scale(${s})">
