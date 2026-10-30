@@ -666,3 +666,33 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .trust-list li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 @media (max-width: 760px) { .trust-list { grid-template-columns: 1fr; } .hero-card { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .hero-card { transition: none; } }
+
+/* witness sheet: one screen, then a receipt slip worth a screenshot */
+.witness-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.witness-private { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--good); font-weight: 600; }
+.witness-details summary { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; list-style: none; }
+.witness-details summary::-webkit-details-marker { display: none; }
+.witness-details[open] summary svg { transform: rotate(180deg); }
+.wallet-ok { font-weight: 600; font-size: 0.92rem; }
+.receipt-card { width: 100%; display: grid; justify-items: center; gap: 6px; padding: 22px 20px 18px; border-radius: 18px; background: var(--surface-2); text-align: center; }
+.receipt-card h3 { margin: 4px 0 0; font: 600 1.35rem/1.2 var(--display); }
+html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
+.receipt-sealed { margin: 6px 0 0; font-weight: 700; font-size: 0.8rem; color: var(--seal); text-transform: none; letter-spacing: 0.02em; }
+.receipt-time { margin: 0; font: 600 1.05rem var(--font); font-variant-numeric: tabular-nums; }
+.receipt-kv { width: 100%; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 10px 0 0; text-align: left; font-size: 0.86rem; }
+.receipt-kv dt { color: var(--text-3); }
+.receipt-kv dd { margin: 0; min-width: 0; font-variant-numeric: tabular-nums; }
+.receipt-foot { margin: 8px 0 0; font-size: 0.78rem; color: var(--text-3); }
+.receipt-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+.stamp-slam { animation: stamp-slam 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
+@keyframes stamp-slam { 0% { opacity: 0; transform: scale(2.6) rotate(-14deg); } 55% { opacity: 1; transform: scale(0.94) rotate(-4deg); } 100% { transform: scale(1) rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) { .stamp-slam { animation: none; transform: rotate(-6deg); } }
+
+/* live strip under the hero: proof the record is running right now */
+.pulse { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; padding-block: 12px; font-size: 0.9rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pulse b { color: var(--text); font-weight: 600; }
+.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); animation: pulse-beat 2s ease-in-out infinite; }
+.pulse-live { font-weight: 600; color: var(--good); }
+@keyframes pulse-beat { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .pulse-dot { animation: none; } }
+.footer-copy { color: var(--text-3); font-size: 0.85rem; }

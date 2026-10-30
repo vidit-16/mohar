@@ -35,7 +35,7 @@ export function useChain() {
     (block: bigint) => (clock ? Number(block - clock.block) * clock.secs * 1000 - (Date.now() - clock.at) : NaN),
     [clock],
   )
-  return { block: clock?.block, online, msUntilBlock }
+  return { block: clock?.block, online, msUntilBlock, clock }
 }
 
 export function useNow(ms = 1000) {

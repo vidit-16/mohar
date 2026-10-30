@@ -32,7 +32,8 @@ describe("/api/status", () => {
   })
 })
 
-describe("drip limits", () => {
+// each case re-imports the drip module (its limits are read at load), which can take a few seconds on a busy machine
+describe("drip limits", { timeout: 30_000 }, () => {
   it("defaults to 5 per IP and 120 per hour", async () => {
     const { LIMITS } = await import("../api/drip")
     expect(LIMITS).toEqual({ perIpPerHour: 5, maxPerHour: 120 })

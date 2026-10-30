@@ -1,11 +1,11 @@
 import { ArrowRight, BadgeCheck, ChevronRight, Clock, Globe, Play, Plus, Search, Stamp, Unlock, Users } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import type { Address } from "viem"
-import { reader, useNow } from "../hooks/useChain"
+import { reader, useChain, useNow } from "../hooks/useChain"
 import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { examHref, navigate } from "../router"
-import { DAY_MS, type Exam, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince } from "../lib/mohar"
+import { blockTimeMs, DAY_MS, type Exam, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, witnessStats } from "../lib/mohar"
 import { AddExamSheet } from "./AddExamSheet"
 import { Emblem } from "./brand"
 import { errText, fmtDateTime, fmtDuration, fmtRelative, REPO } from "./format"
@@ -65,6 +65,8 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         </div>
         <CaughtLeak />
       </section>
+
+      <LivePulse />
 
       <section className="proof bleed" data-tour="proof">
         <div>
@@ -253,5 +255,47 @@ function CaughtLeak() {
         {t("hero.card.cta")} <ArrowRight size={16} />
       </span>
     </a>
+  )
+}
+
+// A strip that shows the record is alive: the chain's block ticking, and how many leaks have really been witnessed.
+// Every number comes from the chain; between polls the block advances at the chain's own block time.
+function LivePulse() {
+  const { t } = useT()
+  const { clock, online } = useChain()
+  const now = useNow(1000)
+  const [stats, setStats] = useState<{ count: number; capped: boolean; latestMs?: number }>()
+  useEffect(() => {
+    let live = true
+    witnessStats(reader)
+      .then(async (s) => {
+        const latestMs = s.latest !== undefined ? await blockTimeMs(reader, s.latest).catch(() => undefined) : undefined
+        if (live) setStats({ count: s.count, capped: s.capped, latestMs })
+      })
+      .catch(() => undefined)
+    return () => {
+      live = false
+    }
+  }, [])
+  if (!clock || online === false) return null
+  const block = clock.block + BigInt(Math.max(0, Math.floor((now - clock.at) / (clock.secs * 1000))))
+  return (
+    <section className="pulse bleed" aria-label={t("pulse.label")}>
+      <span className="pulse-dot" aria-hidden="true" />
+      <span className="pulse-live">{t("pulse.live")}</span>
+      <span className="pulse-block">
+        {t("pulse.block")} <b>#{block.toString()}</b>
+      </span>
+      {stats && (
+        <span className="pulse-stat">
+          <b>
+            {stats.count}
+            {stats.capped ? "+" : ""}
+          </b>{" "}
+          {t("pulse.witnessed")}
+          {stats.latestMs !== undefined && <span className="muted"> · {t("pulse.latest").replace("{ago}", fmtDuration(Math.max(0, now - stats.latestMs)))}</span>}
+        </span>
+      )}
+    </section>
   )
 }

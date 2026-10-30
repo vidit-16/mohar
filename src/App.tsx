@@ -127,6 +127,7 @@ function Footer() {
         <span className="grow" />
         <a href={REPO}>{t("footer.source")}</a>
         <a href={`${REPO}/blob/main/arkiv/schema.md`}>{t("footer.data")}</a>
+        <span className="footer-copy">© 2026 Vidit Choudhary · MIT</span>
       </div>
     </footer>
   )

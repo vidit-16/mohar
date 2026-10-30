@@ -252,6 +252,26 @@ export async function witnessesFor(client: PublicArkivClient, examId: string, cu
   }
 }
 
+// How many leaks have been witnessed on Mohar, and the block of the newest one, for the live strip on the home page.
+// Counts real witness records only; stops after a few pages so a busy day never costs more than five queries.
+export async function witnessStats(client: PublicArkivClient): Promise<{ count: number; capped: boolean; latest?: bigint }> {
+  let count = 0
+  let latest: bigint | undefined
+  let cursor: string | undefined
+  for (let page = 0; page < 5; page++) {
+    let q = client.select(FIELDS).where(and(base("witness"))).limit(200)
+    if (cursor) q = q.cursor(cursor)
+    const res = await q.fetch()
+    for (const e of res.entities) {
+      count++
+      const at = (e as unknown as Entity).createdAt
+      if (at !== undefined && (latest === undefined || at > latest)) latest = at
+    }
+    cursor = res.hasNextPage() ? res.cursor : undefined
+    if (!cursor) return { count, capped: false, latest }
+  }
+  return { count, capped: true, latest }
+}
 
 const blockTimes = new Map<bigint, number>()
 export async function blockTimeMs(client: PublicArkivClient, block: bigint): Promise<number> {
