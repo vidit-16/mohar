@@ -33,7 +33,7 @@
   --font: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --display: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --deva: "Noto Sans Devanagari", "Nirmala UI", "Mangal", var(--font);
-  --mono: "Geist Mono", ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
@@ -767,7 +767,7 @@ html[lang="hi"] h2.big { font-family: var(--deva); line-height: 1.2; letter-spac
 
 /* the numbers, said once */
 .numbers { text-align: center; }
-.big-line { font: 600 clamp(2.4rem, 5.6vw, 5.6rem)/1 var(--display); letter-spacing: -0.055em; max-width: 15ch; margin: 0 auto; }
+.big-line { font: 600 clamp(2.2rem, 4.8vw, 4.8rem)/1.02 var(--display); letter-spacing: -0.05em; max-width: 24ch; margin: 0 auto; text-wrap: balance; }
 html[lang="hi"] .big-line { font-family: var(--deva); line-height: 1.2; letter-spacing: -0.01em; }
 .big-line span { color: var(--seal); }
 .numbers-src { margin-top: 22px; color: var(--text-3); font-size: 0.9rem; }
@@ -813,3 +813,5 @@ html[lang="hi"] .big-line { font-family: var(--deva); line-height: 1.2; letter-s
 @media print { .verdict-seal { animation: none; } }
 .footer { margin-top: clamp(96px, 12vw, 180px); border-top: 0; overflow: clip; }
 .footer-name { font: 600 clamp(7rem, 24vw, 22rem)/0.85 "Mohar Deva", var(--deva); color: var(--seal); letter-spacing: -0.02em; margin-bottom: clamp(18px, 3vw, 36px); user-select: none; }
+.list-card { box-shadow: none; }
+.seg button.on { box-shadow: none; }

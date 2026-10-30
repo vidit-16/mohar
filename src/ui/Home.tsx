@@ -278,7 +278,7 @@ function TryFingerprint() {
   const read = normalise(text)
   const fp = read ? questionHash(text) : undefined
   return (
-    <div className="try">
+    <div className="try" data-ui="">
       <h3>{t("try.title")}</h3>
       <label className="try-label" htmlFor="try-q">
         {t("try.label")}

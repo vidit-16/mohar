@@ -18,7 +18,7 @@ export type LeakCardProps = {
 
 export function LeakCard(p: LeakCardProps) {
   return (
-    <a className={`leak-card ${p.caught ? "is-caught" : ""}`} href={p.href}>
+    <a className={`leak-card ${p.caught ? "is-caught" : ""}`} href={p.href} data-ui="">
       {p.caught && <LacSeal size={190} className="leak-card-seal" label={p.sealLabel} />}
       <div className="leak-card-top">
         <b>{p.title}</b>
