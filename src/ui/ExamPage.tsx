@@ -38,7 +38,8 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
 
   const exam = x.exam
   const sealed = exam?.kind === "sealed"
-  const opened = exam ? now >= exam.opensAtMs : false
+  // a paper made public before its start time has opened the exam: the deadline moved up to that moment
+  const opened = exam ? now >= exam.opensAtMs || x.hasPaper : false
   const startMs = exam?.sets.length ? Math.min(...exam.sets.map((s) => x.times.get(s.createdAt) ?? Infinity)) : undefined
 
   const rows = useMemo(() => {
