@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useState } from "react"
+import { keep, kept } from "../lib/keep"
 import { publicClient } from "../lib/mohar"
 
 export const reader = publicClient()
 
 type Clock = { block: bigint; at: number; secs: number }
 
+// the block this browser last saw, carried forward at the chain's block time, so the number is there at first paint
+// instead of popping in when the first answer arrives; the real block replaces it within a moment
+function remembered(): Clock | undefined {
+  const c = kept<Clock>("clock")
+  if (!c || Date.now() - c.at > 86_400_000) return undefined
+  return { block: c.block + BigInt(Math.max(0, Math.floor((Date.now() - c.at) / (c.secs * 1000)))), at: Date.now(), secs: c.secs }
+}
+
 export function useChain() {
-  const [clock, setClock] = useState<Clock>()
+  const [clock, setClock] = useState<Clock | undefined>(remembered)
   const [online, setOnline] = useState<boolean>()
   useEffect(() => {
     let stop = false
@@ -20,7 +29,9 @@ export function useChain() {
         .getBlockNumber()
         .then((block) => {
           if (stop) return
-          setClock({ block, at: Date.now(), secs })
+          const c = { block, at: Date.now(), secs }
+          setClock(c)
+          keep("clock", c)
           setOnline(true)
         })
         .catch(() => !stop && setOnline(false))

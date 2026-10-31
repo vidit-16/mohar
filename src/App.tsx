@@ -1,4 +1,4 @@
-import { Globe, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import { lazy, Suspense } from "react"
 import { useChain } from "./hooks/useChain"
 import { useIssuer } from "./hooks/useIssuer"
@@ -64,7 +64,7 @@ function Shell() {
         ) : trust.status === "loading" ? (
           <Empty icon={<Spinner size={22} />} title={t("domain.loading").replace("{domain}", trust.domain)} />
         ) : trust.status === "failed" ? (
-          <Empty icon={<Globe size={22} />} title={t("domain.failed").replace("{domain}", trust.domain)}>
+          <Empty title={t("domain.failed").replace("{domain}", trust.domain)}>
             <p className="muted small">{trust.error}</p>
             <p className="muted small">{t("domain.failedHint")}</p>
           </Empty>
@@ -130,7 +130,7 @@ function Footer() {
         <span className="grow" />
         <a href={REPO}>{t("footer.source")}</a>
         <a href={`${REPO}/blob/main/arkiv/schema.md`}>{t("footer.data")}</a>
-        <span className="footer-copy">© 2026 Vidit Choudhary · MIT</span>
+        <span className="footer-copy">© 2026 <a href="https://www.linkedin.com/in/vidit-choudhary/">Vidit Choudhary</a> · MIT</span>
       </div>
     </footer>
   )

@@ -27,6 +27,15 @@ export function Timeline({ startMs, startLabel, official = true, opensAtMs, dead
   const at = (ms: number) => `${(((ms - start + pad) / (span + 2 * pad)) * 100).toFixed(2)}%`
   const sameDay = fmtDate(start) === fmtDate(end)
   const when = (ms: number) => (sameDay ? fmtTime(ms) : fmtDate(ms))
+  // dots sit above or below the line, clear of the seal on it; each takes the side whose last dot is further away,
+  // so witnesses sealed close together never land on top of each other
+  const lastOn = { up: -Infinity, down: -Infinity }
+  const side = new Map<Hex, "up" | "down">()
+  for (const p of [...points].sort((a, b) => a.ms - b.ms)) {
+    const s = p.ms - lastOn.up >= p.ms - lastOn.down ? "up" : "down"
+    side.set(p.key, s)
+    lastOn[s] = p.ms
+  }
 
   return (
     <div className="timeline" role="group" aria-label={t("exam.timeline")} data-tour="timeline">
@@ -49,7 +58,7 @@ export function Timeline({ startMs, startLabel, official = true, opensAtMs, dead
           <button
             key={p.key}
             className={`tl-dot tone-${p.tone}`}
-            style={{ left: at(p.ms), top: `${50 + ((i % 2) * 2 - 1) * 18}%`, animationDelay: `${0.5 + i * 0.12}s` }}
+            style={{ left: at(p.ms), top: side.get(p.key) === "up" ? "calc(50% - 21px)" : "calc(50% + 21px)", animationDelay: `${0.5 + i * 0.12}s` }}
             title={`${p.label} · ${fmtTime(p.ms)}`}
             aria-label={`${p.label}, ${fmtTime(p.ms)}`}
             onClick={() => onPick?.(p.key)}

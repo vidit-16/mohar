@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, Ban, Bell, ChevronRight, CircleCheck, CircleX, ExternalLink, Fingerprint, Globe, Info, ShieldAlert, TriangleAlert, Users } from "lucide-react"
+import { ArrowLeft, ChevronRight, CircleX, Fingerprint } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import type { Address, Hex } from "viem"
 import { useChain, useNow } from "../hooks/useChain"
@@ -96,7 +96,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
   if (x.status === "error")
     return (
       <div className="card">
-        <Empty icon={<TriangleAlert size={22} />} title={t("exams.offline")}>
+        <Empty title={t("exams.offline")}>
           {x.error}{" "}
           <button className="link" onClick={x.reload}>
             {t("exams.retry")}
@@ -109,7 +109,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
       <>
         <BackLink href={homeHref} />
         <div className="card">
-          <Empty icon={<ShieldAlert size={22} />} title={t("exam.missing")}>
+          <Empty title={t("exam.missing")}>
             {t("exam.missingHint")} <code>{examId}</code>
           </Empty>
         </div>
@@ -138,17 +138,17 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         : t("mean.openAfter")
 
   const status = !sealed ? (
-    <Tag tone="info" icon={<Users size={13} />}>
+    <Tag tone="info" dot>
       {t("exam.status.open")}
     </Tag>
   ) : !opened ? (
-    <Tag tone="info" icon={<Fingerprint size={13} />}>
+    <Tag tone="info" dot>
       {t("exam.status.accepting")}
     </Tag>
   ) : x.hasPaper ? (
-    <Tag icon={<CircleCheck size={13} />}>{t("exam.status.revealed")}</Tag>
+    <Tag dot>{t("exam.status.revealed")}</Tag>
   ) : (
-    <Tag tone="warn" icon={<Bell size={13} />}>
+    <Tag tone="warn" dot>
       {t("exam.status.awaiting")}
     </Tag>
   )
@@ -185,7 +185,6 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
       </header>
 
       <section className={`meaning ${firstLeak ? "meaning-leak" : ""}`} data-tour="meaning">
-        {firstLeak ? <ShieldAlert size={20} /> : <Info size={20} />}
         <div className="grow">
           <div className="meaning-k">{firstLeak ? t("hero.app.caught") : t("exam.meaning")}</div>
           <p>{meaning}</p>
@@ -284,7 +283,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               )}
             </div>
             {rows.length === 0 ? (
-              <Empty icon={<Fingerprint size={22} />} title={t("exam.noWitnesses")}>
+              <Empty title={t("exam.noWitnesses")}>
                 {!opened && t("exam.noWitnessesHint")}
               </Empty>
             ) : (
@@ -345,14 +344,13 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             <section className="card" data-tour="seal">
               <div className="card-head">
                 <h2>{t("exam.seal")}</h2>
-                <Tag tone="good" icon={<BadgeCheck size={14} />}>
+                <Tag tone="good" dot>
                   {t("exam.verified")}
                 </Tag>
               </div>
-              <p className="muted small">{t("exam.sealNote")}</p>
-              <p className={`small trust-line trust-${source}`}>
-                {source === "domain" ? <Globe size={14} /> : source === "link" ? <TriangleAlert size={14} /> : <BadgeCheck size={14} />}{" "}
-                {source === "domain" ? t("trust.domain").replace("{domain}", domain ?? "") : source === "link" ? t("trust.link") : t("trust.registry")}
+              <p className="muted small">
+                {t("exam.sealNote")}{" "}
+                <span className={`trust-${source}`}>{source === "domain" ? t("trust.domain").replace("{domain}", domain ?? "") : source === "link" ? t("trust.link") : t("trust.registry")}</span>
               </p>
               <p className="small tech-only">
                 <Mono value={issuer} kind="address" /> {issuerName}
@@ -380,12 +378,12 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               {exam.forged.length > 0 && (
                 <details className="forged" open={forgedOpen} onToggle={(e) => setForgedOpen((e.target as HTMLDetailsElement).open)} data-tour="forged">
                   <summary>
-                    <Ban size={14} /> {t("exam.forgedTitle", { n: exam.forged.length })}
+                    {t("exam.forgedTitle", { n: exam.forged.length })}
                   </summary>
                   <p className="muted small">{t("exam.forgedNote")}</p>
                   {exam.forged.map((f) => (
                     <div key={f.key} className="small forged-row">
-                      <CircleX size={14} /> Set {String(f.attrs.set_code)} · <Mono value={f.creator} kind="address" />
+                      Set {String(f.attrs.set_code)} · <Mono value={f.creator} kind="address" />
                     </div>
                   ))}
                 </details>
@@ -409,7 +407,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                     <dt>{t("exam.notice")}</dt>
                     <dd>
                       <a href={exam.notice} target="_blank" rel="noreferrer nofollow">
-                        {new URL(exam.notice).hostname} <ExternalLink size={12} />
+                        {new URL(exam.notice).hostname} ↗
                       </a>
                     </dd>
                   </>
@@ -418,7 +416,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
               {exam.conflicts.length > 0 && (
                 <details className="conflicts">
                   <summary className="small warn-text">
-                    <TriangleAlert size={13} /> {t("exam.conflicts", { n: exam.conflicts.length })}
+                    {t("exam.conflicts", { n: exam.conflicts.length })}
                   </summary>
                   <p className="muted small">{t("exam.conflictsWhy")}</p>
                   <ul>

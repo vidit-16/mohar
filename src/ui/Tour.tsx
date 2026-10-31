@@ -3,10 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useT } from "../i18n"
 import { navigate } from "../router"
 import { LacSeal } from "./brand"
+import NARRATION from "./narration.json"
 import { STEPS, tourHref } from "./tourSteps"
-import { pickVoice } from "./speech"
 
 type Rect = { top: number; left: number; width: number; height: number }
+
+// the recorded narration (scripts/narration.ts), one clip per step and language
+const clip = (lang: "en" | "hi", step: number) => `${import.meta.env.BASE_URL}tour/${NARRATION[lang][step]}`
+// one player for the whole tour: phones only let a page play sound on an element first started by a tap
+let narrator: HTMLAudioElement | undefined
+const player = () => (narrator ??= new Audio())
 
 const pref = (k: string, fallback: boolean) => {
   try {
@@ -40,19 +46,38 @@ export function Tour({ search }: { search: string }) {
   const rec = params.get("rec") === "1"
   const [started, setStarted] = useState(!rec)
   const [playing, setPlaying] = useState(true)
-  const [voice, setVoice] = useState(() => pref("voice", false))
+  const [voice, setVoice] = useState(() => pref("voice", true))
   const [captions, setCaptions] = useState(() => pref("captions", true))
   const [tick, setTick] = useState<{ step: number; value: number }>({ step: -1, value: 0 })
   const target = useRef<Element | null>(null)
 
+
   const exit = useCallback(() => {
-    speechSynthesis.cancel()
+    narrator?.pause()
     const p = new URLSearchParams(location.search)
     p.delete("tour")
     p.delete("step")
     window.dispatchEvent(new CustomEvent("mohar:tour", { detail: { action: "close" } }))
     navigate(`?${p.toString()}`, true)
   }, [])
+
+  const toggleVoice = useCallback(() => {
+    if (!voice) player().play().catch(() => undefined)
+    setVoice(!voice)
+    savePref("voice", !voice)
+  }, [voice])
+
+  // the tap that starts the tour also starts its voice, which is what lets phones play the rest of it
+  useEffect(() => {
+    const onTap = (e: MouseEvent) => {
+      if (!pref("voice", true) || !(e.target instanceof Element) || !e.target.closest('a[href*="tour=1"]')) return
+      const a = player()
+      a.src = clip(lang, 0)
+      a.play().catch(() => undefined)
+    }
+    document.addEventListener("click", onTap, true)
+    return () => document.removeEventListener("click", onTap, true)
+  }, [lang])
 
   const go = useCallback(
     (n: number) => {
@@ -79,18 +104,22 @@ export function Tour({ search }: { search: string }) {
         if (!el) return
         if (el instanceof HTMLDetailsElement) el.open = true
         target.current = el
-        const inSheet = el.closest(".sheet-body")
-        if (inSheet) el.scrollIntoView({ behavior: "smooth", block: "nearest" })
-        else {
-          const r = el.getBoundingClientRect()
-          const top = 76
-          const room = window.innerHeight - top - (document.querySelector(".tour-bar")?.getBoundingClientRect().height ?? 150) - 40
-          const offset = r.height < room ? top + (room - r.height) / 2 : top
-          window.scrollTo({ top: Math.max(0, r.top + window.scrollY - offset), behavior: "smooth" })
-        }
+        // centre the target in the space the caption bar leaves free, in the page or in the evidence sheet
+        const bar = document.querySelector(".tour-bar")?.getBoundingClientRect().height ?? 150
+        const sheet = el.closest(".sheet-body")
+        const r = el.getBoundingClientRect()
+        const top = sheet ? sheet.getBoundingClientRect().top + 12 : 76
+        const room = window.innerHeight - top - bar - 40
+        const offset = r.height < room ? top + (room - r.height) / 2 : top
+        if (sheet) sheet.scrollTo({ top: Math.max(0, sheet.scrollTop + r.top - offset), behavior: "smooth" })
+        else window.scrollTo({ top: Math.max(0, r.top + window.scrollY - offset), behavior: "smooth" })
+        // a seal that hangs off its card's corner belongs inside the highlight too
+        const parts = [el, ...el.querySelectorAll(".meaning-seal, .leak-card-seal, .verdict-seal")]
         const track = () => {
-          const r = el.getBoundingClientRect()
-          setSpot({ step, rect: { top: r.top - 8, left: r.left - 8, width: r.width + 16, height: r.height + 16 } })
+          const rs = parts.map((p) => p.getBoundingClientRect()).filter((b) => b.width > 0)
+          const t0 = Math.min(...rs.map((b) => b.top)), l0 = Math.min(...rs.map((b) => b.left))
+          const b0 = Math.max(...rs.map((b) => b.bottom)), r0 = Math.max(...rs.map((b) => b.right))
+          setSpot({ step, rect: { top: t0 - 8, left: l0 - 8, width: r0 - l0 + 16, height: b0 - t0 + 16 } })
           raf = requestAnimationFrame(track)
         }
         track()
@@ -102,6 +131,13 @@ export function Tour({ search }: { search: string }) {
     }
   }, [active, step, s])
 
+  // the page and the evidence sheet get room at the bottom, so even their last items can rise above the caption bar
+  useEffect(() => {
+    if (!active) return
+    document.documentElement.classList.add("tour-on")
+    return () => document.documentElement.classList.remove("tour-on")
+  }, [active])
+
   // recording mode: no scrollbar, and the page knows a subtitle strip sits at the bottom
   useEffect(() => {
     if (!active || !rec) return
@@ -111,12 +147,11 @@ export function Tour({ search }: { search: string }) {
 
   // narration or a reading-time timer decides when to move on
   useEffect(() => {
-    if (!active) return
-    speechSynthesis.cancel()
-    if (!playing || !started) return
+    if (!active || !playing || !started) return
     const text = s[lang]
     // reading pace by default; recording mode leaves time to say the line out loud (~150 words a minute)
     const ms = Math.max(rec ? 5000 : 4500, text.length * (rec ? (lang === "hi" ? 95 : 80) : lang === "hi" ? 75 : 62))
+    // set when this step is left: a clip replaced by the next step's rejects late, and must not move the tour again
     let done = false
     const finish = () => {
       if (done) return
@@ -124,22 +159,30 @@ export function Tour({ search }: { search: string }) {
       if (!s.end) setTimeout(() => go(step + 1), 700)
     }
     const startedAt = Date.now()
-    const tick = setInterval(() => setTick({ step, value: Math.min(1, (Date.now() - startedAt) / ms) }), 100)
     let timer: ReturnType<typeof setTimeout> | undefined
-    if (voice && "speechSynthesis" in window) {
-      const u = new SpeechSynthesisUtterance(text)
-      const v = pickVoice(lang)
-      if (v) u.voice = v
-      u.lang = lang === "hi" ? "hi-IN" : "en-IN"
-      u.rate = 0.98
-      u.onend = finish
-      u.onerror = () => (timer = setTimeout(finish, ms))
-      speechSynthesis.speak(u)
+    const a = voice ? player() : null
+    // the tap that opened the tour may already be playing this clip
+    if (a && !a.src.endsWith(NARRATION[lang][step])) a.src = clip(lang, step)
+    // with narration the bar follows the clip; without, the reading time
+    const tick = setInterval(() => setTick({ step, value: a?.duration ? a.currentTime / a.duration : Math.min(1, (Date.now() - startedAt) / ms) }), 100)
+    if (a) {
+      const fallback = () => {
+        if (!done) timer = setTimeout(finish, ms)
+      }
+      a.onended = finish
+      a.onerror = fallback
+      a.play().catch(fallback)
+      // the next clip is fetched while this one plays, so the next step speaks at once
+      if (step + 1 < STEPS.length) fetch(clip(lang, step + 1)).catch(() => undefined)
     } else timer = setTimeout(finish, ms)
     return () => {
+      done = true
       clearInterval(tick)
       clearTimeout(timer)
-      speechSynthesis.cancel()
+      if (a) {
+        a.pause()
+        a.onended = a.onerror = null
+      }
     }
   }, [active, step, playing, started, rec, voice, lang, s, go])
 
@@ -156,12 +199,12 @@ export function Tour({ search }: { search: string }) {
       if (e.key === "ArrowLeft") go(current - 1)
       if (e.key === "Escape") exit()
       if (e.key.toLowerCase() === "c") setCaptions((c) => (savePref("captions", !c), !c))
-      if (e.key.toLowerCase() === "v") setVoice((v) => (savePref("voice", !v), !v))
+      if (e.key.toLowerCase() === "v") toggleVoice()
       if (e.key.toLowerCase() === "f") toggleFullscreen()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [active, go, exit])
+  }, [active, go, exit, toggleVoice])
 
   if (!active) return null
   if (!started)
@@ -220,7 +263,7 @@ export function Tour({ search }: { search: string }) {
             <button className="icon-btn lg" onClick={() => go(step + 1)} aria-label={t("tour.next")}>
               <ChevronRight size={18} />
             </button>
-            <button className={`icon-btn lg ${voice ? "on" : ""}`} onClick={() => setVoice((v) => (savePref("voice", !v), !v))} aria-label={t("tour.voice")} title={`${t("tour.voice")} (V)`}>
+            <button className={`icon-btn lg ${voice ? "on" : ""}`} onClick={() => toggleVoice()} aria-label={t("tour.voice")} title={`${t("tour.voice")} (V)`}>
               {voice ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
             <button className="icon-btn lg" onClick={toggleFullscreen} aria-label={t("tour.fullscreen")} title={`${t("tour.fullscreen")} (F)`}>

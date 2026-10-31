@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight, Globe, Play, Plus, Search, Stamp, Users } from "lucide-react"
+import { ArrowRight, ChevronRight, Play, Plus, Search, Stamp } from "lucide-react"
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 import type { Address } from "viem"
 import { reader, useChain, useNow } from "../hooks/useChain"
@@ -182,7 +182,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
         <div className="card list-card" ref={listRef}>
           {err && (
-            <Empty icon={<Globe size={22} />} title={t("exams.offline")}>
+            <Empty title={t("exams.offline")}>
               {err}{" "}
               <button className="link" onClick={retry}>
                 {t("exams.retry")}
@@ -199,7 +199,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
                 </div>
               </div>
             ))}
-          {list && shown.length === 0 && !exactId && <Empty icon={tab === "sealed" ? <Stamp size={22} /> : <Users size={22} />} title={t("exams.none")}>{tab === "open" && t("exams.noneOpen")}</Empty>}
+          {list && shown.length === 0 && !exactId && <Empty title={t("exams.none")}>{tab === "open" && t("exams.noneOpen")}</Empty>}
           {exactId && (
             <a className="exam-row" href={examHref(exactId)}>
               <div className="grow">
@@ -354,11 +354,15 @@ function HeroLive() {
   const { t } = useT()
   const { clock, online } = useChain()
   const now = useNow(1000)
-  const [count, setCount] = useState<string>()
+  const [count, setCount] = useState<string | undefined>(() => kept<string>("witnessed"))
   useEffect(() => {
     let live = true
     witnessStats(reader)
-      .then((s) => live && setCount(`${s.count}${s.capped ? "+" : ""}`))
+      .then((s) => {
+        if (!live) return
+        setCount(`${s.count}${s.capped ? "+" : ""}`)
+        keep("witnessed", `${s.count}${s.capped ? "+" : ""}`)
+      })
       .catch(() => undefined)
     return () => {
       live = false
@@ -366,7 +370,8 @@ function HeroLive() {
   }, [])
   const block = clock ? clock.block + BigInt(Math.max(0, Math.floor((now - clock.at) / (clock.secs * 1000)))) : undefined
   return (
-    <p className="hero-live" aria-label={t("pulse.label")}>
+    // on a first visit the line waits, its space kept, until both numbers are in, so it appears once and never shifts
+    <p className={`hero-live ${online !== false && (block === undefined || !count) ? "pending" : ""}`} aria-label={t("pulse.label")}>
       <i className={online === false ? "down" : ""} aria-hidden="true" />
       {t("pulse.live")}
       {block !== undefined && (

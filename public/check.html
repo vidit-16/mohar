@@ -11,7 +11,7 @@
 <style>
   @font-face { font-family: "Geist"; font-weight: 400 700; font-display: swap; src: url(./fonts/geist.woff2) format("woff2"); }
   :root { --bg: #fbfaf8; --panel: #f3f1ed; --card: #fff; --text: #0f0f10; --muted: #64625d; --line: #ece9e3; --accent: #c4281a; --ink: #0f0f10; --on-ink: #fff; --good: #1a7a45; --bad: #c4281a; color-scheme: light; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #0c0c0d; --panel: #151517; --card: #1c1c1f; --text: #f5f4f1; --muted: #a3a19c; --line: #26262a; --accent: #ff6a55; --ink: #f5f4f1; --on-ink: #0c0c0d; --good: #4cc883; --bad: #ff6a55; color-scheme: dark; } }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0c0c0d; --panel: #151517; --card: #1c1c1f; --text: #f5f4f1; --muted: #a3a19c; --line: #26262a; --accent: #ef5446; --ink: #f5f4f1; --on-ink: #0c0c0d; --good: #4cc883; --bad: #ef5446; color-scheme: dark; } }
   * { box-sizing: border-box }
   body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Geist, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased }
   main { max-width: 860px; margin: 0 auto; padding: clamp(40px, 8vw, 96px) 16px 64px }
@@ -28,17 +28,17 @@
   input:focus, textarea:focus { outline: 2px solid var(--text); outline-offset: 1px }
   textarea { min-height: 90px; resize: vertical }
   .row { margin-bottom: 16px }
-  .hint { color: var(--muted); font-size: 13px; margin-top: 6px }
+  .hint { color: var(--muted); font-size: 14px; margin-top: 6px }
   details { margin: 4px 0 18px } summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted) } details[open] summary { margin-bottom: 14px }
   button { font: 600 16px Geist, system-ui, sans-serif; padding: 13px 28px; border: 0; border-radius: 999px; background: var(--ink); color: var(--on-ink); cursor: pointer }
   button:disabled { opacity: .6; cursor: wait }
   table { width: 100%; border-collapse: collapse; font-size: 14px }
   th, td { text-align: left; padding: 10px 6px; border-top: 1px solid var(--line); vertical-align: top }
-  th { color: var(--muted); font-weight: 600; font-size: 13px; border-top: 0 }
-  code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 13px; overflow-wrap: anywhere }
+  th { color: var(--muted); font-weight: 600; font-size: 14px; border-top: 0 }
+  code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 14px; overflow-wrap: anywhere }
   .leak { color: var(--bad); font-weight: 700 } .ok { color: var(--good); font-weight: 600 } .muted { color: var(--muted) }
   .err { color: var(--bad) }
-  footer { color: var(--muted); font-size: 13px; margin-top: 28px; max-width: 70ch }
+  footer { color: var(--muted); font-size: 14px; margin-top: 28px; max-width: 70ch }
   a { color: var(--text) }
   .table-wrap { overflow-x: auto }
 </style>

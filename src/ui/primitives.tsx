@@ -23,9 +23,9 @@ export function Badge({ tone = "neutral", icon, children }: { tone?: Tone; icon?
 }
 
 // a state written as coloured text; the pill Badge is for the few labels that have to stand out
-export function Tag({ tone = "neutral", icon, children }: { tone?: Tone; icon?: ReactNode; children: ReactNode }) {
+export function Tag({ tone = "neutral", icon, dot, children }: { tone?: Tone; icon?: ReactNode; dot?: boolean; children: ReactNode }) {
   return (
-    <span className={`tag tag-${tone}`}>
+    <span className={`tag tag-${tone} ${dot ? "tag-dot" : ""}`}>
       {icon}
       {children}
     </span>
@@ -106,10 +106,10 @@ export function Stat({ label, value, hint }: { label: string; value: ReactNode; 
   )
 }
 
-export function Empty({ icon, title, children }: { icon: ReactNode; title: string; children?: ReactNode }) {
+export function Empty({ icon, title, children }: { icon?: ReactNode; title: string; children?: ReactNode }) {
   return (
     <div className="empty">
-      <div className="empty-icon">{icon}</div>
+      {icon && <div className="empty-icon">{icon}</div>}
       <div className="empty-title">{title}</div>
       {children && <div className="empty-body">{children}</div>}
     </div>

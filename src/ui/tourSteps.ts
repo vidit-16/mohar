@@ -31,7 +31,7 @@ export const STEPS: TourStep[] = [
   {
     target: "#how",
     en: "Mohar gives everyone a clock that neither the exam body nor the leakers control. Seal, witness, verdict.",
-    hi: "मोहर सबको एक ऐसी घड़ी देता है जिस पर न परीक्षा संस्था का बस चलता है, न लीक करने वालों का। मोहर, गवाही, निर्णय।",
+    hi: "मोहर सबको एक ऐसी घड़ी देता है जिस पर न परीक्षा संस्था का बस चलता है, न लीक करने वालों का। मोहर, गवाही, फ़ैसला।",
   },
   {
     exam: DEMO_EXAM,

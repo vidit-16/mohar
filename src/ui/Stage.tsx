@@ -15,7 +15,7 @@ import { fmtDuration } from "./format"
 //   ?stage=1&exam=ID        the talk. Next: → PageDown Space Enter (or a click). Back: ← PageUp. H Hindi, F fullscreen, S setup.
 //   ?stage=remote&exam=ID   one big Reveal button, for revealing from a phone while the room watches their own phones.
 //   &issuer=0x…             rehearse against an exam sealed by another wallet (defaults to the demo exam body)
-//   &qr=https://…           what the closing QR opens (defaults to mohar.live/devcon)
+//   &qr=https://…           what the closing QR opens (defaults to the Linktree; the QR before the demo is mohar.live/devcon)
 // On the demo slide the first "next" sends the real reveal transaction; the image frame flips to the verdict read
 // back from the chain. If nothing is on screen within a few seconds, the recorded backup plays instead.
 
@@ -75,6 +75,7 @@ const copy = {
     arkiv: "The record lives on Arkiv, not on my server.",
     arkivBody: "Every seal, witness and reveal is a public record, timed by the network. Seals are read-only and their ownership is burned, so not even the exam body can delete one. Anyone can rebuild every verdict without my site.",
     s3: "Live demo.",
+    scanNow: "Scan now. The paper opens in a minute.",
     demoLabel: "03 / LIVE DEMO",
     demo: "I leaked this talk’s paper. Watch it get caught.",
     demoBody: "Days ago I sealed a 5-question paper for this talk, then leaked 3 of its questions and sealed them from my phone. At the bell the paper is revealed, and the verdict comes straight from the public record.",
@@ -111,19 +112,20 @@ const copy = {
     bigIdeaLabel: "बड़ा विचार",
     bigIdea: "पेपर लीक के लिए एक घड़ी, जिस पर किसी का क़ब्ज़ा नहीं।",
     howLabel: "कैसे काम करता है",
-    how: "मोहर, गवाही, निर्णय।",
+    how: "मोहर, गवाही, फ़ैसला।",
     steps: [
       ["मोहर", "परीक्षा से पहले संस्था हर प्रश्न की फ़िंगरप्रिंट मोहर लगाती है। कोई उसे बदल या मिटा नहीं सकता।"],
       ["गवाही", "“लीक पेपर” मिला? फ़ोन से उसकी फ़िंगरप्रिंट मोहर लगाएँ। प्रश्न और आपका नाम फ़ोन से बाहर नहीं जाते।"],
-      ["निर्णय", "परीक्षा शुरू होते ही पेपर खुलता है, और सब देखते हैं कि असली प्रश्न पहले किसके पास थे।"],
+      ["फ़ैसला", "परीक्षा शुरू होते ही पेपर खुलता है, और सब देखते हैं कि असली प्रश्न पहले किसके पास थे।"],
     ],
     arkivLabel: "02 / ARKIV क्यों",
     arkiv: "रिकॉर्ड Arkiv पर है, मेरे सर्वर पर नहीं।",
-    arkivBody: "हर मोहर, गवाही और खुला पेपर एक सार्वजनिक रिकॉर्ड है, समय नेटवर्क का। मोहरें केवल-पढ़ने योग्य हैं और उनका स्वामित्व जला दिया जाता है, इसलिए संस्था भी उन्हें मिटा नहीं सकती। कोई भी हर निर्णय मेरी साइट के बिना जाँच सकता है।",
+    arkivBody: "हर मोहर, गवाही और खुला पेपर एक सार्वजनिक रिकॉर्ड है, समय नेटवर्क का। मोहरें सिर्फ़ पढ़ी जा सकती हैं और उनका स्वामित्व जला दिया जाता है, इसलिए संस्था भी उन्हें मिटा नहीं सकती। कोई भी हर फ़ैसला मेरी साइट के बिना जाँच सकता है।",
     s3: "लाइव डेमो।",
+    scanNow: "अभी स्कैन करें। पेपर एक मिनट में खुलेगा।",
     demoLabel: "03 / लाइव डेमो",
     demo: "मैंने इस टॉक का पेपर लीक किया। देखिए, कैसे पकड़ा गया।",
-    demoBody: "कुछ दिन पहले मैंने इस टॉक के लिए 5 प्रश्नों के पेपर पर मोहर लगाई, फिर उसके 3 प्रश्न लीक करके फ़ोन से उनकी मोहर लगाई। अब पेपर खुलेगा, और निर्णय सीधे सार्वजनिक रिकॉर्ड से आएगा।",
+    demoBody: "कुछ दिन पहले मैंने इस टॉक के लिए 5 प्रश्नों के पेपर पर मोहर लगाई, फिर उसके 3 प्रश्न लीक करके फ़ोन से उनकी मोहर लगाई। अब पेपर खुलेगा, और फ़ैसला सीधे सार्वजनिक रिकॉर्ड से आएगा।",
     sealedBy: "मोहर",
     witnessN: (n: number) => `${n} गवाही`,
     firstSealed: "पहली मोहर {ago} पहले",
@@ -148,6 +150,9 @@ type Copy = (typeof copy)["en"]
 
 const SLIDES = ["cover", "problem", "number", "fight", "built", "idea", "how", "arkiv", "demoSection", "demo", "learned", "next", "thanks"] as const
 const DEMO_AT = SLIDES.indexOf("demo")
+// the room scans this before the reveal and watches the verdict land on their own phones
+const DEMO_QR = "https://mohar.live/devcon"
+const LINKTREE = "https://linktr.ee/vidit.choudhary"
 
 // template geometry: a 13.333 × 7.5 inch slide drawn on a 1920 × 1080 canvas, so 1 inch = 144 px and 1 pt = 2 px
 const IN = 144
@@ -188,8 +193,18 @@ const Footer = ({ logoX = 1.11, textX = 9.07, light }: { logoX?: number; textX?:
   </>
 )
 
-function Section({ n, title, tone }: { n: string; title: string; tone: "green" | "sky" | "cream" }) {
+// a QR drawn on the slide itself, so it works offline and needs no image file
+function useQr(url?: string) {
+  const [qr, setQr] = useState("")
+  useEffect(() => {
+    if (url) QRCode.toDataURL(url, { margin: 1, width: 720, errorCorrectionLevel: "M", color: { dark: "#000000", light: "#ffffff" } }).then(setQr, () => setQr(""))
+  }, [url])
+  return qr
+}
+
+function Section({ n, title, tone, qr }: { n: string; title: string; tone: "green" | "sky" | "cream"; qr?: { url: string; caption: string } }) {
   const light = tone === "green"
+  const code = useQr(qr?.url)
   return (
     <div className={`tpl-slide tpl-bg-${tone}`}>
       <Lockup light={light} />
@@ -202,6 +217,14 @@ function Section({ n, title, tone }: { n: string; title: string; tone: "green" |
       <Box x={6.5} y={4.44} w={5.72} className={`tpl-pixel tpl-section-n ${tone === "green" ? "tpl-white" : tone === "sky" ? "" : "tpl-green"}`}>
         {n}
       </Box>
+      {qr && code && (
+        <>
+          <img className="tpl-box tpl-qr" src={code} alt={`QR code for ${qr.url}`} style={at(9.2, 0.8, 3.0, 3.0)} />
+          <Box x={5.2} y={3.95} w={7} className="tpl-role tpl-right">
+            {qr.caption}
+          </Box>
+        </>
+      )}
     </div>
   )
 }
@@ -471,7 +494,7 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
               <Footer />
             </div>
           )}
-          {name === "demoSection" && <Section n="03" title={c.s3} tone="cream" />}
+          {name === "demoSection" && <Section n="03" title={c.s3} tone="cream" qr={{ url: DEMO_QR, caption: c.scanNow }} />}
           {name === "demo" && (
             <div className="tpl-slide tpl-bg-white">
               <Box x={1.11} y={2.3} w={5.72} className="tpl-pixel tpl-label-sm tpl-green">
@@ -491,7 +514,7 @@ export function Stage({ examId, remote, issuer = DEMO_ISSUER, qr }: { examId: st
           )}
           {name === "learned" && <KeyPoint label={c.learnedLabel} title={c.learned} body={c.learnedBody} tone="cream" />}
           {name === "next" && <KeyPoint label={c.nextLabel} title={c.next} body={c.nextBody} tone="black" panelRight />}
-          {name === "thanks" && <Thanks c={c} url={qr ?? "https://mohar.live/devcon"} />}
+          {name === "thanks" && <Thanks c={c} url={qr ?? LINKTREE} />}
         </div>
       </div>
       {backupVisible && video && (
@@ -541,10 +564,7 @@ function LiveExam({ c, summary, shown = true, state, error, exam, witnesses, fir
 }
 
 function Thanks({ c, url }: { c: Copy; url: string }) {
-  const [qr, setQr] = useState("")
-  useEffect(() => {
-    QRCode.toDataURL(url, { margin: 1, width: 720, errorCorrectionLevel: "M", color: { dark: "#000000", light: "#ffffff" } }).then(setQr, () => setQr(""))
-  }, [url])
+  const qr = useQr(url)
   return (
     <div className="tpl-slide tpl-bg-green">
       <Lockup light />
@@ -565,6 +585,9 @@ function Thanks({ c, url }: { c: Copy; url: string }) {
         github.com/vidit-16/mohar
       </Box>
       {qr && <img className="tpl-box tpl-qr" src={qr} alt={`QR code for ${url}`} style={at(7.55, 1.9, 3.1, 3.1)} />}
+      <Box x={7.55} y={5.12} w={3.1} className="tpl-pixel tpl-label tpl-white tpl-center">
+        {url.replace(/^https?:\/\/(www\.)?/, "")}
+      </Box>
       <Img src="leaf" x={11.11} y={1.67} w={1.67} h={1.99} />
       <Img src="paisley" x={10} y={5} w={3.06} h={2.24} />
     </div>

@@ -1,4 +1,4 @@
-import { Clock, HeartPulse, Link2, Printer, Square, Volume2 } from "lucide-react"
+import { Link2, Printer, Square, Volume2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNow } from "../hooks/useChain"
 import { useT } from "../i18n"
@@ -132,7 +132,6 @@ export function KeepAlive({ row, msLeft, onDone, compact }: { row: Row; msLeft: 
   return (
     <div className={`keepalive no-print ${compact ? "compact" : ""}`}>
       <div className="keepalive-info">
-        <Clock size={14} />
         <span>{Number.isNaN(msLeft) ? "…" : msLeft <= 0 ? t("ev.expired") : `${t("ev.expires")} ${fmtDuration(msLeft)}`}</span>
         {soon && msLeft > 0 && <Badge tone="warn">{t("ev.soon")}</Badge>}
       </div>
@@ -153,7 +152,7 @@ export function KeepAlive({ row, msLeft, onDone, compact }: { row: Row; msLeft: 
             }
           }}
         >
-          {busy ? <Spinner size={14} /> : <HeartPulse size={14} />} {t("ev.keep")}
+          {busy && <Spinner size={14} />} {t("ev.keep")}
         </button>
       )}
     </div>

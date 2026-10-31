@@ -33,7 +33,7 @@ function Shell() {
       <main id="main" className="container" data-shell="">
         <section className="hero">
           <SealOutline className="hero-outline" />
-          <p className="hero-live">
+          <p className="hero-live pending">
             <i aria-hidden="true" />
             {t["pulse.live"]}
           </p>
