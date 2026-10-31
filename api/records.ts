@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     if (!res.ok) throw new Error(`upstream ${res.status}`)
     return res.json()
   }
+  const t0 = Date.now()
   try {
     const q = await call({ jsonrpc: "2.0", id: 1, method: "arkiv_query", params: [`project = str('mohar-v1') AND exam_id = str('${exam}')`, { select: SELECT, limit: "0xc8" }] })
     if (!q?.result?.data) throw new Error("no data")
@@ -32,7 +33,14 @@ export async function GET(req: Request) {
     }
     return Response.json(
       { data, cursor: q.result.cursor ?? null, times },
-      { headers: { "cache-control": "public, max-age=0, s-maxage=2, stale-while-revalidate=2", "vercel-cdn-cache-control": "max-age=2" } },
+      {
+        headers: {
+          "cache-control": "public, max-age=0, s-maxage=2, stale-while-revalidate=2",
+          "vercel-cdn-cache-control": "max-age=2",
+          // how long Arkiv took, to tell the network apart from the chain when a page feels slow
+          "server-timing": `arkiv;dur=${Date.now() - t0}`,
+        },
+      },
     )
   } catch {
     return Response.json({ error: "upstream" }, { status: 502, headers: { "cache-control": "no-store" } })
