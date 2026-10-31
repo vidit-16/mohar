@@ -603,8 +603,6 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .tpl-verdict .tpl-verdict-when { font: 400 34px/1.2 "Geist", "Noto Sans Devanagari"; }
 .tpl-verdict .tpl-verdict-counts { font: 400 26px "Geist"; color: #444; }
 .tpl-qr { border-radius: 24px; background: #fff; padding: 16px; box-sizing: border-box; }
-.stage-stamp { font: 700 120px/1 "Geist", var(--display); color: #c8321e; border: 0.08em solid currentColor; border-radius: 0.12em; padding: 0.04em 0.3em; transform: rotate(-6deg); animation: stage-stamp 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
-@keyframes stage-stamp { from { opacity: 0; transform: rotate(-6deg) scale(2.6); } 60% { opacity: 1; } to { transform: rotate(-6deg) scale(1); } }
 .stage-backup { position: absolute; inset: 0; background: #000; display: grid; place-items: center; z-index: 5; }
 .stage-backup video { width: 100%; height: 100%; object-fit: contain; }
 .stage-setup { position: absolute; inset: auto 24px 24px auto; width: min(560px, calc(100vw - 48px)); max-height: calc(100vh - 48px); overflow: auto; overscroll-behavior: contain; background: #1f1d19; color: #f4efe6; border-radius: 16px; padding: 24px; z-index: 10; display: flex; flex-direction: column; gap: 14px; user-select: text; font-family: var(--font); }
@@ -623,13 +621,15 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .stage-remote-logo { height: 28px; }
 .stage-remote h1 { font: 700 30px/1.1 "Geist"; margin: 0; }
 .stage-remote .tpl-verdict { padding: 0; gap: 16px; }
-.stage-remote .stage-stamp { font-size: 64px; }
+.stage-seal { display: block; margin: 0 auto 12px; }
+.tpl-verdict .tpl-verdict-kicker { margin: 0 0 4px; font: 650 44px/1.1 "Geist", var(--display); color: #c4281a; }
+.stage-remote .stage-seal { width: 120px; height: 120px; }
 .stage-remote .tpl-verdict .tpl-verdict-big { font-size: 34px; }
 .stage-remote .tpl-verdict .tpl-verdict-when { font-size: 20px; }
 .stage-big { width: 100%; max-width: 420px; min-height: 96px; font: 700 26px "Geist"; border: 0; border-radius: 999px; background: var(--tpl-green, #0e783a); color: #fff; cursor: pointer; touch-action: manipulation; }
 .stage-big:disabled { opacity: 0.6; }
 .stage-setup-link { background: transparent; color: #555; text-decoration: underline; }
-@media (prefers-reduced-motion: reduce) { .tpl-canvas .stage-slide, .stage-stamp { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tpl-canvas .stage-slide { animation: none; } }
 
 /* hero: the real caught leak, as a piece of the product */
 .step-hi { font: 600 1rem var(--deva); color: var(--text-3); }

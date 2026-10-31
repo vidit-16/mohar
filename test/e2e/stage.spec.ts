@@ -29,7 +29,7 @@ test("the demo slide shows the verdict of a revealed exam, in English and Hindi,
   await expect(page.getByRole("heading", { name: "Mohar: who had the paper first?" })).toBeVisible()
   for (let i = 0; i < 9; i++) await page.keyboard.press("ArrowRight")
   expect(await slide(page)).toBe("demo")
-  await expect(page.locator(".stage-stamp")).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator(".stage-seal")).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole("heading", { name: "Held 3 real questions" })).toBeVisible()
   await page.keyboard.press("h")
   await expect(page.getByRole("heading", { name: "3 असली प्रश्न पहले से थे" })).toBeVisible()
@@ -42,6 +42,6 @@ test("the demo slide shows the verdict of a revealed exam, in English and Hindi,
 test("the phone remote shows the verdict once revealed and never asks for a key up front", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto("/?stage=remote&exam=DSPSC-PRE26-10170937")
-  await expect(page.locator(".stage-stamp")).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator(".stage-seal")).toBeVisible({ timeout: 30_000 })
   await expect(page.locator(".stage-setup")).toHaveCount(0)
 })

@@ -8,6 +8,7 @@ import { useExam } from "../hooks/useExam"
 import { useT } from "../i18n"
 import { ISSUERS, revealExam } from "../lib/mohar"
 import type { SealSecrets } from "../lib/rules"
+import { LacSeal } from "./brand"
 import { fmtDuration } from "./format"
 
 // Presentation mode for the ETHIndia talk: the same 13 slides as the uploaded deck, drawn to the ETHIndia × Devcon
@@ -84,6 +85,7 @@ const copy = {
     firstSealed: "first sealed {ago} ago",
     waiting: "Waiting for the paper",
     revealing: "Revealing the paper on Arkiv…",
+    leakCaught: "Leak caught",
     caught: "Held {n} real questions",
     caughtSub: "{t} before the exam",
     fake: "{n} fake",
@@ -131,6 +133,7 @@ const copy = {
     firstSealed: "पहली मोहर {ago} पहले",
     waiting: "पेपर का इंतज़ार",
     revealing: "Arkiv पर पेपर खुल रहा है…",
+    leakCaught: "लीक पकड़ा गया",
     caught: "{n} असली प्रश्न पहले से थे",
     caughtSub: "परीक्षा से {t} पहले",
     fake: "{n} नकली",
@@ -535,9 +538,10 @@ function LiveExam({ c, summary, shown = true, state, error, exam, witnesses, fir
     const top = summary.top
     return (
       <div className="tpl-verdict">
-        <div className="stage-stamp">LEAK</div>
         {top ? (
           <>
+            <LacSeal size={200} className="stage-seal stamp-slam lac-drop" label={c.caught.replace("{n}", String(top.matches.length))} />
+            <p className="tpl-verdict-kicker">{c.leakCaught}</p>
             <h1 className="tpl-verdict-big">{c.caught.replace("{n}", String(top.matches.length))}</h1>
             <p className="tpl-verdict-when">{c.caughtSub.replace("{t}", fmtDuration(top.deadlineMs - top.witnessedAtMs))}</p>
           </>
@@ -552,7 +556,7 @@ function LiveExam({ c, summary, shown = true, state, error, exam, witnesses, fir
   }
   return (
     <div className="tpl-waiting">
-      <p className="tpl-pixel tpl-label-sm tpl-green">{exam ? `${c.sealedBy} ${exam.by} ✓` : "…"}</p>
+      <p className="tpl-pixel tpl-label-sm tpl-green">{exam ? `${c.sealedBy} ${exam.by}` : "…"}</p>
       <h2>{exam?.title ?? "…"}</h2>
       <p>
         {c.witnessN(witnesses ?? 0)}
