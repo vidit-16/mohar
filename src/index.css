@@ -204,7 +204,7 @@ html[lang="hi"] .btn { font-family: var(--deva); }
 .btn-lg { height: 52px; padding: 0 26px; font-size: 1rem; border-radius: 999px; }
 .btn-sm { height: 34px; padding: 0 14px; font-size: 0.875rem; border-radius: 999px; }
 .btn-block { width: 100%; margin-top: 12px; }
-.link { background: none; border: 0; padding: 0; color: var(--info); font: inherit; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-underline-offset: 2px; }
+.link { background: none; border: 0; padding: 0; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-underline-offset: 2px; }
 .icon-btn { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; border: 0; background: transparent; color: var(--text-3); cursor: pointer; text-decoration: none; flex: none; }
 .icon-btn:hover { background: var(--surface-2); color: var(--text); }
 .icon-btn:disabled { opacity: 0.35; cursor: default; }
@@ -312,7 +312,7 @@ a.exam-row:hover { background: var(--surface-2); border-radius: 10px; }
 /* timeline */
 .timeline { padding: 4px 4px 0; }
 /* the timeline is drawn like the leak card's line: ink up to the bell, grey after, small dots for what happened */
-.tl-track { position: relative; height: 72px; }
+.tl-track { position: relative; height: 60px; }
 .tl-before, .tl-after { position: absolute; top: 50%; height: 2px; margin-top: -1px; animation: grow-x 0.8s ease-out both; transform-origin: left; }
 .tl-before { background: var(--text); border-radius: 2px 0 0 2px; }
 .tl-after { background: var(--border-strong); border-radius: 0 2px 2px 0; animation-delay: 0.3s; }
@@ -366,7 +366,9 @@ a.exam-row:hover { background: var(--surface-2); border-radius: 10px; }
 
 /* seal card */
 .sets { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 10px; }
-.sets li { padding: 12px; border: 1px solid var(--border); border-radius: 11px; display: grid; gap: 6px; background: var(--surface-2); }
+.sets li { padding: 12px 14px; border-radius: 12px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; background: var(--surface-2); }
+.sets li .set-top { grid-column: 1 / -1; }
+.sets li .keepalive.compact { justify-content: flex-end; }
 .set-top { display: flex; align-items: center; gap: 8px; }
 .forged { margin-top: 12px; font-size: 0.875rem; }
 .forged summary { cursor: pointer; color: var(--text-2); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
@@ -434,17 +436,22 @@ html[lang="hi"] .sheet-head h2 { font-family: var(--deva); }
 .field { display: grid; gap: 4px; }
 .field-label { font-weight: 600; font-size: 0.875rem; }
 .field-hint { color: var(--text-2); font-size: 0.8125rem; }
-.callout { display: flex; gap: 10px; padding: 12px 14px; border-radius: 11px; background: var(--surface-2); font-size: 0.875rem; color: var(--text-2); }
+/* notes are calm grey panels in ink; only a small dot carries the colour, so a warning reads as information */
+.callout { display: flex; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); font-size: 0.875rem; color: var(--text); }
+.callout:not(:has(> svg))::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--text-3); }
 .callout svg { flex: none; margin-top: 2px; color: var(--text); }
-.callout-warn { background: var(--warn-soft); color: var(--warn); margin-bottom: 16px; }
-.callout-danger { background: var(--danger-soft); color: var(--danger); }
+.callout-warn { margin-bottom: 16px; }
+.callout.callout-warn::before { background: var(--warn); }
+.callout-warn > svg { color: var(--warn); }
+.callout.callout-danger::before { background: var(--danger); }
+.callout-danger > svg { color: var(--danger); }
 .row-end { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
 .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .hash-list { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
 .hash-list li { display: grid; grid-template-columns: auto auto 1fr; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 9px; background: var(--surface-2); font-size: 0.8125rem; }
-.wallet-card { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; }
+.wallet-card { display: flex; gap: 12px; padding: 14px; border-radius: 12px; background: var(--surface-2); }
 .wallet-card > svg { flex: none; color: var(--text-2); margin-top: 2px; }
-.wallet-empty { border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-soft); }
+.wallet-empty::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 14px; border-radius: 50%; background: var(--warn); }
 .wallet-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 2px; }
 .fund-steps { margin-top: 8px; color: var(--text); line-height: 1.7; }
 .receipt { text-align: center; justify-items: center; }
@@ -864,3 +871,22 @@ html[data-vt="card"] .leak-card, html[data-vt="card"] .meaning { view-transition
 ::view-transition-new(verdict) { animation: vt-in 0.45s ease-out 0.2s both; }
 @keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; } }
+
+/* seal a paper: a slim wallet line, the form, and beside it what will actually go on chain, filled in as you type */
+.wallet-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 18px 22px; margin-bottom: 18px; border-radius: var(--radius); background: var(--surface-2); }
+.issue-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+.chain-panel { position: sticky; top: 84px; padding: 24px; border-radius: var(--radius); background: var(--surface-2); display: grid; gap: 18px; overflow: visible; }
+.chain-panel h2 { font: 600 1.125rem var(--display); letter-spacing: -0.02em; }
+.chain-seal { position: absolute; top: -40px; right: -14px; }
+.chain-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin: 0; }
+.chain-kv dt { font-size: 0.8125rem; color: var(--text-2); }
+.chain-kv dd { margin: 2px 0 0; font: 600 1.125rem var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.chain-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.chain-steps li { position: relative; padding-left: 22px; font-size: 0.875rem; color: var(--text-2); }
+.chain-steps li::before { content: ""; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border-strong); background: var(--surface-2); }
+.chain-steps li + li::after { content: ""; position: absolute; left: 6px; top: -10px; height: 14px; border-left: 2px solid var(--border-strong); }
+.chain-steps li.now { color: var(--text); font-weight: 500; }
+.chain-steps li.now::before { border-color: var(--text); }
+.chain-steps li.done::before { background: var(--seal); border-color: var(--seal); }
+.issue-grid .link, .issue-grid a:not(.btn) { color: var(--text); }
+@media (max-width: 900px) { .issue-grid { grid-template-columns: 1fr; } .chain-panel { position: static; } }

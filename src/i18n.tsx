@@ -322,6 +322,16 @@ const en = {
   "iss.tooEarly": "The exam starts in {t}. Revealing early would let anyone \"witness\" the paper.",
   "iss.revealed": "Paper revealed. Every witness can now be checked.",
   "iss.needWallet": "Connect a wallet first.",
+  "iss.chain.title": "What goes on chain",
+  "iss.chain.qs": "Questions",
+  "iss.chain.sets": "Sets",
+  "iss.chain.opens": "Bell",
+  "iss.chain.leaves": "Leaves this browser",
+  "iss.chain.leavesV": "Fingerprints only",
+  "iss.chain.s1": "Seal now: a fingerprint of every question",
+  "iss.chain.s2": "The bell rings",
+  "iss.chain.s2at": "The bell rings at {t}",
+  "iss.chain.s3": "Reveal the paper; every witness is checked",
 }
 
 
@@ -645,6 +655,16 @@ const hi: Record<Key, string> = {
   "iss.tooEarly": "परीक्षा {t} में शुरू होगी। पहले जारी करने से कोई भी पेपर की \"गवाही\" दे सकेगा।",
   "iss.revealed": "पेपर जारी हुआ। अब हर गवाही जाँची जा सकती है।",
   "iss.needWallet": "पहले वॉलेट जोड़ें।",
+  "iss.chain.title": "चेन पर क्या जाता है",
+  "iss.chain.qs": "प्रश्न",
+  "iss.chain.sets": "सेट",
+  "iss.chain.opens": "घंटी",
+  "iss.chain.leaves": "ब्राउज़र से बाहर जाता है",
+  "iss.chain.leavesV": "केवल फिंगरप्रिंट",
+  "iss.chain.s1": "अभी सील करें: हर प्रश्न का फिंगरप्रिंट",
+  "iss.chain.s2": "घंटी बजती है",
+  "iss.chain.s2at": "घंटी {t} पर बजती है",
+  "iss.chain.s3": "पेपर जारी करें; हर गवाही जाँची जाती है",
 }
 
 export const DICT = { en, hi }

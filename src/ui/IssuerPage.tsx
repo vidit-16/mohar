@@ -1,5 +1,5 @@
 import type { WalletArkivClient } from "@arkiv-network/sdk"
-import { ArrowLeft, BadgeCheck, Download, FileUp, Lock, ShieldAlert, Unlock, Wallet } from "lucide-react"
+import { ArrowLeft, BadgeCheck, Download, FileUp, Lock, Unlock } from "lucide-react"
 import { useMemo, useState } from "react"
 import { formatEther, type Hex } from "viem"
 import { reader, useNow } from "../hooks/useChain"
@@ -8,7 +8,8 @@ import { burner } from "../lib/burner"
 import { parsePaperCsv } from "../lib/csv"
 import { connectInjected, hasInjectedWallet } from "../lib/injected"
 import { DAY_MS, ISSUERS, revealExam, type SealSecrets, sealExam } from "../lib/mohar"
-import { errText, fmtDateTime, fmtDuration } from "./format"
+import { errText, fmtDateTime, fmtDuration, fmtWhen } from "./format"
+import { LacSeal } from "./brand"
 import { Badge, FileButton, Mono, Spinner } from "./primitives"
 import { useToast } from "./toast"
 
@@ -126,26 +127,21 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
         </div>
       </header>
 
-      <section className="card">
-        <div className="card-head">
-          <h2>
-            <Wallet size={16} /> {t("iss.wallet")}
-          </h2>
-          {address && (registered ? <Badge tone="good" icon={<BadgeCheck size={12} />}>{t("iss.registered")}</Badge> : null)}
-        </div>
-        {address ? (
-          <div className="stack-xs">
+      <section className="wallet-row">
+        <div className="grow stack-xs">
+          <span className="field-label">{t("iss.wallet")}</span>
+          {address ? (
             <div className="row-gap">
               <Mono value={address} kind="address" />
-              {balance !== undefined && <Badge>{Number(formatEther(balance)).toFixed(3)} GLM</Badge>}
+              {balance !== undefined && <span className="muted small">{Number(formatEther(balance)).toFixed(3)} GLM</span>}
+              {registered && <span className="good small">{t("iss.registered")}</span>}
             </div>
-            {!registered && (
-              <p className="small warn-text">
-                <ShieldAlert size={14} /> {t("iss.unregistered")}
-              </p>
-            )}
-          </div>
-        ) : (
+          ) : (
+            <span className="muted small">{t("iss.needWallet")}</span>
+          )}
+          {address && !registered && <p className="small muted">{t("iss.unregistered")}</p>}
+        </div>
+        {!address && (
           <div className="row-gap">
             {hasInjectedWallet() && (
               <button className="btn btn-primary" onClick={() => use("metamask")}>
@@ -170,7 +166,10 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
 
       {err && <div className="callout callout-danger">{err}</div>}
 
-      {tab === "seal" && !sealed && (
+      {tab === "seal" && (
+        <div className="issue-grid">
+          <div>
+      {!sealed && (
         <section className="card stack">
           <div className="form-grid">
             <label className="field">
@@ -232,7 +231,7 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
         </section>
       )}
 
-      {tab === "seal" && sealed && (
+      {sealed && (
         <section className="card stack">
           <div className="callout">
             <BadgeCheck size={16} />
@@ -250,6 +249,37 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
             </a>
           </div>
         </section>
+      )}
+
+          </div>
+          <aside className="chain-panel" aria-live="polite">
+            <h2>{t("iss.chain.title")}</h2>
+            {sealed && <LacSeal size={150} className="stamp-slam lac-drop chain-seal" label={t("iss.sealed")} />}
+            <dl className="chain-kv">
+              <div>
+                <dt>{t("iss.chain.qs")}</dt>
+                <dd>{total || "—"}</dd>
+              </div>
+              <div>
+                <dt>{t("iss.chain.sets")}</dt>
+                <dd>{paper.sets.length || "—"}</dd>
+              </div>
+              <div>
+                <dt>{t("iss.chain.opens")}</dt>
+                <dd>{Number.isFinite(opensAtMs) ? fmtWhen(opensAtMs) : "—"}</dd>
+              </div>
+              <div>
+                <dt>{t("iss.chain.leaves")}</dt>
+                <dd>{t("iss.chain.leavesV")}</dd>
+              </div>
+            </dl>
+            <ol className="chain-steps">
+              <li className={sealed ? "done" : "now"}>{t("iss.chain.s1")}</li>
+              <li>{Number.isFinite(opensAtMs) ? t("iss.chain.s2at", { t: fmtWhen(opensAtMs) }) : t("iss.chain.s2")}</li>
+              <li>{t("iss.chain.s3")}</li>
+            </ol>
+          </aside>
+        </div>
       )}
 
       {tab === "reveal" && (
