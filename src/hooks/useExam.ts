@@ -8,6 +8,10 @@ import {
   groupExams,
   judge,
   examRecords,
+  fastRecords,
+  knownBlockTime,
+  type Records,
+  rememberedRecords,
   examVersion,
   liveClient,
   openExamFrom,
@@ -24,22 +28,26 @@ import { reader } from "./useChain"
 export type FeedItem = { id: string; at: number; kind: "witness" | "extend"; who: string; href: string }
 export type LiveState = "connecting" | "live" | "down"
 
-type Records = Awaited<ReturnType<typeof examRecords>>
-// The last records seen for each exam and every block time looked up, shared by the whole tab: opening an exam the
-// home page already loaded draws it at once (and lets the leak card turn into it), then refreshes in the background.
+// The last records seen for each exam, shared by the whole tab (and kept by the browser between visits): opening an
+// exam the home page already loaded draws it at once (and lets the leak card turn into it), then refreshes.
 const recent = new Map<string, Records>()
-const blockTimes = new Map<bigint, number>()
+const knownTimes = (r?: Records) =>
+  new Map(
+    [...(r?.commits ?? []), ...(r?.reveals ?? []), ...(r?.entries ?? []), ...(r?.witnesses ?? [])]
+      .map((x) => [x.createdAt, knownBlockTime(x.createdAt)] as const)
+      .filter((p): p is readonly [bigint, number] => p[1] !== undefined),
+  )
 const examOf = (r: Records, issuer: Address) => groupExams(r.commits, issuer)[0] ?? openExamFrom(r.entries)
 const revealsOf = (r: Records, issuer: Address) => r.reveals.filter((x) => sameAddr(x.creator, issuer))
 
 export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]) {
-  const seed = recent.get(examId)
+  const seed = recent.get(examId) ?? rememberedRecords(examId)
   const [exam, setExam] = useState<Exam | null | undefined>(() => seed && examOf(seed, issuer))
   const [reveals, setReveals] = useState<Row[]>(() => (seed ? revealsOf(seed, issuer) : []))
   const [witnesses, setWitnesses] = useState<Row[]>(() => seed?.witnesses ?? [])
   const [cursor, setCursor] = useState<string | undefined>(() => seed?.next)
   const [error, setError] = useState<string>()
-  const [times, setTimes] = useState<Map<bigint, number>>(() => new Map(blockTimes))
+  const [times, setTimes] = useState<Map<bigint, number>>(() => knownTimes(seed))
   const [feed, setFeed] = useState<FeedItem[]>([])
   const [live, setLive] = useState<LiveState>("connecting")
   const [attempt, setAttempt] = useState(0)
@@ -58,8 +66,8 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   )
 
   const load = useCallback(
-    () =>
-      examRecords(reader, examId)
+    (version?: string) =>
+      fastRecords(reader, examId, version)
         .then(apply)
         .catch((e) => setError(errText(e))),
     [examId, apply],
@@ -67,7 +75,7 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
 
   useEffect(() => {
     let current = true
-    examRecords(reader, examId)
+    fastRecords(reader, examId)
       .then((r) => current && apply(r))
       .catch((e) => current && setError(errText(e)))
     return () => {
@@ -93,10 +101,7 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
     if (missing.length === 0) return
     let stop = false
     Promise.all(missing.map(async (b) => [b, await blockTimeMs(reader, b)] as const))
-      .then((pairs) => {
-        pairs.forEach(([b, ms]) => blockTimes.set(b, ms))
-        if (!stop) setTimes((t) => new Map([...t, ...pairs]))
-      })
+      .then((pairs) => !stop && setTimes((t) => new Map([...t, ...pairs])))
       .catch(() => undefined)
     return () => {
       stop = true
@@ -136,7 +141,8 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
       pending = setTimeout(() => {
         pending = undefined
         last = Date.now()
-        load()
+        // viewers woken by the same event share one fresh copy per 2s window
+        load(`e${Math.floor(Date.now() / 2000)}`)
       }, wait)
     }
     let unwatchBlocks: (() => void) | undefined
@@ -190,7 +196,7 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
     const tick = async () => {
       if (document.visibilityState === "visible" && nearBell()) {
         const v = await examVersion(examId).catch(() => undefined)
-        if (v && last && v !== last) load()
+        if (v && last && v !== last) load(v)
         if (v) last = v
       }
       if (!stopped) timer = setTimeout(tick, 3000)
@@ -216,5 +222,5 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   }, [witnesses, exam])
 
   const status = error && exam === undefined ? "error" : exam === undefined ? "loading" : exam === null ? "missing" : "ready"
-  return { status, error, exam, reveals, witnesses, paper, hasPaper, verdicts, times, revealMs, deadlineMs, cursor, loadMore, loadingMore, reload: load, live, feed } as const
+  return { status, error, exam, reveals, witnesses, paper, hasPaper, verdicts, times, revealMs, deadlineMs, cursor, loadMore, loadingMore, reload: () => load(`r${Date.now()}`), live, feed } as const
 }

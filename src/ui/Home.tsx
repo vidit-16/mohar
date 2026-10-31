@@ -7,6 +7,7 @@ import { useT } from "../i18n"
 import { examHref, navigate } from "../router"
 import { normalise, questionHash } from "../lib/hash"
 import { DAY_MS, type Exam, examOutcome, examsFrom, groupExams, ISSUERS, openExamFrom, openExamsSince, type Outcome, witnessStats } from "../lib/mohar"
+import { keep, kept } from "../lib/keep"
 import { AddExamSheet } from "./AddExamSheet"
 import { LacSeal, SealOutline } from "./brand"
 import { LeakCard } from "./LeakCard"
@@ -19,8 +20,8 @@ type Tab = "sealed" | "open"
 
 export function Home({ issuer, issuerName }: { issuer: Address; issuerName: string }) {
   const { t } = useT()
-  const [sealed, setSealed] = useState<Exam[]>()
-  const [open, setOpen] = useState<Exam[]>()
+  const [sealed, setSealed] = useState<Exam[] | undefined>(() => kept(`sealed:${issuer}`))
+  const [open, setOpen] = useState<Exam[] | undefined>(() => kept("open"))
   const [err, setErr] = useState<string>()
   const [q, setQ] = useState("")
   const [tab, setTab] = useState<Tab>("sealed")
@@ -32,10 +33,14 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
     const since = Date.now() - 30 * DAY_MS
     Promise.all([examsFrom(reader, issuer, since), openExamsSince(reader, since)])
       .then(([commits, entries]) => {
-        setSealed(groupExams(commits, issuer).sort((a, b) => b.opensAtMs - a.opensAtMs))
+        const s = groupExams(commits, issuer).sort((a, b) => b.opensAtMs - a.opensAtMs)
         const byId = new Map<string, typeof entries>()
         for (const e of entries) byId.set(String(e.attrs.exam_id), [...(byId.get(String(e.attrs.exam_id)) ?? []), e])
-        setOpen([...byId.values()].map((es) => openExamFrom(es)!).sort((a, b) => a.opensAtMs - b.opensAtMs))
+        const o = [...byId.values()].map((es) => openExamFrom(es)!).sort((a, b) => a.opensAtMs - b.opensAtMs)
+        setSealed(s)
+        setOpen(o)
+        keep(`sealed:${issuer}`, s)
+        keep("open", o)
       })
       .catch((e) => setErr(errText(e)))
   }
@@ -54,17 +59,26 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
   // what happened at each sealed exam, loaded once the list scrolls into view; a busy or rate-limited network gets
   // a few retries, then the row falls back to when the exam was held
-  const [outcomes, setOutcomes] = useState<Map<string, Outcome | "unknown">>(new Map())
+  const [outcomes, setOutcomes] = useState<Map<string, Outcome | "unknown">>(() => new Map(kept<[string, Outcome][]>("outcomes") ?? []))
   const listRef = useRef<HTMLDivElement>(null)
+  // keyed by which exams are held, so the remembered list and the fresh one don't each trigger a round of reads
+  const heldIds = (sealed ?? []).filter((x) => x.opensAtMs <= Date.now()).map((x) => x.examId).join(" ")
   useEffect(() => {
     const el = listRef.current
-    const held = (sealed ?? []).filter((x) => x.opensAtMs <= Date.now())
+    const held = heldIds ? heldIds.split(" ").map((examId) => ({ examId })) : []
     if (!el || held.length === 0) return
     let live = true
     const timers: ReturnType<typeof setTimeout>[] = []
     const get = (examId: string, tries = 0): void => {
       examOutcome(reader, examId, issuer)
-        .then((o) => live && setOutcomes((m) => new Map(m).set(examId, o)))
+        .then((o) => {
+          if (!live) return
+          setOutcomes((m) => {
+            const next = new Map(m).set(examId, o)
+            keep("outcomes", [...next].filter(([, v]) => v !== "unknown"))
+            return next
+          })
+        })
         .catch(() => {
           if (!live) return
           if (tries < 3) timers.push(setTimeout(() => get(examId, tries + 1), 2000 * 2 ** tries))
@@ -85,7 +99,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
       io.disconnect()
       timers.forEach(clearTimeout)
     }
-  }, [sealed, issuer])
+  }, [heldIds, issuer])
 
   return (
     <>

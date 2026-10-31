@@ -9,7 +9,7 @@ import {
 import { bytes32, i32, str, u64 } from "@arkiv-network/sdk/attr"
 import { tiramisu } from "@arkiv-network/sdk/chains"
 import { and, eq, gte } from "@arkiv-network/sdk/query"
-import { type Address, fallback, type Hex, http, webSocket } from "viem"
+import { type Address, fallback, type Hex, hexToBytes, http, webSocket } from "viem"
 import { commitHash, questionHash, randomSalt, rootHash, splitQuestions } from "./hash"
 import { type CommitPayload, deadlineOf, type ExamSpec, groupExams, judge, newOpenExamId, openReveals, type OpenExamPayload, packBatches, type RevealPayload, type Row, type SealSecrets, sameAddr, type WitnessPayload } from "./rules"
 
@@ -36,7 +36,9 @@ export const viaProxy = Boolean((import.meta as { env?: { PROD?: boolean } }).en
 export function publicClient(rpc = RPC_URL): PublicArkivClient {
   // retryCount 0: on a keyless 429 viem would otherwise sit on a ~40 min Retry-After without telling anyone
   const direct = http(rpc, { retryCount: 0 })
-  return createPublicClient({ chain: tiramisu, transport: viaProxy ? fallback([http("/api/rpc", { retryCount: 0 }), direct], { retryCount: 0 }) : direct })
+  // calls made together (block times for a list of exams) go out as one batch; the proxy takes up to 20
+  const proxy = http("/api/rpc", { retryCount: 0, batch: { batchSize: 20, wait: 8 } })
+  return createPublicClient({ chain: tiramisu, transport: viaProxy ? fallback([proxy, direct], { retryCount: 0 }) : direct })
 }
 
 // A version string for one exam from the site's 2s-cached /api/status; it changes whenever a record is added.
@@ -239,11 +241,94 @@ export async function examRecords(client: PublicArkivClient, examId: string, cur
   }
 }
 
+// The same records through the site's 2s-cached /api/records, which also carries every block time, so a page needs
+// one fast request. Rows are rebuilt exactly as toRow builds them; if the endpoint is down the SDK reads Arkiv.
+type RawEntity = {
+  key: Hex
+  creator: Address
+  owner: Address
+  createdAt: Hex
+  expiresAt: Hex
+  creationFlags?: { readonly?: boolean; permissionlessExtension?: boolean }
+  attributes?: { name: string; type: string; value: string | number }[]
+  payload?: Hex
+}
+export type Records = Awaited<ReturnType<typeof examRecords>>
+
+export function rowFromRaw(e: RawEntity): Row {
+  const attrs: Row["attrs"] = {}
+  // 64-bit numbers arrive as hex text; the SDK hands them over as bigints, so do the same
+  for (const a of e.attributes ?? []) attrs[a.name] = a.type === "u64" ? BigInt(a.value) : a.value
+  let json: unknown = null
+  try {
+    json = e.payload && e.payload !== "0x" ? JSON.parse(new TextDecoder().decode(hexToBytes(e.payload))) : null
+  } catch {
+    json = null
+  }
+  return {
+    key: e.key,
+    creator: e.creator,
+    owner: e.owner,
+    createdAt: BigInt(e.createdAt),
+    expiresAt: BigInt(e.expiresAt),
+    readonly: !!e.creationFlags?.readonly,
+    extendable: !!e.creationFlags?.permissionlessExtension,
+    attrs,
+    json,
+  }
+}
+
+export function recordsFromRaw(raw: { data: RawEntity[]; cursor: string | null; times: Record<string, number> }): Records {
+  for (const [b, ms] of Object.entries(raw.times)) blockTimes.set(BigInt(b), ms)
+  const all = raw.data.map(rowFromRaw)
+  const of = (type: string) => all.filter((r) => r.attrs.type === type)
+  return { commits: of("paper_commit"), reveals: of("reveal"), entries: of("open_exam"), witnesses: of("witness"), next: raw.cursor ?? undefined }
+}
+
+// version: the exam's /api/status version when the caller knows it changed, so the CDN can't hand back an older copy
+export async function fastRecords(client: PublicArkivClient, examId: string, version?: string): Promise<Records> {
+  if (viaProxy) {
+    try {
+      const res = await fetch(`/api/records?exam=${encodeURIComponent(examId)}${version ? `&v=${encodeURIComponent(version)}` : ""}`)
+      if (res.ok) {
+        const text = await res.text()
+        remember(examId, text)
+        return recordsFromRaw(JSON.parse(text))
+      }
+    } catch {
+      // fall through to a direct read
+    }
+  }
+  return examRecords(client, examId)
+}
+
+// The last records this browser saw for an exam, so a page it has opened before draws at once and then refreshes.
+// Records only ever get added, so the worst a stale copy can do is miss the newest ones for a moment.
+const STORE = "mohar.rec:"
+function remember(examId: string, text: string) {
+  try {
+    if (text.length < 400_000) localStorage.setItem(STORE + examId, text)
+  } catch {
+    // private mode or full: the page just loads from the network next time
+  }
+}
+export function rememberedRecords(examId: string): Records | undefined {
+  try {
+    const text = localStorage.getItem(STORE + examId)
+    return text ? recordsFromRaw(JSON.parse(text)) : undefined
+  } catch {
+    return undefined
+  }
+}
+
+// Block times already looked up, for a page that wants to draw before asking again.
+export const knownBlockTime = (block: bigint) => blockTimes.get(block)
+
 // What happened at a sealed exam, for its row in the list: still waiting for the paper, clean, or how many witnesses
 // held real questions before it started. One query for the exam's records plus cached block times.
 export type Outcome = { kind: "waiting" } | { kind: "clean" } | { kind: "leak"; n: number }
 export async function examOutcome(client: PublicArkivClient, examId: string, issuer: Address): Promise<Outcome> {
-  const r = await examRecords(client, examId)
+  const r = await fastRecords(client, examId)
   const exam = groupExams(r.commits, issuer)[0]
   const reveals = r.reveals.filter((x) => sameAddr(x.creator, issuer))
   if (!exam || reveals.length === 0) return { kind: "waiting" }

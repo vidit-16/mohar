@@ -1,8 +1,11 @@
 import "dotenv/config"
 import { test as base } from "@playwright/test"
+import { GET as records } from "../../api/records"
 import { POST as rpc } from "../../api/rpc"
+import { GET as status } from "../../api/status"
 
-// vite preview has no serverless functions, so serve /api/rpc with the real handler (same code Vercel runs).
+// vite preview has no serverless functions, so serve /api/rpc, /api/records and /api/status with the real handlers
+// (same code Vercel runs).
 // /api/drip is stubbed: the live drip is covered by the chain tests and shouldn't spend GLM per run.
 export const test = base.extend({
   page: async ({ page }, provide) => {
@@ -12,6 +15,11 @@ export const test = base.extend({
       const res = await rpc(new Request("http://local/api/rpc", { method: "POST", headers: { "content-type": "application/json" }, body: req.postData() ?? "" }))
       await route.fulfill({ status: res.status, contentType: "application/json", body: await res.text() })
     })
+    for (const [path, handler] of [["**/api/records*", records], ["**/api/status*", status]] as const)
+      if (!process.env.E2E_BASE_URL) await page.route(path, async (route) => {
+        const res = await handler(new Request(route.request().url()))
+        await route.fulfill({ status: res.status, contentType: "application/json", body: await res.text() })
+      })
     await page.route("**/api/drip*", (route) =>
       route.request().method() === "GET"
         ? route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ address: "0x", salt: "0x" + "00".repeat(16), exp: Date.now() + 60_000, bits: 1, sig: "0x" + "00".repeat(32) }) })
