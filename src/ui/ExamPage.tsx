@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, Ban, Bell, ChevronRight, CircleCheck, CircleX, ExternalLink, FileText, Fingerprint, Globe, Info, Radio, ShieldAlert, Terminal, TriangleAlert, Users } from "lucide-react"
+import { ArrowLeft, BadgeCheck, Ban, Bell, ChevronRight, CircleCheck, CircleX, ExternalLink, Fingerprint, Globe, Info, ShieldAlert, TriangleAlert, Users } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import type { Address, Hex } from "viem"
 import { useChain, useNow } from "../hooks/useChain"
@@ -202,7 +202,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
 
       <section className="stats" data-tour="stats">
         {sealed ? (
-          <Stat label={t("exam.stat.seal")} value={<span className="ok-inline"><BadgeCheck size={18} /> {exam.sets.length}</span>} hint={issuerName} />
+          <Stat label={t("exam.stat.seal")} value={exam.sets.length} hint={issuerName} />
         ) : (
           <Stat label={t("exam.stat.entry")} value={<span className="stat-addr">{exam.creator.slice(0, 6)}…{exam.creator.slice(-4)}</span>} hint={t("exam.status.open")} />
         )}
@@ -214,7 +214,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             </span>
           } hint={`${counts.before} ${t("exam.stat.before")} · ${counts.late} ${t("exam.stat.after")}`} />
         {sealed ? (
-          <Stat label={t("exam.stat.integrity")} value={x.hasPaper ? `${integrity}/${x.paper.length}` : "—"} hint={x.hasPaper ? (integrity === x.paper.length ? "✓" : "✗") : t("exam.status.awaiting")} />
+          <Stat label={t("exam.stat.integrity")} value={x.hasPaper ? `${integrity}/${x.paper.length}` : "—"} hint={x.hasPaper ? (integrity === x.paper.length ? t("exam.stat.allMatch") : t("exam.stat.someDont")) : t("exam.status.awaiting")} />
         ) : (
           <Stat label={t("exam.filter.leak")} value={x.hasPaper ? counts.leak : "—"} hint={x.hasPaper ? "" : t("exam.check")} />
         )}
@@ -243,7 +243,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         <section className="card" data-tour="check">
           <div className="card-head">
             <h2>
-              <FileText size={16} /> {t("exam.check")}
+              {t("exam.check")}
             </h2>
           </div>
           <p className="muted small">{t("exam.checkHint")}</p>
@@ -262,56 +262,83 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
       )}
 
       <div className="split">
-        <section className="card" data-tour="witnesses">
-          <div className="card-head">
-            <h2>{t("exam.witnesses")}</h2>
-            <div className="chips" role="tablist">
-              {(
-                [
-                  ["all", t("exam.filter.all"), rows.length],
-                  ["leak", t("exam.filter.leak"), counts.leak],
-                  ["before", t("exam.filter.before"), counts.before],
-                  ["late", t("exam.filter.late"), counts.late],
-                ] as const
-              ).map(([k, label, n]) => (
-                <button key={k} role="tab" aria-selected={filter === k} className={`chip ${filter === k ? "on" : ""}`} onClick={() => setFilter(k)}>
-                  {label} {n}
-                </button>
-              ))}
-            </div>
-          </div>
-          {rows.length === 0 ? (
-            <Empty icon={<Fingerprint size={22} />} title={t("exam.noWitnesses")}>
-              {!opened && t("exam.noWitnessesHint")}
-            </Empty>
-          ) : (
-            <ul className="wlist">
-              {filtered.map(({ w, v, d, n }) => (
-                <li key={w.key}>
-                  <button className={`wrow ${d.kind === "leak" ? "wrow-leak" : ""} ${arrived.has(w.key) ? "wrow-new" : ""}`} onClick={() => setPicked(w.key)} data-tour={`w-${d.kind}`}>
-                    <span className={`wdot tone-${d.tone}`}>
-                      <Fingerprint size={14} />
-                    </span>
-                    <span className="grow">
-                      <span className="wtitle">{d.title}</span>
-                      <span className="muted small">
-                        {n} × <Fingerprint size={11} /> · {v ? `${fmtTime(v.witnessedAtMs)} · ${fmtDuration(Math.abs(v.deadlineMs - v.witnessedAtMs))} ${v.before ? t("v.before") : t("v.after")}` : "…"}
-                        <span className="tech-only"> · {w.creator.slice(0, 6)}…{w.creator.slice(-4)} · #{String(w.createdAt)}</span>
-                      </span>
-                    </span>
-                    <Tag tone={d.tone}>{d.short}</Tag>
-                    <ChevronRight size={16} className="muted hide-sm" />
+        <div className="side">
+          <section className="card" data-tour="witnesses">
+            <div className="card-head">
+              <h2>{t("exam.witnesses")}</h2>
+              {rows.length >= 6 && (
+              <div className="seg seg-sm" role="tablist">
+                {(
+                  [
+                    ["all", t("exam.filter.all"), rows.length],
+                    ["leak", t("exam.filter.leak"), counts.leak],
+                    ["before", t("exam.filter.before"), counts.before],
+                    ["late", t("exam.filter.late"), counts.late],
+                  ] as const
+                ).map(([k, label, n]) => (
+                  <button key={k} role="tab" aria-selected={filter === k} className={filter === k ? "on" : ""} onClick={() => setFilter(k)}>
+                    {label} {n}
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {x.cursor && (
-            <button className="btn btn-secondary btn-block" onClick={x.loadMore} disabled={x.loadingMore}>
-              {t("exam.loadMore")}
-            </button>
-          )}
-        </section>
+                ))}
+              </div>
+              )}
+            </div>
+            {rows.length === 0 ? (
+              <Empty icon={<Fingerprint size={22} />} title={t("exam.noWitnesses")}>
+                {!opened && t("exam.noWitnessesHint")}
+              </Empty>
+            ) : (
+              <ul className="wlist">
+                {filtered.map(({ w, v, d, n }) => (
+                  <li key={w.key}>
+                    <button className={`wrow ${d.kind === "leak" ? "wrow-leak" : ""} ${arrived.has(w.key) ? "wrow-new" : ""}`} onClick={() => setPicked(w.key)} data-tour={`w-${d.kind}`}>
+                      <span className={`wdot tone-${d.tone}`} />
+                      <span className="grow">
+                        <span className="wtitle">{d.title}</span>
+                        <span className="muted small">
+                          {n === 1 ? t("exam.nQ1") : t("exam.nQs", { n })} · {v ? `${fmtTime(v.witnessedAtMs)} · ${fmtDuration(Math.abs(v.deadlineMs - v.witnessedAtMs))} ${v.before ? t("v.before") : t("v.after")}` : "…"}
+                          <span className="tech-only"> · {w.creator.slice(0, 6)}…{w.creator.slice(-4)} · #{String(w.createdAt)}</span>
+                        </span>
+                      </span>
+                      <Tag tone={d.tone}>{d.short}</Tag>
+                      <ChevronRight size={16} className="muted hide-sm" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {x.cursor && (
+              <button className="btn btn-secondary btn-block" onClick={x.loadMore} disabled={x.loadingMore}>
+                {t("exam.loadMore")}
+              </button>
+            )}
+          </section>
+            <section className="card" data-tour="live">
+              <div className="card-head">
+                <h2>
+                  {t("exam.live")}
+                </h2>
+                <span className={`live live-${x.live}`}>
+                  <i /> {x.live === "down" ? t("exam.liveOff") : t("exam.liveOn")}
+                </span>
+              </div>
+              {x.feed.length === 0 ? (
+                <p className="muted small">{t("exam.liveHint")}</p>
+              ) : (
+                <ul className="feed">
+                  {x.feed.map((f) => (
+                    <li key={f.id} className="feed-in">
+                      <span className={`feed-dot ${f.kind}`} />
+                      <span className="grow">{f.kind === "witness" ? `${t("exam.witness")} · ${f.who.slice(0, 6)}…` : t("ev.kept")}</span>
+                      <a href={f.href} target="_blank" rel="noreferrer" className="muted small">
+                        {fmtTime(f.at)} ↗
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+        </div>
 
         <aside className="side">
           {sealed ? (
@@ -414,31 +441,6 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
             </section>
           )}
 
-          <section className="card" data-tour="live">
-            <div className="card-head">
-              <h2>
-                <Radio size={16} /> {t("exam.live")}
-              </h2>
-              <span className={`live live-${x.live}`}>
-                <i /> {x.live === "down" ? t("exam.liveOff") : t("exam.liveOn")}
-              </span>
-            </div>
-            {x.feed.length === 0 ? (
-              <p className="muted small">{t("exam.liveHint")}</p>
-            ) : (
-              <ul className="feed">
-                {x.feed.map((f) => (
-                  <li key={f.id} className="feed-in">
-                    <span className={`feed-dot ${f.kind}`} />
-                    <span className="grow">{f.kind === "witness" ? `${t("exam.witness")} · ${f.who.slice(0, 6)}…` : t("ev.kept")}</span>
-                    <a href={f.href} target="_blank" rel="noreferrer" className="muted small">
-                      {fmtTime(f.at)} ↗
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </aside>
       </div>
 
@@ -446,7 +448,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
         <section className="card" data-tour="paper">
           <div className="card-head">
             <h2>
-              <FileText size={16} /> {t("exam.paper")}
+              {t("exam.paper")}
             </h2>
             <span className="muted small">
               {revealTxs > 1 ? t("exam.paperNoteSplit", { n: revealTxs }) : t("exam.paperNote")}
@@ -467,7 +469,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
                       {t("exam.heldEarly")} {hits}
                     </Tag>
                   )}
-                  {q.sealed ? <CircleCheck size={16} className="good" aria-label="matches seal" /> : <CircleX size={16} className="bad" aria-label="doesn't match seal" />}
+                  {!q.sealed && <CircleX size={16} className="bad" aria-label="doesn't match seal" />}
                 </div>
               )
             })}
@@ -482,7 +484,7 @@ export function ExamPage({ examId, issuer, issuerName, source, domain, homeHref 
 
       <details className="card verify-card" data-tour="verify">
         <summary>
-          <Terminal size={16} /> {t("exam.verify")}
+          {t("exam.verify")}
         </summary>
         <p className="muted small">{t("exam.verifyHint")}</p>
         <div className="verify">

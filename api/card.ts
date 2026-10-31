@@ -2,7 +2,7 @@
 //   GET /api/card?exam=<exam id>&w=<witness key>   → 1200×630 PNG
 import { readFileSync } from "node:fs"
 import { ImageResponse } from "@vercel/og"
-import { CLOCK_SMALL, scallopPath } from "../src/ui/geometry.js"
+import { markSvg } from "../src/ui/geometry.js"
 import { type Card, FALLBACK, loadCard, plain, type Tone } from "./_share.js"
 
 // the renderer's built-in font has no bold, so the card brings the site's own faces
@@ -12,9 +12,7 @@ const FONTS = [
   { name: "Geist", data: font("geist-600.ttf"), weight: 600 as const, style: "normal" as const },
 ]
 // the flat seal, drawn from the app's own geometry and embedded, so the card never depends on fetching anything
-const SEAL = `data:image/svg+xml;base64,${Buffer.from(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 70 70"><path d="${scallopPath(32, 32, 30, 14)}" fill="#c4281a"/><g transform="translate(32 32) scale(0.656)" fill="none" stroke="#fff4f1" stroke-width="7" stroke-linecap="round">${CLOCK_SMALL.map((d) => `<path d="${d}"/>`).join("")}</g></svg>`,
-).toString("base64")}`
+const SEAL = `data:image/svg+xml;base64,${Buffer.from(markSvg()).toString("base64")}`
 // Mohar's lac seal, the mark of a caught leak, rendered once from the site's seal: the card renderer can't light wax
 const LAC = `data:image/png;base64,${readFileSync(new URL("./assets/lac.png", import.meta.url)).toString("base64")}`
 

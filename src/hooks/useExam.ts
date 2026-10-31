@@ -24,27 +24,37 @@ import { reader } from "./useChain"
 export type FeedItem = { id: string; at: number; kind: "witness" | "extend"; who: string; href: string }
 export type LiveState = "connecting" | "live" | "down"
 
+type Records = Awaited<ReturnType<typeof examRecords>>
+// The last records seen for each exam and every block time looked up, shared by the whole tab: opening an exam the
+// home page already loaded draws it at once (and lets the leak card turn into it), then refreshes in the background.
+const recent = new Map<string, Records>()
+const blockTimes = new Map<bigint, number>()
+const examOf = (r: Records, issuer: Address) => groupExams(r.commits, issuer)[0] ?? openExamFrom(r.entries)
+const revealsOf = (r: Records, issuer: Address) => r.reveals.filter((x) => sameAddr(x.creator, issuer))
+
 export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]) {
-  const [exam, setExam] = useState<Exam | null>()
-  const [reveals, setReveals] = useState<Row[]>([])
-  const [witnesses, setWitnesses] = useState<Row[]>([])
-  const [cursor, setCursor] = useState<string>()
+  const seed = recent.get(examId)
+  const [exam, setExam] = useState<Exam | null | undefined>(() => seed && examOf(seed, issuer))
+  const [reveals, setReveals] = useState<Row[]>(() => (seed ? revealsOf(seed, issuer) : []))
+  const [witnesses, setWitnesses] = useState<Row[]>(() => seed?.witnesses ?? [])
+  const [cursor, setCursor] = useState<string | undefined>(() => seed?.next)
   const [error, setError] = useState<string>()
-  const [times, setTimes] = useState<Map<bigint, number>>(new Map())
+  const [times, setTimes] = useState<Map<bigint, number>>(() => new Map(blockTimes))
   const [feed, setFeed] = useState<FeedItem[]>([])
   const [live, setLive] = useState<LiveState>("connecting")
   const [attempt, setAttempt] = useState(0)
   const [loadingMore, setLoadingMore] = useState(false)
 
   const apply = useCallback(
-    (r: Awaited<ReturnType<typeof examRecords>>) => {
-      setExam(groupExams(r.commits, issuer)[0] ?? openExamFrom(r.entries))
-      setReveals(r.reveals.filter((x) => sameAddr(x.creator, issuer)))
+    (r: Records) => {
+      recent.set(examId, r)
+      setExam(examOf(r, issuer))
+      setReveals(revealsOf(r, issuer))
       setWitnesses(r.witnesses)
       setCursor(r.next)
       setError(undefined)
     },
-    [issuer],
+    [examId, issuer],
   )
 
   const load = useCallback(
@@ -83,7 +93,10 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
     if (missing.length === 0) return
     let stop = false
     Promise.all(missing.map(async (b) => [b, await blockTimeMs(reader, b)] as const))
-      .then((pairs) => !stop && setTimes((t) => new Map([...t, ...pairs])))
+      .then((pairs) => {
+        pairs.forEach(([b, ms]) => blockTimes.set(b, ms))
+        if (!stop) setTimes((t) => new Map([...t, ...pairs]))
+      })
       .catch(() => undefined)
     return () => {
       stop = true

@@ -1,4 +1,3 @@
-import { Bell, Fingerprint, Stamp, Unlock, UserPlus } from "lucide-react"
 import type { Hex } from "viem"
 import { useT } from "../i18n"
 import { fmtDate, fmtTime } from "./format"
@@ -34,37 +33,27 @@ export function Timeline({ startMs, startLabel, official = true, opensAtMs, dead
       <div className="tl-track">
         <div className="tl-before" style={{ left: 0, width: at(deadlineMs) }} />
         <div className="tl-after" style={{ left: at(deadlineMs), right: 0 }} />
+        <div className="tl-bell" style={{ left: at(opensAtMs) }} title={`${t("exam.opens")} ${fmtTime(opensAtMs)}`} />
         {upcoming && <div className="tl-now" style={{ left: at(now) }} />}
         {startMs !== undefined && (
-          <div className={`tl-mark ${official ? "tl-seal" : "tl-entry"}`} style={{ left: at(startMs) }} title={`${startLabel} ${fmtTime(startMs)}`}>
-            {official ? <Stamp size={14} /> : <UserPlus size={14} />}
-          </div>
+          <div className={`tl-mark ${official ? "tl-seal" : "tl-entry"}`} style={{ left: at(startMs) }} title={`${startLabel} ${fmtTime(startMs)}`} />
         )}
-        <div className="tl-bell" style={{ left: at(opensAtMs) }} title={`${t("exam.opens")} ${fmtTime(opensAtMs)}`}>
-          <div className="tl-bell-icon">
-            <Bell size={14} />
-          </div>
-        </div>
         {revealMs !== undefined && (
           <div
             className="tl-mark tl-reveal"
-            style={{ left: at(revealMs), marginLeft: Math.abs(revealMs - opensAtMs) < span * 0.06 ? 20 : undefined }}
+            style={{ left: at(revealMs), marginLeft: Math.abs(revealMs - opensAtMs) < span * 0.03 ? 12 : undefined }}
             title={`${t("exam.paper")} ${fmtTime(revealMs)}`}
-          >
-            <Unlock size={14} />
-          </div>
+          />
         )}
         {points.map((p, i) => (
           <button
             key={p.key}
             className={`tl-dot tone-${p.tone}`}
-            style={{ left: at(p.ms), top: `${70 + ((i % 2) * 2 - 1) * 11}%`, animationDelay: `${0.5 + i * 0.12}s` }}
+            style={{ left: at(p.ms), top: `${50 + ((i % 2) * 2 - 1) * 18}%`, animationDelay: `${0.5 + i * 0.12}s` }}
             title={`${p.label} · ${fmtTime(p.ms)}`}
             aria-label={`${p.label}, ${fmtTime(p.ms)}`}
             onClick={() => onPick?.(p.key)}
-          >
-            <Fingerprint size={11} />
-          </button>
+          />
         ))}
       </div>
       <div className="tl-labels">

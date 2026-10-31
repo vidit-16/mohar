@@ -161,10 +161,10 @@ export function IssuerPage({ homeHref }: { homeHref: string }) {
 
       <div className="seg issuer-tabs" role="tablist">
         <button role="tab" aria-selected={tab === "seal"} className={tab === "seal" ? "on" : ""} onClick={() => setTab("seal")}>
-          <Lock size={14} /> {t("iss.tabSeal")}
+          {t("iss.tabSeal")}
         </button>
         <button role="tab" aria-selected={tab === "reveal"} className={tab === "reveal" ? "on" : ""} onClick={() => setTab("reveal")}>
-          <Unlock size={14} /> {t("iss.tabReveal")}
+          {t("iss.tabReveal")}
         </button>
       </div>
 

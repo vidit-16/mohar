@@ -25,5 +25,21 @@ export const CLOCK = [
   `M0 0 L${polar((9 + 58 / 60) * 30, 10)}`,
   `M0 0 L${polar(58 * 6, 15)}`,
 ]
-// At favicon and nav sizes twelve ticks turn to noise, so the small mark keeps only the face and the two hands.
-export const CLOCK_SMALL = [CLOCK[0], ...CLOCK.slice(-2)]
+
+// The edge of a pool of wax: a circle that swells and dips a little, fixed so every mark is the same pour.
+export function waxPath(cx: number, cy: number, r: number) {
+  const n = 72
+  let d = ""
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2
+    const rr = r * (1 + 0.035 * Math.sin(3 * a + 0.5) + 0.022 * Math.sin(5 * a + 1.7) + 0.012 * Math.sin(9 * a + 0.3))
+    d += `${i ? "L" : "M"}${(cx + rr * Math.cos(a)).toFixed(2)} ${(cy + rr * Math.sin(a)).toFixed(2)}`
+  }
+  return `${d}Z`
+}
+
+// The same mark as a standalone SVG, for the favicon and the share card, which can't read the page's colour tokens.
+export const markSvg = (seal = "#c4281a", lo = "#8a1610", ink = "#fff4f1") =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="${waxPath(32, 32, 30)}" fill="${seal}"/>` +
+  `<circle cx="32" cy="32" r="21.5" fill="${lo}" opacity="0.32"/><g fill="none" stroke="${ink}" stroke-linecap="round">` +
+  `<circle cx="32" cy="31" r="10.5" stroke-width="3"/><path d="M32 31 L26 26.6 M32 31 L30.6 22" stroke-width="3"/></g></svg>`

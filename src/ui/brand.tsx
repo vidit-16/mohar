@@ -1,14 +1,14 @@
 import { useId } from "react"
-import { CLOCK, CLOCK_SMALL, scallopPath } from "./geometry"
+import { CLOCK, scallopPath, waxPath } from "./geometry"
 
 // half the top arc (r=66) plus half the letter-spacing that trails the last letter
 const TOP_MID = (Math.PI * 66) / 2 + 2.5
 
-function Clock({ size, color, width = 2.6, small }: { size: number; color: string; width?: number; small?: boolean }) {
+function Clock({ size, color, width = 2.6 }: { size: number; color: string; width?: number }) {
   const s = size / 64
   return (
     <g transform={`scale(${s})`} fill="none" stroke={color} strokeWidth={width / s} strokeLinecap="round">
-      {(small ? CLOCK_SMALL : CLOCK).map((d) => (
+      {CLOCK.map((d) => (
         <path key={d} d={d} />
       ))}
     </g>
@@ -60,13 +60,16 @@ export function Emblem({ size = 200, className, animate }: { size?: number; clas
   )
 }
 
+// The nav and favicon mark: the lac seal flattened to two tones so it stays crisp at 20px. A pool of wax, the pressed
+// disc, and the clock at 9:58 from the imprint.
 export function Mark({ size = 32, className }: { size?: number; className?: string }) {
   return (
-    <svg viewBox="-1 -1 66 66" width={size} height={size} className={className} aria-hidden>
-      <path d={scallopPath(32, 32, 29, 16)} fill="var(--seal)" />
-      <circle cx="32" cy="32" r="20" fill="none" stroke="var(--seal-ink)" strokeOpacity="0.35" strokeWidth="1" />
-      <g transform="translate(32 32)">
-        <Clock size={38} color="var(--seal-ink)" width={3.4} small />
+    <svg viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden>
+      <path d={waxPath(32, 32, 30)} fill="var(--seal)" />
+      <circle cx="32" cy="32" r="21.5" fill="var(--seal-lo)" opacity="0.32" />
+      <g fill="none" stroke="var(--seal-ink)" strokeLinecap="round">
+        <circle cx="32" cy="31" r="10.5" strokeWidth="3" />
+        <path d="M32 31 L26 26.6 M32 31 L30.6 22" strokeWidth="3" />
       </g>
     </svg>
   )

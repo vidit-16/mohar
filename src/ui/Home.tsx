@@ -1,4 +1,4 @@
-import { ArrowRight, BadgeCheck, ChevronRight, Clock, Globe, Play, Plus, Search, Stamp, Unlock, Users } from "lucide-react"
+import { ArrowRight, ChevronRight, Globe, Play, Plus, Search, Stamp, Users } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { Address } from "viem"
 import { reader, useChain, useNow } from "../hooks/useChain"
@@ -143,10 +143,10 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
         <div className="tabs-row">
           <div className="seg" role="tablist">
             <button role="tab" aria-selected={tab === "sealed"} className={tab === "sealed" ? "on" : ""} onClick={() => setTab("sealed")}>
-              <BadgeCheck size={14} /> {t("exams.sealed")}
+              {t("exams.sealed")}
             </button>
             <button role="tab" aria-selected={tab === "open"} className={tab === "open" ? "on" : ""} onClick={() => setTab("open")}>
-              <Users size={14} /> {t("exams.open")}
+              {t("exams.open")}
             </button>
           </div>
           {tab === "open" && (
@@ -178,7 +178,6 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
             !err &&
             [0, 1].map((i) => (
               <div key={i} className="exam-row">
-                <Skeleton w={40} h={40} r={11} />
                 <div className="grow stack-xs">
                   <Skeleton w="45%" h={16} />
                   <Skeleton w="30%" h={12} />
@@ -188,9 +187,6 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
           {list && shown.length === 0 && !exactId && <Empty icon={tab === "sealed" ? <Stamp size={22} /> : <Users size={22} />} title={t("exams.none")}>{tab === "open" && t("exams.noneOpen")}</Empty>}
           {exactId && (
             <a className="exam-row" href={examHref(exactId)}>
-              <div className="exam-icon">
-                <Search size={18} />
-              </div>
               <div className="grow">
                 <div className="exam-title">
                   {t("exams.lookup")} “{exactId}”
@@ -203,7 +199,6 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
             const upcoming = x.opensAtMs > now
             return (
               <a key={x.examId} className="exam-row" href={examHref(x.examId)}>
-                <div className={`exam-icon ${upcoming ? "up" : ""}`}>{upcoming ? <Clock size={18} /> : <Unlock size={18} />}</div>
                 <div className="grow">
                   <div className="exam-title">{shownTitle(x.title, !upcoming)}</div>
                   <div className="muted small">{fmtWhen(x.opensAtMs)}</div>
@@ -313,7 +308,7 @@ function CaughtLeak() {
   const leakPct = Math.min(bellPct - 14, Math.max(sealPct + 18, sealPct + ((top.witnessedAtMs - sealMs!) / (top.deadlineMs - sealMs!)) * (bellPct - sealPct)))
   return (
     <LeakCard
-      href={`${examHref(DEMO_EXAM)}&w=${top.witness.key}`}
+      href={examHref(DEMO_EXAM)}
       title={x.exam!.title}
       started={t("hero.app.started", { t: fmtWhen(x.exam!.opensAtMs) })}
       verdict={t("hero.app.caught")}
