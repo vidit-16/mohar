@@ -2,23 +2,21 @@
 // The CDN caches it for 2 seconds, so a whole room of phones polling it costs Arkiv about one query every 2s,
 // and each page reloads the exam the moment the signal changes. It says nothing about trust; the page still
 // decides what counts from the records themselves.
-const UPSTREAM = "https://rpc.tiramisu.db-chain.testnet.arkiv.network"
+import { arkiv } from "./_arkiv.js"
+
 export const EXAM_ID = /^[A-Za-z0-9._-]{1,120}$/
 
 export async function GET(req: Request) {
   const exam = new URL(req.url).searchParams.get("exam") ?? ""
   if (!EXAM_ID.test(exam)) return Response.json({ error: "bad exam id" }, { status: 400 })
-  const key = process.env.ARKIV_KEY?.trim()
-  const res = await fetch(key ? `${UPSTREAM}/${key}` : UPSTREAM, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
+  const res = await arkiv(
+    JSON.stringify({
       jsonrpc: "2.0",
       id: 1,
       method: "arkiv_query",
       params: [`project = str('mohar-v1') AND exam_id = str('${exam}')`, { select: { key: true, createdAt: true }, limit: "0xc8" }],
     }),
-  })
+  )
   const body = (await res.json().catch(() => null)) as { result?: { data: { createdAt: string }[] } } | null
   const rows = body?.result?.data
   if (!res.ok || !rows) return Response.json({ error: "upstream" }, { status: 502, headers: { "cache-control": "no-store" } })

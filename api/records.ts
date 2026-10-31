@@ -2,9 +2,9 @@
 // A page then needs one fast request instead of a query plus a lookup per block, and a room of phones costs Arkiv
 // about one query every 2s. It is only a faster read of the same public records: the page decides trust itself,
 // and falls back to reading Arkiv directly if this is down.
+import { arkiv } from "./_arkiv.js"
 import { EXAM_ID } from "./status.js"
 
-const UPSTREAM = "https://rpc.tiramisu.db-chain.testnet.arkiv.network"
 const SELECT = { key: true, creator: true, owner: true, createdAt: true, expiresAt: true, creationFlags: true, attributes: true, payload: true }
 
 type Raw = { createdAt: string }
@@ -12,10 +12,8 @@ type Raw = { createdAt: string }
 export async function GET(req: Request) {
   const exam = new URL(req.url).searchParams.get("exam") ?? ""
   if (!EXAM_ID.test(exam)) return Response.json({ error: "bad exam id" }, { status: 400 })
-  const key = process.env.ARKIV_KEY?.trim()
-  const url = key ? `${UPSTREAM}/${key}` : UPSTREAM
   const call = async (body: unknown) => {
-    const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+    const res = await arkiv(JSON.stringify(body))
     if (!res.ok) throw new Error(`upstream ${res.status}`)
     return res.json()
   }

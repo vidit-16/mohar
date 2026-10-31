@@ -1,6 +1,7 @@
 // Read-only JSON-RPC proxy: adds the Arkiv access key on the server so it never ships to browsers.
 // The site falls back to the public RPC if this is down, so nothing depends on it.
-const UPSTREAM = "https://rpc.tiramisu.db-chain.testnet.arkiv.network"
+import { arkiv } from "./_arkiv.js"
+
 const READS = new Set([
   "arkiv_query",
   "arkiv_getBlockTiming",
@@ -26,12 +27,7 @@ export async function POST(req: Request) {
   if (calls.length === 0 || calls.length > 20 || calls.some((c) => !READS.has(c?.method))) {
     return Response.json({ error: "only read methods are allowed" }, { status: 403 })
   }
-  const key = process.env.ARKIV_KEY?.trim()
-  const res = await fetch(key ? `${UPSTREAM}/${key}` : UPSTREAM, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  })
+  const res = await arkiv(JSON.stringify(body))
   // a block by explicit number never changes, everything else is live
   const immutable = calls.every((c) => c.method === "eth_getBlockByNumber" && typeof c.params?.[0] === "string" && c.params[0].startsWith("0x"))
   return new Response(res.body, {

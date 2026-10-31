@@ -51,3 +51,17 @@ describe("drip limits", { timeout: 30_000 }, () => {
     expect(LIMITS).toEqual({ perIpPerHour: 5, maxPerHour: 120 })
   })
 })
+
+describe("a spent access key", () => {
+  it("falls back to the public endpoint instead of failing", async () => {
+    vi.stubEnv("ARKIV_KEY", "spent")
+    const seen: string[] = []
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+      seen.push(url)
+      return url.endsWith("/spent") ? Response.json({ error: "QUOTA_EXCEEDED" }, { status: 429 }) : Response.json({ result: { data: [{ createdAt: "0x10" }] } })
+    }))
+    const res = await get("E")
+    expect(res.status).toBe(200)
+    expect(seen).toEqual(["https://rpc.tiramisu.db-chain.testnet.arkiv.network/spent", "https://rpc.tiramisu.db-chain.testnet.arkiv.network"])
+  })
+})
