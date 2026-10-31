@@ -149,7 +149,6 @@ html, body { overflow-x: clip; }
 .wm-text { font: 650 1.35rem var(--display); letter-spacing: -0.03em; display: inline-flex; align-items: baseline; gap: 6px; }
 .wm-hi { font: 600 1rem "Mohar Deva", var(--deva); color: var(--accent); }
 .footer .wm-text { font-size: 1.125rem; }
-.stamp-in { animation: stamp 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.15) both; transform-origin: 50% 50%; }
 @keyframes stamp {
   0% { transform: scale(1.6) rotate(-14deg); opacity: 0; }
   55% { transform: scale(0.94) rotate(2deg); opacity: 1; }
@@ -647,6 +646,7 @@ html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
 .receipt-kv dd { margin: 0; min-width: 0; font-variant-numeric: tabular-nums; }
 .receipt-foot { margin: 8px 0 0; font-size: 0.8125rem; color: var(--text-3); }
 .receipt-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+.lac-drop { filter: drop-shadow(0 2px 1.5px rgb(70 20 10 / 0.35)) drop-shadow(0 10px 14px rgb(70 20 10 / 0.16)); }
 .stamp-slam { animation: stamp-slam 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
 @keyframes stamp-slam { 0% { opacity: 0; transform: scale(2.6) rotate(-14deg); } 55% { opacity: 1; transform: scale(0.94) rotate(-4deg); } 100% { transform: scale(1) rotate(-6deg); } }
 @media (prefers-reduced-motion: reduce) { .stamp-slam { animation: none; transform: rotate(-6deg); } }
@@ -760,6 +760,19 @@ html[lang="hi"] h2.big { font-family: var(--deva); line-height: 1.2; letter-spac
 .moments li { position: relative; padding-top: 30px; border-top: 2px solid var(--border); }
 .moments li::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--text-3); }
 .moments li.is-bell::before { background: var(--seal-hi); }
+/* as the section comes into view the line runs from the night before to the bell, one moment after another */
+.moments.armed li { --d: calc(var(--i) * 0.75s); }
+.moments.armed li::after { content: ""; position: absolute; top: -2px; left: 0; right: -40px; height: 2px; background: var(--text); transform: scaleX(0); transform-origin: left; transition: transform 0.75s linear var(--d); }
+.moments.armed li:last-child::after { right: 0; transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+.moments.armed li::before { z-index: 1; transform: scale(0.7); transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1) var(--d), background-color 0.2s var(--d); }
+.moments.armed li.is-bell::before { background: var(--text-3); }
+.moments.armed li > * { transform: translateY(6px); transition: transform 0.5s ease-out var(--d); }
+.moments.armed.draw li::after { transform: scaleX(1); }
+.moments.armed.draw li::before { transform: scale(1); background: var(--text); }
+.moments.armed.draw li.is-bell::before { background: var(--seal-hi); animation: bell-ring 1.2s ease-out calc(var(--d) + 0.2s) 2; }
+.moments.armed.draw li > * { transform: none; }
+@keyframes bell-ring { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--seal-hi) 55%, transparent); } to { box-shadow: 0 0 0 14px transparent; } }
+@media (max-width: 760px) { .moments.armed li::after { right: 0; } }
 .m-time { font: 600 clamp(2.6rem, 4vw, 3.6rem)/1 var(--display); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
 .is-bell .m-time { color: var(--seal); }
 .m-when { color: var(--text-3); font-size: 0.875rem; margin-top: 8px; }
@@ -830,6 +843,17 @@ html[lang="hi"] .big-line { font-family: var(--deva); line-height: 1.2; letter-s
 .footer { margin-top: clamp(96px, 12vw, 180px); border-top: 0; overflow: clip; }
 .footer-name { font: 600 clamp(7rem, 24vw, 22rem)/0.85 "Mohar Deva", var(--deva); color: var(--seal); letter-spacing: -0.02em; margin-bottom: clamp(18px, 3vw, 36px); user-select: none; }
 .list-card { box-shadow: none; }
+/* home surfaces are fields of tone, not outlined boxes; rows are parted by space, not rules */
+.try, .cta-card, #exams .list-card { background: var(--surface-2); border: 0; }
+.try input, .try textarea, .cta-card pre { background: var(--surface); }
+.cta-card pre { border: 0; }
+#exams .list-card { display: grid; gap: 2px; }
+#exams .exam-row + .exam-row { border-top: 0; border-radius: 12px; }
+#exams a.exam-row:hover { background: var(--surface); border-radius: 12px; }
+#exams .tabs-row { margin-top: 18px; justify-content: flex-start; column-gap: 40px; }
+#exams .tabs-tools { flex: 1; } #exams .search { flex: 1; }
+.tabs-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 640px) { .tabs-tools, .tabs-tools .search { width: 100%; } }
 
 /* page moves: a quick cross-fade, and the leak card growing into the exam's verdict panel */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.22s; }

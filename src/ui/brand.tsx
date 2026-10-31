@@ -1,87 +1,24 @@
 import { useId } from "react"
-import { CLOCK, scallopPath, waxPath } from "./geometry"
+import { waxPath } from "./geometry"
 
-// half the top arc (r=66) plus half the letter-spacing that trails the last letter
-const TOP_MID = (Math.PI * 66) / 2 + 2.5
-
-function Clock({ size, color, width = 2.6 }: { size: number; color: string; width?: number }) {
-  const s = size / 64
-  return (
-    <g transform={`scale(${s})`} fill="none" stroke={color} strokeWidth={width / s} strokeLinecap="round">
-      {CLOCK.map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </g>
-  )
-}
-
-export function Emblem({ size = 200, className, animate }: { size?: number; className?: string; animate?: boolean }) {
-  const id = useId().replace(/:/g, "")
-  return (
-    <svg
-      viewBox="0 0 200 200"
-      width={size}
-      height={size}
-      className={`${className ?? ""} ${animate ? "stamp-in" : ""}`}
-      role="img"
-      aria-label="Mohar seal"
-    >
-      <defs>
-        {/* a rubber stamp never prints a perfect edge: a faint, fixed wobble so it reads as ink, not a vector */}
-        <filter id={`ink${id}`} x="-5%" y="-5%" width="110%" height="110%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-        <path id={`top${id}`} d="M34 100 A66 66 0 0 1 166 100" />
-        <path id={`bot${id}`} d="M21 100 A79 79 0 0 0 179 100" />
-      </defs>
-      <g filter={`url(#ink${id})`}>
-        <path d={scallopPath(100, 100, 92, 26)} fill="var(--seal)" />
-        <circle cx="100" cy="100" r="84" fill="none" stroke="var(--seal-lo)" strokeWidth="1.5" opacity="0.6" />
-        <circle cx="100" cy="100" r="58" fill="var(--seal-lo)" opacity="0.35" />
-        <circle cx="100" cy="100" r="58" fill="none" stroke="var(--seal-ink)" strokeOpacity="0.35" strokeWidth="1.2" />
-        <text fontSize="14.5" fontWeight="700" letterSpacing="5" fill="var(--seal-ink)" fontFamily="Geist, sans-serif" textAnchor="middle">
-          <textPath href={`#top${id}`} startOffset={TOP_MID}>
-            MOHAR
-          </textPath>
-        </text>
-        <text fontSize="20" fontWeight="600" fill="var(--seal-ink)" fontFamily="'Mohar Deva', 'Noto Sans Devanagari', 'Nirmala UI', sans-serif" textAnchor="middle">
-          <textPath href={`#bot${id}`} startOffset="50%">
-            मोहर
-          </textPath>
-        </text>
-        <circle cx="29" cy="100" r="3" fill="var(--seal-ink)" />
-        <circle cx="171" cy="100" r="3" fill="var(--seal-ink)" />
-        <g transform="translate(100 100)">
-          <Clock size={70} color="var(--seal-ink)" width={3.4} />
-        </g>
-      </g>
-    </svg>
-  )
-}
-
-// The nav and favicon mark: the lac seal flattened to two tones so it stays crisp at 20px. A pool of wax, the pressed
-// disc, and the clock at 9:58 from the imprint.
+// The logo is the lac seal itself, cropped to the pool of wax so it fills its box like a mark should.
 export function Mark({ size = 32, className }: { size?: number; className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden>
-      <path d={waxPath(32, 32, 30)} fill="var(--seal)" />
-      <circle cx="32" cy="32" r="21.5" fill="var(--seal-lo)" opacity="0.32" />
-      <g fill="none" stroke="var(--seal-ink)" strokeLinecap="round">
-        <circle cx="32" cy="31" r="10.5" strokeWidth="3" />
-        <path d="M32 31 L26 26.6 M32 31 L30.6 22" strokeWidth="3" />
-      </g>
-    </svg>
-  )
+  return <LacSeal size={size} className={className} tight />
 }
 
 // Mohar's seal on a caught leak, in lac. Height is drawn as opacity (a thin pool of wax, a thick pressed disc with a
 // raised lip, the clock and मोहर pressed into it) and the filter lights that like satin wax: deep red where it is
 // thick, lighter where it thins out, a fine grain and a soft sheen. It appears only where a leak was caught.
-export function LacSeal({ size = 160, className, label = "Mohar seal: leak caught" }: { size?: number; className?: string; label?: string }) {
+export function LacSeal({ size = 160, className, label = "Mohar seal: leak caught", tight }: { size?: number; className?: string; label?: string; tight?: boolean }) {
   const id = useId().replace(/:/g, "")
   return (
-    <svg viewBox="-150 -150 300 300" width={size} height={size} className={`lac ${className ?? ""}`} role="img" aria-label={label}>
+    <svg
+      viewBox={tight ? "-124 -124 248 248" : "-150 -150 300 300"}
+      width={size}
+      height={size}
+      className={`lac ${className ?? ""}`}
+      {...(tight ? { "aria-hidden": true } : { role: "img", "aria-label": label })}
+    >
       <defs>
         <filter id={`pool${id}`} x="-20%" y="-20%" width="140%" height="140%">
           <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="14" result="n" />
@@ -148,12 +85,12 @@ export function LacSeal({ size = 160, className, label = "Mohar seal: leak caugh
   )
 }
 
-// The seal drawn as a faint outline, for backgrounds: the scalloped edge, two rings and the clock hands at 9:58.
+// The seal drawn as a faint outline, for backgrounds: the rim of the wax, two rings and the clock hands at 9:58.
 export function SealOutline({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden>
       <g fill="none" stroke="var(--seal-line)" strokeLinecap="round">
-        <path d={scallopPath(32, 32, 29, 16)} strokeWidth="0.22" />
+        <path d={waxPath(32, 32, 29)} strokeWidth="0.22" />
         <circle cx="32" cy="32" r="19" strokeWidth="0.18" />
         <circle cx="32" cy="32" r="9" strokeWidth="0.5" />
         <path d="M32 32 L26.8 28.2 M32 32 L30.6 23.6" strokeWidth="0.5" />

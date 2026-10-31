@@ -7,7 +7,7 @@ export type Card = { exam: string; headline: string; detail: string; tone: Tone;
 type Witness = { key: string; at: number; before: boolean; total: number; hits: string[]; verdict: "late" | "waiting" | "leak" | "no-match" }
 type Verdicts = { kind: "sealed" | "open" | "none"; title?: string; deadline?: number; witnesses?: Witness[] }
 
-export const FALLBACK: Card = { exam: "Mohar", tone: "info", badge: "MOHAR", headline: "Prove who had the paper before the exam", detail: "Tamper-proof records for exam paper leaks, readable by anyone." }
+export const FALLBACK: Card = { exam: "Mohar", tone: "info", badge: "MOHAR", headline: "Prove who had the paper first", detail: "Exam bodies seal every question before the exam. Anyone holding a leak can prove it." }
 
 // same wording as the exam page's fmtDuration ("2m before the exam"); a test keeps the two identical
 export function fmtDuration(ms: number): string {
@@ -75,7 +75,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 export type Meta = { title: string; description: string; image: string; url: string }
 export const cardMeta = (card: Card, image: string, url: string): Meta => ({
-  title: card === FALLBACK ? "Mohar · Prove who had the paper before the exam" : `${card.badge === "LEAK" ? "Leak: " : ""}${card.headline} · ${card.exam}`,
+  title: card === FALLBACK ? "Mohar · Prove who had the paper first" : `${card.badge === "LEAK" ? "Leak: " : ""}${card.headline} · ${card.exam}`,
   description: card.detail,
   image,
   url,

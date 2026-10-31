@@ -106,7 +106,7 @@ export const STEPS: TourStep[] = [
   },
   {
     end: true,
-    en: "Mohar. Prove who had the paper before the exam.",
+    en: "Mohar. Prove who had the paper first.",
     hi: "मोहर। साबित करें, पेपर परीक्षा से पहले किसके पास था।",
   },
 ]

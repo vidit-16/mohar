@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight, Maximize, Pause, Play, Subtitles, Volume2, V
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useT } from "../i18n"
 import { navigate } from "../router"
-import { Emblem } from "./brand"
+import { LacSeal } from "./brand"
 import { STEPS, tourHref } from "./tourSteps"
 import { pickVoice } from "./speech"
 
@@ -174,7 +174,7 @@ export function Tour({ search }: { search: string }) {
             setStarted(true)
           }}
         >
-          <Emblem size={120} />
+          <LacSeal size={140} className="lac-drop" label="Mohar" />
           <span className="tour-rec-title">{t("tour.recStart")}</span>
           <span className="muted small">{t("tour.recHint")}</span>
         </button>
@@ -187,7 +187,7 @@ export function Tour({ search }: { search: string }) {
     <div className="tour" aria-live="polite">
       {s.end ? (
         <div className="tour-end">
-          <Emblem size={180} animate />
+          <LacSeal size={210} className="stamp-slam lac-drop" label="Mohar" />
           <p className="tour-end-line">{s[lang]}</p>
           <p className="tour-end-url">mohar.live</p>
           <div className="row-gap" hidden={rec}>

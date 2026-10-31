@@ -8,7 +8,7 @@ import { burner, type BurnerKind, retireWitnessWallet } from "../lib/burner"
 import { normalise, questionHash, splitQuestions } from "../lib/hash"
 import { witnessPaper } from "../lib/mohar"
 import { readPhoto } from "../lib/ocr"
-import { Emblem } from "./brand"
+import { LacSeal } from "./brand"
 import { errText, FAUCET, fmtDateTime } from "./format"
 import { CopyButton, FileButton, Mono, Sheet, Spinner } from "./primitives"
 import { useToast } from "./toast"
@@ -118,7 +118,7 @@ export function WitnessSheet({ open, onClose, examId, examTitle, deadlineMs, onS
         <div className="stack receipt">
           <div className="receipt-card" data-testid="receipt">
             <div className="receipt-stamp">
-              <Emblem size={132} className="stamp-slam" />
+              <LacSeal size={150} className="stamp-slam lac-drop" label={t("w.receipt.sealed")} />
             </div>
             <p className="receipt-sealed">{t("w.receipt.sealed")}</p>
             <h3>{examTitle}</h3>

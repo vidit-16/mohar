@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronRight, Globe, Play, Plus, Search, Stamp, Users } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 import type { Address } from "viem"
 import { reader, useChain, useNow } from "../hooks/useChain"
 import { useExam } from "../hooks/useExam"
@@ -26,6 +26,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
   const [tab, setTab] = useState<Tab>("sealed")
   const [adding, setAdding] = useState(false)
   const now = useNow(30_000)
+  const momentsRef = useDrawOnView<HTMLOListElement>()
 
   const load = () => {
     const since = Date.now() - 30 * DAY_MS
@@ -106,9 +107,9 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
 
       <section id="how" className="section how">
         <h2 className="big">{t("how.big")}</h2>
-        <ol className="moments">
+        <ol className="moments" ref={momentsRef}>
           {([1, 2, 3] as const).map((i) => (
-            <li key={i} className={i === 3 ? "is-bell" : ""}>
+            <li key={i} className={i === 3 ? "is-bell" : ""} style={{ "--i": i - 1 } as CSSProperties}>
               <div className="m-time">{t(`how.m${i}.time`)}</div>
               <div className="m-when">{t(`how.m${i}.when`)}</div>
               <h3>{t(`how.m${i}.t`)}</h3>
@@ -133,13 +134,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
       </section>
 
       <section id="exams" className="section">
-        <div className="section-head">
-          <h2 className="big">{t("exams.title")}</h2>
-          <label className="search">
-            <Search size={16} />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("exams.search")} aria-label={t("exams.search")} />
-          </label>
-        </div>
+        <h2 className="big">{t("exams.title")}</h2>
         <div className="tabs-row">
           <div className="seg" role="tablist">
             <button role="tab" aria-selected={tab === "sealed"} className={tab === "sealed" ? "on" : ""} onClick={() => setTab("sealed")}>
@@ -149,11 +144,17 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
               {t("exams.open")}
             </button>
           </div>
-          {tab === "open" && (
-            <button className="btn btn-secondary btn-sm" onClick={() => setAdding(true)}>
-              <Plus size={15} /> {t("exams.add")}
-            </button>
-          )}
+          <div className="tabs-tools">
+            {tab === "open" && (
+              <button className="btn btn-secondary btn-sm" onClick={() => setAdding(true)}>
+                <Plus size={15} /> {t("exams.add")}
+              </button>
+            )}
+            <label className="search">
+              <Search size={16} />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("exams.search")} aria-label={t("exams.search")} />
+            </label>
+          </div>
         </div>
         <p className="muted small tab-hint">
           {tab === "sealed" ? (
@@ -368,4 +369,26 @@ function HeroLive() {
       )}
     </p>
   )
+}
+
+// Arms an element to play its drawing once it is half on screen. Without script, or with reduced motion, it simply
+// shows its finished state.
+function useDrawOnView<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return
+    el.classList.add("armed")
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        el.classList.add("draw")
+        io.disconnect()
+      },
+      { threshold: 0.5 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return ref
 }
