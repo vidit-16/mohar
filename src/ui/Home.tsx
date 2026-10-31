@@ -62,7 +62,7 @@ export function Home({ issuer, issuerName }: { issuer: Address; issuerName: stri
   const [outcomes, setOutcomes] = useState<Map<string, Outcome | "unknown">>(() => new Map(kept<[string, Outcome][]>("outcomes") ?? []))
   const listRef = useRef<HTMLDivElement>(null)
   // keyed by which exams are held, so the remembered list and the fresh one don't each trigger a round of reads
-  const heldIds = (sealed ?? []).filter((x) => x.opensAtMs <= Date.now()).map((x) => x.examId).join(" ")
+  const heldIds = (sealed ?? []).filter((x) => x.opensAtMs <= now).map((x) => x.examId).join(" ")
   useEffect(() => {
     const el = listRef.current
     const held = heldIds ? heldIds.split(" ").map((examId) => ({ examId })) : []

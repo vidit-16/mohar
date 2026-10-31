@@ -12,6 +12,7 @@
     "src/lib/domain.ts",
     "scripts/upkeep.ts"
   ],
+  "disableTypeChecks": "{src,scripts,test}/**/*.{js,ts,jsx,tsx}",
   "coverageAnalysis": "off",
   "concurrency": 4,
   "timeoutMS": 90000,

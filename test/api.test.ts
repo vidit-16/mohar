@@ -77,7 +77,8 @@ describe("/api/drip proof of work", () => {
     await refused({ address: A, challenge: c, nonce: wrong })
     vi.stubEnv("DRIP_KEY", "0x" + "22".repeat(32))
     await refused({ address: A, challenge: c, nonce })
-  })
+    // solving the real puzzle is seconds of CPU by design, more when every suite runs at once
+  }, 30_000)
 })
 
 describe("proof of work", () => {
