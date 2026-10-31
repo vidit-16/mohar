@@ -119,11 +119,11 @@ a, button, label, summary, [role="tab"] { touch-action: manipulation; -webkit-ta
 code, .mono-strong, pre { font-family: var(--mono); font-size: 0.86em; }
 :focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: 6px; }
 ::selection { background: var(--seal-soft); }
-.container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+.container { padding-inline: clamp(16px, 4vw, 56px); }
 html, body { overflow-x: clip; }
 /* background runs to the window edges, content stays on the column */
 .bleed { margin-inline: calc(50% - 50vw); padding-inline: calc(50vw - 50%); }
-@media (max-width: 640px) { .container { padding: 0 16px; } }
+
 .muted { color: var(--text-2); }
 .small { font-size: 0.82rem; }
 .ink { color: var(--text); font-weight: 600; }
@@ -660,7 +660,11 @@ html[lang="hi"] .receipt-card h3 { font-family: var(--deva); }
 @media (max-width: 480px) { .pq .tag { margin-left: 56px; } }
 
 /* try it: a question's fingerprint, changing with every key */
-.try-fp { display: block; font: 500 1rem/1.6 var(--mono); color: var(--accent); overflow-wrap: anywhere; }
+.try-fp { display: block; max-width: 34ch; font: 500 1rem/1.6 var(--mono); color: var(--accent); overflow-wrap: anywhere; }
+/* 66 characters always break as two even lines, never with one left over */
+@media (max-width: 900px) { .try-fp { font-size: 0.9rem; } }
+@media (max-width: 380px) { .try-fp { font-size: 0.8rem; } }
+@media (max-width: 340px) { .try-fp { font-size: 0.7rem; } }
 .try-fp span { display: inline-block; animation: fp-flip 0.12s ease-out both; }
 .try-fp i { color: var(--text-3); font-style: normal; }
 @keyframes fp-flip { from { opacity: 0.15; transform: translateY(-3px); } }
@@ -763,7 +767,7 @@ html[lang="hi"] h2.big { font-family: var(--deva); line-height: 1.2; letter-spac
 .try .try-fp-k { grid-column: 2; grid-row: 2; font-weight: 600; font-size: 0.92rem; }
 .try .try-fp { grid-column: 2; grid-row: 3 / 5; }
 .try > p:last-child { grid-column: 1 / -1; margin-top: 8px; }
-@media (max-width: 760px) { .try { grid-template-columns: 1fr; } .try > * { grid-column: 1 !important; grid-row: auto !important; } }
+@media (max-width: 900px) { .try { grid-template-columns: 1fr; } .try > * { grid-column: 1 !important; grid-row: auto !important; } }
 
 /* the numbers, said once */
 .numbers { text-align: center; }
