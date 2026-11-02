@@ -183,13 +183,14 @@ export function useExam(examId: string, issuer: Address, pasted: PaperQuestion[]
   }, [load, attempt])
 
   // Around the bell the 15s live throttle is too slow for a room watching a reveal, and the keyless socket is
-  // shared by everyone on the venue's IP. So near the start time, poll the 2s-cached /api/status and reload the
-  // exam as soon as its version changes: hundreds of phones, about one Arkiv query every two seconds.
+  // shared by everyone on the venue's IP. So from shortly before the start until the paper is out (a talk can
+  // reveal hours after the bell), poll the 2s-cached /api/status and reload the exam as soon as its version
+  // changes: hundreds of phones, about one Arkiv query every two seconds.
   const opensAtMs = exam?.opensAtMs
   const revealed = reveals.length > 0
   useEffect(() => {
     if (opensAtMs === undefined || revealed || !viaProxy) return
-    const nearBell = () => Date.now() > opensAtMs - 2 * 3_600_000 && Date.now() < opensAtMs + 6 * 3_600_000
+    const nearBell = () => Date.now() > opensAtMs - 2 * 3_600_000 && Date.now() < opensAtMs + 48 * 3_600_000
     let last: string | undefined
     let timer: ReturnType<typeof setTimeout>
     let stopped = false
