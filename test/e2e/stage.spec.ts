@@ -9,11 +9,21 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("mohar.lang", "en"))
 })
 
+test("opens on the leak, with its questions from setup and a QR to the exam", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("mohar.stage.leak", "Which city is hosting Devcon 8?\n\nWho wrote the Ethereum whitepaper?"))
+  await page.goto(STAGE)
+  await expect(page.getByRole("heading", { name: "Mohar: who had the paper first?" })).toBeVisible()
+  await page.keyboard.press("ArrowRight")
+  expect(await slide(page)).toBe("leak")
+  await expect(page.locator(".tpl-leak li")).toHaveText(["Which city is hosting Devcon 8?", "Who wrote the Ethereum whitepaper?"])
+  await expect(page.getByRole("img", { name: "QR code for https://mohar.live/devcon" })).toBeVisible()
+})
+
 test("moves with the keys a clicker sends, including keys sent to the document", async ({ page }) => {
   await page.goto(STAGE)
   await expect(page.getByRole("heading", { name: "Mohar: who had the paper first?" })).toBeVisible()
   await page.keyboard.press("PageDown")
-  expect(await slide(page)).toBe("problem")
+  expect(await slide(page)).toBe("leak")
   await page.keyboard.press("ArrowRight")
   await page.keyboard.press("Space")
   expect(await slide(page)).toBe("fight")
@@ -27,7 +37,7 @@ test("moves with the keys a clicker sends, including keys sent to the document",
 test("the demo slide shows the verdict of a revealed exam, in English and Hindi, then the QR", async ({ page }) => {
   await page.goto(STAGE)
   await expect(page.getByRole("heading", { name: "Mohar: who had the paper first?" })).toBeVisible()
-  for (let i = 0; i < 9; i++) await page.keyboard.press("ArrowRight")
+  for (let i = 0; i < 8; i++) await page.keyboard.press("ArrowRight")
   expect(await slide(page)).toBe("demo")
   await expect(page.locator(".stage-seal")).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole("heading", { name: "Held 3 real questions" })).toBeVisible()
@@ -36,7 +46,7 @@ test("the demo slide shows the verdict of a revealed exam, in English and Hindi,
   await page.keyboard.press("h")
   for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowRight")
   expect(await slide(page)).toBe("thanks")
-  await expect(page.getByRole("img", { name: "QR code for https://mohar.live/devcon" })).toBeVisible()
+  await expect(page.getByRole("img", { name: "QR code for https://linktr.ee/vidit.choudhary" })).toBeVisible()
 })
 
 test("the phone remote shows the verdict once revealed and never asks for a key up front", async ({ page }) => {

@@ -587,6 +587,10 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .tpl-panel-green { background: var(--tpl-green); }
 .tpl-panel-cream { background: var(--tpl-cream); }
 .tpl-panel-black { background: #000; }
+.tpl-panel-sky { background: var(--tpl-sky); }
+.tpl-leak ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 28px; font: 400 48px/1.17 "Geist", "Noto Sans Devanagari"; }
+.tpl-leak li::marker { font-weight: 700; }
+.tpl-leak-missing { font: 400 32px/1.2 "Geist"; color: #666; }
 .tpl-rule { height: 0; border-top: 4px solid var(--tpl-green); }
 .tpl-step-n { font-size: 28px; }
 .tpl-step-t { font: 700 44px/1 "Geist", "Noto Sans Devanagari"; }
@@ -608,7 +612,7 @@ html.tour-rec::-webkit-scrollbar, html.tour-rec body::-webkit-scrollbar { displa
 .stage-setup { position: absolute; inset: auto 24px 24px auto; width: min(560px, calc(100vw - 48px)); max-height: calc(100vh - 48px); overflow: auto; overscroll-behavior: contain; background: #1f1d19; color: #f4efe6; border-radius: 16px; padding: 24px; z-index: 10; display: flex; flex-direction: column; gap: 14px; user-select: text; font-family: var(--font); }
 .stage-setup h2 { margin: 0; font: 600 24px var(--display); }
 .stage-setup label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
-.stage-setup input { font: inherit; padding: 10px 12px; border-radius: 10px; border: 0; background: #0f0e0c; color: #f4efe6; }
+.stage-setup input, .stage-setup textarea { font: inherit; padding: 10px 12px; border-radius: 10px; border: 0; background: #0f0e0c; color: #f4efe6; }
 .stage-setup button, .stage-setup-link { font: 600 15px var(--font); padding: 10px 16px; border-radius: 10px; border: 0; background: #f4efe6; color: #0f0e0c; cursor: pointer; }
 .stage-setup-actions { display: flex; gap: 10px; justify-content: space-between; }
 .stage-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
